@@ -1,0 +1,61 @@
+import { useSEO } from "@/hooks/useSEO";
+import { stories } from "@/data/stories";
+import { Link } from "react-router-dom";
+import FadeInUp from "@/components/ui/FadeInUp";
+import PageHero from "@/components/layout/PageHero";
+
+const colorMap: Record<string, string> = { teal: "from-teal to-teal-dark", purple: "from-purple to-purple/80", beige: "from-beige to-teal" };
+
+const Blog = () => {
+  useSEO("Blog", "AGSWS stories of impact — real stories from the field.");
+  const featured = stories[0];
+  const rest = stories.slice(1);
+
+  return (
+    <main id="main-content">
+      <PageHero title="Impact Stories" label="From The Field" breadcrumb={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
+
+      <section className="bg-card py-16">
+        <div className="max-w-[1100px] mx-auto px-6">
+          {/* Featured */}
+          <FadeInUp>
+            <Link to={`/blog/${featured.slug}`} className="group block mb-16">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-card border border-border rounded-xl overflow-hidden shadow-brand-md hover:shadow-brand-lg transition-shadow">
+                <div className={`h-[300px] lg:h-auto bg-gradient-to-br ${colorMap[featured.color] || colorMap.teal}`} />
+                <div className="p-8 flex flex-col justify-center">
+                  <span className="bg-yellow text-text-dark text-xs font-bold px-3 py-1 rounded-full self-start mb-4">{featured.category}</span>
+                  <p className="text-xs text-text-light mb-2">{featured.date} · {featured.readTime}</p>
+                  <h2 className="heading-3 text-text-dark mb-3 group-hover:text-teal transition-colors">{featured.title}</h2>
+                  <p className="body-text text-text-mid mb-4">{featured.excerpt}</p>
+                  <span className="text-teal font-semibold text-sm">Read Full Story →</span>
+                </div>
+              </div>
+            </Link>
+          </FadeInUp>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {rest.map((story, i) => (
+              <FadeInUp key={story.slug} delay={i * 0.1}>
+                <Link to={`/blog/${story.slug}`} className="group block">
+                  <div className="bg-card border border-border rounded-xl overflow-hidden shadow-brand-sm hover:shadow-brand-md hover:-translate-y-1 transition-all duration-300">
+                    <div className={`h-[200px] bg-gradient-to-br ${colorMap[story.color] || colorMap.teal} relative`}>
+                      <span className="absolute top-4 left-4 bg-yellow text-text-dark text-xs font-bold px-3 py-1 rounded-full">{story.category}</span>
+                    </div>
+                    <div className="p-6">
+                      <p className="text-xs text-text-light mb-2">{story.date}</p>
+                      <h4 className="heading-4 text-text-dark mb-2 line-clamp-2 group-hover:text-teal transition-colors">{story.title}</h4>
+                      <p className="body-small text-text-mid line-clamp-3">{story.excerpt}</p>
+                      <span className="inline-block mt-4 text-teal font-semibold text-sm">Read Story →</span>
+                    </div>
+                  </div>
+                </Link>
+              </FadeInUp>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+};
+
+export default Blog;

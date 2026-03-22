@@ -1,0 +1,10 @@
+export const resources = [
+  { title: "Annual Report 2024", type: "PDF", year: "2024", description: "Comprehensive overview of AGSWS activities, financials, and impact metrics for the fiscal year 2024.", fileSize: "2.4 MB", category: "Annual Reports", color: "teal" },
+  { title: "Financial Statement Q3 2024", type: "PDF", year: "2024", description: "Quarterly financial breakdown showing fund allocation across medical, education, and operations.", fileSize: "1.1 MB", category: "Financial Reports", color: "teal" },
+  { title: "Emergency Care Protocol Guide", type: "PDF", year: "2024", description: "Standard operating procedures for emergency medical response under the Parent Registration program.", fileSize: "890 KB", category: "Medical Articles", color: "purple" },
+  { title: "Education Impact Assessment", type: "DOC", year: "2023", description: "Third-party assessment of AGSWS education programs measuring learning outcomes and attendance rates.", fileSize: "3.2 MB", category: "Education Updates", color: "yellow" },
+  { title: "Annual Report 2023", type: "PDF", year: "2023", description: "Full annual report covering all initiatives, donor statistics, and organizational growth in 2023.", fileSize: "2.8 MB", category: "Annual Reports", color: "teal" },
+  { title: "Healthcare Access in Urban Kolkata", type: "PDF", year: "2023", description: "Research paper on healthcare accessibility challenges for elderly populations in Kolkata's urban areas.", fileSize: "1.5 MB", category: "Research", color: "beige" },
+  { title: "Volunteer Training Manual", type: "PDF", year: "2024", description: "Comprehensive training guide for medical and education volunteers joining AGSWS programs.", fileSize: "4.1 MB", category: "Education Updates", color: "yellow" },
+  { title: "80G Compliance Report", type: "PDF", year: "2024", description: "Official documentation of AGSWS 80G certification, compliance status, and tax benefit eligibility.", fileSize: "560 KB", category: "Financial Reports", color: "teal" },
+];

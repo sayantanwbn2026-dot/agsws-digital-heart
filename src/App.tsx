@@ -1,0 +1,141 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { DonateOverlayProvider } from "@/contexts/DonateOverlayContext";
+import { useLenis } from "@/hooks/useLenis";
+import LiveTicker from "./components/layout/LiveTicker";
+import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
+import StickyDonationRibbon from "./components/layout/StickyDonationRibbon";
+import MobileBottomNav from "./components/layout/MobileBottomNav";
+import LoadingScreen from "./components/layout/LoadingScreen";
+import BackToTop from "./components/ui/BackToTop";
+import CookieConsent from "./components/ui/CookieConsent";
+import DonateChoiceOverlay from "./components/ui/DonateChoiceOverlay";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Initiatives from "./pages/Initiatives";
+import MedicalAid from "./pages/MedicalAid";
+import EducationSupport from "./pages/EducationSupport";
+import DonateMedical from "./pages/DonateMedical";
+import DonateEducation from "./pages/DonateEducation";
+import RegisterParent from "./pages/RegisterParent";
+import TrackRegistration from "./pages/TrackRegistration";
+import TrackDonation from "./pages/TrackDonation";
+import DonorWall from "./pages/DonorWall";
+import CSRPartnership from "./pages/CSRPartnership";
+import VolunteerPortal from "./pages/VolunteerPortal";
+import ApplyForSupport from "./pages/ApplyForSupport";
+import Resources from "./pages/Resources";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import Contact from "./pages/Contact";
+import ThankYou from "./pages/ThankYou";
+import FAQ from "./pages/FAQ";
+import Events from "./pages/Events";
+import Gallery from "./pages/Gallery";
+import ImpactReport from "./pages/ImpactReport";
+import Updates from "./pages/Updates";
+import SearchPage from "./pages/Search";
+import TransparencyPage from "./pages/TransparencyPage";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import NotFound from "./pages/NotFound";
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = localStorage.getItem("agsws_admin") === "true";
+  if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
+  return <>{children}</>;
+};
+
+const queryClient = new QueryClient();
+
+const AppInner = () => {
+  useLenis();
+
+  return (
+    <>
+      <LoadingScreen />
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          style: {
+            background: "hsl(0 0% 10%)",
+            color: "#FFFFFF",
+            borderRadius: "10px",
+            fontSize: "13px",
+            fontFamily: "Inter, sans-serif",
+            padding: "12px 16px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+            maxWidth: "360px",
+          },
+          success: {
+            iconTheme: { primary: "hsl(187 70% 39%)", secondary: "#FFFFFF" },
+            duration: 3000,
+          },
+          error: {
+            iconTheme: { primary: "#DC2626", secondary: "#FFFFFF" },
+            duration: 4000,
+          },
+        }}
+      />
+      <BrowserRouter>
+        <DonateChoiceOverlay />
+        <LiveTicker />
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/initiatives" element={<Initiatives />} />
+          <Route path="/initiatives/medical" element={<MedicalAid />} />
+          <Route path="/initiatives/education" element={<EducationSupport />} />
+          <Route path="/donate/medical" element={<DonateMedical />} />
+          <Route path="/donate/education" element={<DonateEducation />} />
+          <Route path="/register-parent" element={<RegisterParent />} />
+          <Route path="/track" element={<TrackRegistration />} />
+          <Route path="/track-donation" element={<TrackDonation />} />
+          <Route path="/donor-wall" element={<DonorWall />} />
+          <Route path="/csr" element={<CSRPartnership />} />
+          <Route path="/volunteer-portal" element={<VolunteerPortal />} />
+          <Route path="/apply" element={<ApplyForSupport />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/impact" element={<ImpactReport />} />
+          <Route path="/updates" element={<Updates />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/transparency" element={<TransparencyPage />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Footer />
+        <StickyDonationRibbon />
+        <BackToTop />
+        <MobileBottomNav />
+        <CookieConsent />
+      </BrowserRouter>
+    </>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <LanguageProvider>
+        <DonateOverlayProvider>
+          <AppInner />
+        </DonateOverlayProvider>
+      </LanguageProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
