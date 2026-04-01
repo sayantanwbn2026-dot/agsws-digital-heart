@@ -3,21 +3,13 @@ import { useSEO } from "@/hooks/useSEO";
 import { stories } from "@/data/stories";
 import { useEffect, useState } from "react";
 import { Twitter, MessageCircle, Linkedin, Copy } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const BlogPost = () => {
   const { slug } = useParams();
   const story = stories.find((s) => s.slug === slug);
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const { scrollYProgress } = useScroll();
+  const scaleX = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   useSEO(story?.title || "Story", story?.excerpt || "");
 
@@ -28,8 +20,8 @@ const BlogPost = () => {
   return (
     <main id="main-content">
       {/* Reading progress */}
-      <div className="fixed top-0 left-0 right-0 h-[2px] bg-teal/20 z-[60]">
-        <div className="h-full bg-teal transition-all duration-100" style={{ width: `${progress}%` }} />
+      <div className="fixed top-0 left-0 right-0 h-[2px] bg-[var(--teal-light)] z-[9999]">
+        <motion.div className="h-full bg-[var(--teal)] origin-left" style={{ width: scaleX }} />
       </div>
 
       <section className="bg-card pt-32 pb-16">
@@ -44,24 +36,31 @@ const BlogPost = () => {
             <span>{story.readTime}</span>
           </div>
 
-          <div className="prose max-w-none">
-            <p className="drop-cap body-lg text-text-dark leading-[1.85]">{story.body}</p>
-            <p className="body-lg text-text-dark leading-[1.85] mt-6">
+          <div className="prose max-w-none text-[17px] leading-[1.85]">
+            <p className="blog-drop-cap text-[var(--dark)] mb-[24px]">{story.body}</p>
+            <p className="text-[var(--dark)] mb-[24px]">
               This story represents one of the hundreds of lives AGSWS touches every year. Behind every statistic is a real person, a real family, and a real transformation made possible by the generosity of donors like you.
             </p>
-            <blockquote className="border-l-4 border-teal pl-6 my-8 italic text-2xl font-light text-text-mid leading-relaxed">
+            <h2 className="font-['Inter'] font-[700] text-[22px] text-[var(--dark)] mt-[40px] mb-[16px]">Impact In Numbers</h2>
+            <p className="text-[var(--dark)] mb-[24px]">
+              Supporting local ecosystems with healthcare interventions. We constantly track these markers.
+            </p>
+            <h3 className="font-['Inter'] font-[600] text-[18px] mt-[28px] mb-[12px] text-[var(--dark)]">Community Reception</h3>
+            <blockquote className="border-l-[4px] border-[var(--teal)] pl-[24px] text-[20px] font-[300] italic text-[var(--mid)] my-[32px]">
               "Every donation, no matter how small, creates ripples that change lives across Kolkata."
             </blockquote>
-            <p className="body-lg text-text-dark leading-[1.85]">
+            <p className="text-[var(--dark)]">
               If you'd like to support families like this one, consider making a donation today. Every rupee goes directly to those who need it most.
             </p>
           </div>
 
           {/* Donate CTA */}
-          <Link to="/donate/medical" className="block mt-12 bg-yellow rounded-xl p-8 text-center shadow-yellow">
-            <p className="font-bold text-lg text-text-dark mb-2">Support stories like this one</p>
-            <span className="font-semibold text-text-dark">Donate to this cause →</span>
-          </Link>
+          <div className="bg-[var(--yellow)] rounded-[var(--radius-xl)] p-[32px] mt-[56px] text-center shadow-[var(--shadow-yellow)]">
+            <h3 className="font-['Inter'] font-[700] text-[22px] text-[var(--dark)] mb-[8px]">Support stories like this one</h3>
+            <Link to="/donate/medical" className="inline-block bg-[var(--teal)] text-white px-[28px] py-[12px] rounded-full mt-[24px] font-[600] hover:scale-[1.03] transition-transform">
+              Donate to this cause →
+            </Link>
+          </div>
 
           {/* Share */}
           <div className="flex items-center gap-3 mt-12">

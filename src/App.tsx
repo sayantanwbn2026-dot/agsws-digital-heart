@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -12,6 +12,7 @@ import StickyDonationRibbon from "./components/layout/StickyDonationRibbon";
 import MobileBottomNav from "./components/layout/MobileBottomNav";
 import LoadingScreen from "./components/layout/LoadingScreen";
 import BackToTop from "./components/ui/BackToTop";
+import { AnimatePresence, motion } from "framer-motion";
 import CookieConsent from "./components/ui/CookieConsent";
 import DonateChoiceOverlay from "./components/ui/DonateChoiceOverlay";
 import Home from "./pages/Home";
@@ -52,45 +53,25 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const queryClient = new QueryClient();
 
-const AppInner = () => {
-  useLenis();
-
+const AnimatedRoutes = () => {
+  const location = useLocation();
   return (
-    <>
-      <LoadingScreen />
-      <Toaster
-        position="bottom-center"
-        toastOptions={{
-          style: {
-            background: "hsl(0 0% 10%)",
-            color: "#FFFFFF",
-            borderRadius: "10px",
-            fontSize: "13px",
-            fontFamily: "Inter, sans-serif",
-            padding: "12px 16px",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-            maxWidth: "360px",
-          },
-          success: {
-            iconTheme: { primary: "hsl(187 70% 39%)", secondary: "#FFFFFF" },
-            duration: 3000,
-          },
-          error: {
-            iconTheme: { primary: "#DC2626", secondary: "#FFFFFF" },
-            duration: 4000,
-          },
-        }}
-      />
-      <BrowserRouter>
-        <DonateChoiceOverlay />
-        <LiveTicker />
-        <Navbar />
-        <Routes>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="will-change-transform"
+      >
+        <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/initiatives" element={<Initiatives />} />
           <Route path="/initiatives/medical" element={<MedicalAid />} />
           <Route path="/initiatives/education" element={<EducationSupport />} />
+          <Route path="/donate" element={<Navigate to="/donate/medical" replace />} />
           <Route path="/donate/medical" element={<DonateMedical />} />
           <Route path="/donate/education" element={<DonateEducation />} />
           <Route path="/register-parent" element={<RegisterParent />} />
@@ -116,6 +97,45 @@ const AppInner = () => {
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+const AppInner = () => {
+  useLenis();
+
+  return (
+    <>
+      <LoadingScreen />
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          style: {
+            background: '#1A1D2E',
+            color: '#FFFFFF',
+            borderRadius: '10px',
+            fontSize: '13px',
+            fontFamily: 'Inter, sans-serif',
+            padding: '12px 18px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+            maxWidth: '360px',
+          },
+          success: {
+            iconTheme: { primary: '#1F9AA8', secondary: '#FFFFFF' },
+            duration: 3000,
+          },
+          error: {
+            iconTheme: { primary: '#DC2626', secondary: '#FFFFFF' },
+            duration: 4000,
+          },
+        }}
+      />
+      <BrowserRouter>
+        <DonateChoiceOverlay />
+        <LiveTicker />
+        <Navbar />
+        <AnimatedRoutes />
         <Footer />
         <StickyDonationRibbon />
         <BackToTop />

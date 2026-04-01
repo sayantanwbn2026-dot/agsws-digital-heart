@@ -3,8 +3,14 @@ import { stories } from "@/data/stories";
 import { Link } from "react-router-dom";
 import FadeInUp from "@/components/ui/FadeInUp";
 import PageHero from "@/components/layout/PageHero";
+import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 
-const colorMap: Record<string, string> = { teal: "from-teal to-teal-dark", purple: "from-purple to-purple/80", beige: "from-beige to-teal" };
+type ImgCategory = "medical" | "education" | "elderly" | "community" | "child" | "hospital" | "classroom";
+const categoryMap: Record<string, ImgCategory> = {
+  Medical: "medical", Education: "education", Community: "community",
+  Report: "hospital", Elderly: "elderly",
+};
+const getCategory = (c: string): ImgCategory => categoryMap[c] ?? "community";
 
 const Blog = () => {
   useSEO("Blog", "AGSWS stories of impact — real stories from the field.");
@@ -16,12 +22,12 @@ const Blog = () => {
       <PageHero title="Impact Stories" label="From The Field" breadcrumb={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
 
       <section className="bg-card py-16">
-        <div className="max-w-[1100px] mx-auto px-6">
+        <div className="max-w-[1200px] mx-auto px-6">
           {/* Featured */}
           <FadeInUp>
             <Link to={`/blog/${featured.slug}`} className="group block mb-16">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-card border border-border rounded-xl overflow-hidden shadow-brand-md hover:shadow-brand-lg transition-shadow">
-                <div className={`h-[300px] lg:h-auto bg-gradient-to-br ${colorMap[featured.color] || colorMap.teal}`} />
+              <div className="global-card grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-8 hover:">
+                <ImagePlaceholder category={getCategory(featured.category)} className="h-[300px] lg:h-auto min-h-[260px] rounded-l-[var(--radius-lg)]" />
                 <div className="p-8 flex flex-col justify-center">
                   <span className="bg-yellow text-text-dark text-xs font-bold px-3 py-1 rounded-full self-start mb-4">{featured.category}</span>
                   <p className="text-xs text-text-light mb-2">{featured.date} · {featured.readTime}</p>
@@ -37,9 +43,10 @@ const Blog = () => {
             {rest.map((story, i) => (
               <FadeInUp key={story.slug} delay={i * 0.1}>
                 <Link to={`/blog/${story.slug}`} className="group block">
-                  <div className="bg-card border border-border rounded-xl overflow-hidden shadow-brand-sm hover:shadow-brand-md hover:-translate-y-1 transition-all duration-300">
-                    <div className={`h-[200px] bg-gradient-to-br ${colorMap[story.color] || colorMap.teal} relative`}>
-                      <span className="absolute top-4 left-4 bg-yellow text-text-dark text-xs font-bold px-3 py-1 rounded-full">{story.category}</span>
+                  <div className="global-card hover: overflow-hidden">
+                    <div className="relative h-[200px]">
+                      <ImagePlaceholder category={getCategory(story.category)} className="w-full h-full" />
+                      <span className="absolute top-4 left-4 bg-yellow text-text-dark text-xs font-bold px-3 py-1 rounded-full z-10">{story.category}</span>
                     </div>
                     <div className="p-6">
                       <p className="text-xs text-text-light mb-2">{story.date}</p>
@@ -59,3 +66,4 @@ const Blog = () => {
 };
 
 export default Blog;
+

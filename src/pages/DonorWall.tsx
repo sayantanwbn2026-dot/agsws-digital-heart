@@ -1,22 +1,8 @@
 import { useSEO } from "@/hooks/useSEO";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import FadeInUp from "@/components/ui/FadeInUp";
-
-const donors = [
-  { name: "Rahul", city: "Mumbai", gateway: "Medical Aid", amount: 10000, time: "2 weeks ago" },
-  { name: "Priya", city: "Delhi", gateway: "Education", amount: 5000, time: "3 weeks ago" },
-  { name: "Amit", city: "Bengaluru", gateway: "Medical Aid", amount: 1000, time: "1 month ago" },
-  { name: "Sneha", city: "Chennai", gateway: "Education", amount: 12000, time: "1 month ago" },
-  { name: "Vikram", city: "Pune", gateway: "Medical Aid", amount: 500, time: "2 months ago" },
-  { name: "Ananya", city: "Kolkata", gateway: "Registration", amount: 100, time: "2 months ago" },
-  { name: "Ravi", city: "Hyderabad", gateway: "Medical Aid", amount: 5000, time: "3 months ago" },
-  { name: "Meera", city: "London", gateway: "Education", amount: 25000, time: "3 months ago" },
-  { name: "Sanjay", city: "Singapore", gateway: "Registration", amount: 100, time: "4 months ago" },
-  { name: "Kavita", city: "Dubai", gateway: "Medical Aid", amount: 10000, time: "4 months ago" },
-  { name: "Arjun", city: "Mumbai", gateway: "Education", amount: 3000, time: "5 months ago" },
-  { name: "Deepa", city: "Kolkata", gateway: "Medical Aid", amount: 2000, time: "6 months ago" },
-];
+import { supabase } from "@/lib/supabase/client";
 
 function getTier(amount: number) {
   if (amount >= 10000) return { label: "Champion", cls: "bg-purple-light text-purple" };
@@ -26,8 +12,8 @@ function getTier(amount: number) {
 }
 
 function getColor(gateway: string) {
-  if (gateway === "Education") return "bg-purple";
-  if (gateway === "Registration") return "bg-beige";
+  if (gateway === "Education" || gateway === "education") return "bg-purple";
+  if (gateway === "Registration" || gateway === "registration") return "bg-beige";
   return "bg-teal";
 }
 
@@ -35,8 +21,51 @@ const filters = ["All", "Medical Aid", "Education", "Registration"];
 
 const DonorWall = () => {
   useSEO("Donor Wall", "Our wall of donors — every name represents a real act of kindness.");
-  const [filter, setFilter] = useState("All");
-  const filtered = filter === "All" ? donors : donors.filter(d => d.gateway === filter);
+  const [entries, setEntries] = useState<any[]>([]);
+  const [gateway, setGateway] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadWall = async (gw: string | null = null) => {
+    setLoading(true);
+    const url = gw ? `/api/donor-wall?gateway=${encodeURIComponent(gw)}&limit=50` : "/api/donor-wall?limit=50";
+    try {
+      const data = await fetch(url).then(r => r.json());
+      if (Array.isArray(data)) setEntries(data);
+    } catch { /* keep existing entries */ }
+    setLoading(false);
+  };
+
+  useEffect(() => { loadWall(); }, []);
+
+  // Realtime: new medical donors appear instantly
+  useEffect(() => {
+    const channel = supabase
+      .channel("donor-wall-live")
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "medical_donations",
+        filter: "show_on_wall=eq.true",
+      }, payload => {
+        if (payload.new.status !== "captured") return;
+        setEntries(prev => [{
+          donor_first_name: (payload.new.donor_name ?? "").split(" ")[0],
+          city: "India",
+          gateway: "medical",
+          amount: payload.new.amount,
+          amount_tier: payload.new.amount >= 10000 ? "champion"
+            : payload.new.amount >= 5000 ? "gold"
+            : payload.new.amount >= 1000 ? "silver" : "supporter",
+          created_at: payload.new.created_at,
+        }, ...prev]);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const filtered = gateway
+    ? entries.filter(d => (d.gateway ?? "").toLowerCase().includes(gateway.toLowerCase().split(" ")[0]))
+    : entries;
 
   return (
     <main id="main-content">
@@ -49,7 +78,7 @@ const DonorWall = () => {
       </section>
 
       <section className="bg-background py-12">
-        <div className="max-w-[1100px] mx-auto px-6">
+        <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex items-center gap-6 mb-8 flex-wrap">
             <div className="flex gap-3 flex-wrap">
               {[
@@ -57,7 +86,7 @@ const DonorWall = () => {
                 { label: "This Month", value: "124" },
                 { label: "Cities", value: "42" },
               ].map(s => (
-                <div key={s.label} className="bg-card border border-border rounded-xl px-5 py-3 shadow-brand-sm">
+                <div key={s.label} className="global-card">
                   <p className="text-xl font-bold text-teal">{s.value}</p>
                   <p className="text-xs text-text-light">{s.label}</p>
                 </div>
@@ -67,18 +96,18 @@ const DonorWall = () => {
 
           <div className="flex gap-2 mb-8 flex-wrap">
             {filters.map(f => (
-              <button key={f} onClick={() => setFilter(f)} className={`px-5 py-2 rounded-full text-sm font-medium border transition-all ${filter === f ? "bg-teal text-primary-foreground border-teal" : "bg-card text-text-mid border-border hover:border-teal"}`}>
+              <button key={f} onClick={() => { const gw = f === "All" ? null : f; setGateway(gw); loadWall(gw); }} className={`px-5 py-2 rounded-full text-sm font-medium border transition-all ${(gateway === null && f === "All") || gateway === f ? "bg-teal text-primary-foreground border-teal" : "bg-card text-text-mid border-border hover:border-teal"}`}>
                 {f}
               </button>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-3 md:gap-4 lg:gap-6">
             {filtered.map((d, i) => {
               const tier = getTier(d.amount);
               const avatarColor = getColor(d.gateway);
               return (
-                <motion.div key={`${d.name}-${d.city}-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="bg-card border border-border rounded-xl p-5 shadow-brand-sm relative hover:-translate-y-1 hover:shadow-brand-lg transition-all duration-300">
+                <motion.div key={`${d.name}-${d.city}-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="global-card relative hover:">
                   <span className={`absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full ${tier.cls}`}>{tier.label}</span>
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-primary-foreground font-bold text-sm`}>

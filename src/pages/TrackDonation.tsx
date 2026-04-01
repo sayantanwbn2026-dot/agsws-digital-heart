@@ -2,28 +2,7 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, CheckCircle, AlertCircle } from "lucide-react";
-
-const mockJourneys: Record<string, any> = {
-  "pay_ABC123XYZ": {
-    amount: 5000, gateway: "Medical Aid", createdAt: "2025-02-10",
-    stages: [
-      { label: "Donation Received", completed: true, date: "10 Feb 2025", note: "Payment verified via Razorpay." },
-      { label: "Funds Allocated", completed: true, date: "14 Feb 2025", note: "Allocated to North Kolkata Medical Camp." },
-      { label: "Programme Deployed", completed: true, date: "28 Feb 2025", note: "Medicines purchased and distributed." },
-      { label: "Impact Confirmed", completed: false, date: null, note: "" },
-    ],
-  },
-  "pay_DEF456UVW": {
-    amount: 12000, gateway: "Education", createdAt: "2024-11-05",
-    stages: [
-      { label: "Donation Received", completed: true, date: "5 Nov 2024", note: "Payment confirmed." },
-      { label: "Funds Allocated", completed: true, date: "8 Nov 2024", note: "Allocated to Shyambazar School." },
-      { label: "Programme Deployed", completed: true, date: "15 Nov 2024", note: "Child enrolled and fees paid." },
-      { label: "Impact Confirmed", completed: true, date: "15 Mar 2025", note: "Child completed full academic year. Rank: 5th in class." },
-    ],
-  },
-};
+import { Search, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 const TrackDonation = () => {
   useSEO("Track Donation", "Track where your AGSWS donation goes.");
@@ -31,13 +10,34 @@ const TrackDonation = () => {
   const [paymentId, setPaymentId] = useState(params.get("payment_id") || "");
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
+    if (!paymentId.trim()) return;
+    setLoading(true);
+    setError(false);
+    setResult(null);
     setSearched(true);
-    const data = mockJourneys[paymentId.trim()];
-    if (data) { setResult(data); setError(false); }
-    else { setResult(null); setError(true); }
+    try {
+      const res = await fetch(`/api/track/donation?payment_id=${encodeURIComponent(paymentId.trim())}`);
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError(true);
+      } else {
+        const stages = data.journey_stages ?? data.stages ?? [];
+        setResult({ ...data, stages });
+        // Fire confetti if all stages complete
+        if (stages.length > 0 && stages.every((s: any) => s.completed)) {
+          import("canvas-confetti").then(({ default: confetti }) => {
+            confetti({ particleCount: 80, spread: 60, colors: ["#1F9AA8", "#F2B705"] });
+          });
+        }
+      }
+    } catch {
+      setError(true);
+    }
+    setLoading(false);
   };
 
   const completedCount = result?.stages.filter((s: any) => s.completed).length || 0;
@@ -56,7 +56,7 @@ const TrackDonation = () => {
       <section className="bg-background py-16">
         <div className="max-w-[480px] mx-auto px-6">
           <div className="flex gap-2">
-            <input value={paymentId} onChange={(e) => setPaymentId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. pay_ABC123XYZ" className="flex-1 h-[52px] px-4 border border-border rounded-lg text-base font-medium bg-card focus:border-teal focus:ring-2 focus:ring-teal/15 outline-none" />
+            <input value={paymentId} onChange={(e) => setPaymentId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. pay_XXXXXXXXXX" className="global-card flex-1 h-[52px] px-4 text-base font-medium focus:ring-2 focus:ring-teal/15 outline-none" />
             <button onClick={handleSearch} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2">
               <Search size={18} /> Track
             </button>
@@ -76,7 +76,7 @@ const TrackDonation = () => {
 
           {result && (
             <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-[560px] mx-auto mt-8 px-6">
-              <div className="bg-card border border-border rounded-xl shadow-brand-lg p-8">
+              <div className="global-card">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p className="text-3xl font-bold text-teal">₹{result.amount.toLocaleString()}</p>

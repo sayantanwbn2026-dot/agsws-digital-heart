@@ -1,9 +1,9 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Heart, BookOpen, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import FadeInUp from "../ui/FadeInUp";
+import { SectionHeader } from "../ui/SectionHeader";
+import { StaggerContainer } from "../ui/StaggerContainer";
 import ImagePlaceholder from "../ui/ImagePlaceholder";
-import { useRef } from "react";
 
 const cards = [
   {
@@ -13,14 +13,14 @@ const cards = [
     link: "/initiatives/medical",
     linkText: "Explore →",
     chip: "₹500 onwards",
-    chipBg: "bg-teal-light text-teal",
-    topBg: "bg-teal",
-    hoverBorder: "group-hover:border-t-teal",
+    chipBg: "bg-[var(--teal-light)] text-[var(--teal)]",
+    topBg: "bg-[var(--teal)]",
+    hoverBorder: "group-hover:border-t-[var(--teal)]",
     imgCategory: "hospital" as const,
     svgElement: (
-      <svg className="absolute inset-0 w-full h-full opacity-[0.15]" viewBox="0 0 180 180">
-        <line x1="90" y1="40" x2="90" y2="140" stroke="white" strokeWidth="12" strokeLinecap="round" />
-        <line x1="40" y1="90" x2="140" y2="90" stroke="white" strokeWidth="12" strokeLinecap="round" />
+      <svg className="absolute inset-0 w-full h-full opacity-[0.12] -rotate-6 scale-110" viewBox="0 0 180 180">
+        <line x1="90" y1="20" x2="90" y2="160" stroke="white" strokeWidth="14" strokeLinecap="round" />
+        <line x1="20" y1="90" x2="160" y2="90" stroke="white" strokeWidth="14" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -31,91 +31,71 @@ const cards = [
     link: "/initiatives/education",
     linkText: "Sponsor a Child →",
     chip: "From ₹1,500",
-    chipBg: "bg-purple-light text-purple",
-    topBg: "bg-purple",
-    hoverBorder: "group-hover:border-t-purple",
+    chipBg: "bg-[var(--purple-light)] text-[var(--purple)]",
+    topBg: "bg-[var(--purple)]",
+    hoverBorder: "group-hover:border-t-[var(--purple)]",
     imgCategory: "classroom" as const,
     featured: true,
   },
   {
     icon: Users,
-    title: "Parent Medical Support Registration",
+    title: "Parent Medical Support",
     desc: "Register your elderly parents in Kolkata for emergency medical response. We become their local emergency contact.",
     link: "/register-parent",
     linkText: "Register Now →",
     chip: "₹100 Platform Fee",
-    chipBg: "bg-yellow-light text-text-dark",
-    topBg: "bg-gradient-to-r from-beige to-teal",
-    hoverBorder: "group-hover:border-t-yellow",
+    chipBg: "bg-[var(--yellow-light)] text-[var(--dark)]",
+    topBg: "bg-gradient-to-r from-[var(--beige)] to-[var(--teal)]",
+    hoverBorder: "group-hover:border-t-[var(--yellow)]",
     imgCategory: "elderly" as const,
   },
 ];
 
-const parallaxStarts = [40, 60, 40];
-const parallaxEnds = [-20, -30, -20];
-
 const InitiativeCards = () => {
-  const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
-
   return (
-    <section ref={sectionRef} className="bg-teal-light/50 py-24 relative overflow-hidden">
-      <div className="max-w-[1100px] mx-auto px-6">
-        <FadeInUp className="text-center max-w-[640px] mx-auto mb-16">
-          <motion.span
-            className="label-text text-teal block"
-            initial={{ clipPath: "inset(0 100% 0 0)" }}
-            whileInView={{ clipPath: "inset(0 0% 0 0)" }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            What We Do
-          </motion.span>
-          <h2 className="heading-2 text-text-dark mt-3 before:hidden text-center">Three Ways We Create Impact</h2>
-          <p className="body-text text-text-mid mt-4">
-            Every initiative is designed for direct, measurable impact on real lives in Kolkata.
-          </p>
-        </FadeInUp>
+    <section className="bg-[var(--bg)] section">
+      <div className="container">
+        <SectionHeader 
+          label="What We Do" 
+          title="Three Ways We Create Impact" 
+          subtitle="Every initiative is designed for direct, measurable impact on real lives in Kolkata."
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {cards.map((card, i) => {
-            const y = useTransform(scrollYProgress, [0, 1], [parallaxStarts[i], parallaxEnds[i]]);
-            return (
-              <motion.div key={card.title} style={{ y }} className="will-change-transform">
-                <FadeInUp delay={i * 0.15}>
-                  <motion.div
-                    className={`group relative bg-card rounded-xl border border-border shadow-brand-md overflow-hidden transition-all duration-300 border-t-2 border-t-transparent ${card.hoverBorder}`}
-                    whileHover={{ y: -6 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  >
-                    {card.featured && (
-                      <div className="absolute top-4 right-4 z-10 bg-yellow text-text-dark text-xs font-bold px-3 py-1 rounded-full -rotate-2">
-                        Most Supported
-                      </div>
-                    )}
-                    <div className={`relative h-[180px] ${card.topBg} flex items-center justify-center overflow-hidden`}>
-                      <ImagePlaceholder category={card.imgCategory} className="absolute inset-0 w-full h-full opacity-40" />
-                      {card.svgElement}
-                      <card.icon size={40} className="text-primary-foreground relative z-10" />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="heading-4 text-text-dark mb-3">{card.title}</h3>
-                      <p className="body-small text-text-mid mb-4">{card.desc}</p>
-                      <Link to={card.link} className="text-teal font-semibold text-sm hover:underline">
-                        {card.linkText}
-                      </Link>
-                      <div className="mt-4">
-                        <span className={`inline-block text-xs font-semibold px-3 py-1.5 rounded-full ${card.chipBg}`}>
-                          {card.chip}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                </FadeInUp>
+        <StaggerContainer staggerDelay={0.08} className="grid grid-cols-1 lg:grid-cols-3 gap-[24px]">
+          {cards.map((card, i) => (
+            <div key={card.title} className="will-change-transform h-full">
+              <motion.div
+                className={`group relative bg-white rounded-[var(--radius-2xl)] overflow-hidden border border-[var(--border-color)] shadow-[var(--shadow-card)] transition-colors flex flex-col h-full border-t-[3px] border-t-transparent ${card.hoverBorder}`}
+                initial={card.featured ? { scale: 1.02 } : { scale: 1 }}
+                whileHover={{ y: -8, scale: card.featured ? 1.04 : 1.02, boxShadow: "var(--shadow-lg)" }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              >
+                {card.featured && (
+                  <div className="absolute top-4 right-4 z-10 bg-[var(--yellow)] text-[var(--dark)] text-[12px] font-bold px-3 py-1 rounded-[var(--radius-full)] -rotate-2">
+                    Most Supported
+                  </div>
+                )}
+                <div className={`relative h-[140px] lg:h-[180px] w-full ${card.topBg} flex items-center justify-center overflow-hidden flex-shrink-0`}>
+                  <ImagePlaceholder category={card.imgCategory} className="absolute inset-0 w-full h-full opacity-[0.35] object-cover mix-blend-overlay" />
+                  {card.svgElement}
+                  <card.icon size={44} className="text-white relative z-10" />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-[var(--dark)] mb-3">{card.title}</h3>
+                  <p className="text-[14px] text-[var(--mid)] mb-5 flex-1 leading-[1.6]">{card.desc}</p>
+                  <div className="flex items-center justify-between mt-auto">
+                    <Link to={card.link} className="text-[var(--teal)] font-semibold text-[14px] hover:underline">
+                      {card.linkText}
+                    </Link>
+                    <span className={`inline-block text-[12px] font-semibold px-3 py-1.5 rounded-[var(--radius-full)] ${card.chipBg}`}>
+                      {card.chip}
+                    </span>
+                  </div>
+                </div>
               </motion.div>
-            );
-          })}
-        </div>
+            </div>
+          ))}
+        </StaggerContainer>
       </div>
     </section>
   );

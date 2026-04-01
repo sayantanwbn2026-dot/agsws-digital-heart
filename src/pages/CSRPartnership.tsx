@@ -65,7 +65,7 @@ const CSRPartnership = () => {
       </section>
 
       <section className="bg-background py-12">
-        <div className="max-w-[1100px] mx-auto px-6">
+        <div className="max-w-[1200px] mx-auto px-6">
           <FadeInUp>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
               {[
@@ -73,7 +73,7 @@ const CSRPartnership = () => {
                 { icon: BookOpen, title: "Education CSR", desc: "Schedule VII item (ii) — promoting education and livelihood" },
                 { icon: Users, title: "Elderly Care CSR", desc: "Schedule VII item (iii) — measures for elderly welfare" },
               ].map(c => (
-                <div key={c.title} className="bg-card border border-border rounded-xl p-6 shadow-brand-sm">
+                <div key={c.title} className="global-card">
                   <c.icon size={28} className="text-teal mb-3" />
                   <h4 className="font-semibold text-text-dark mb-2">{c.title}</h4>
                   <p className="text-sm text-text-mid">{c.desc}</p>
@@ -108,12 +108,12 @@ const CSRPartnership = () => {
                       ].map(f => (
                         <div key={f.name}>
                           <label className="text-sm font-medium text-text-dark mb-1 block">{f.label}</label>
-                          <input {...register(f.name)} type={f.type} className={`w-full h-12 px-4 border rounded-lg bg-card outline-none transition-all focus:border-teal focus:ring-2 focus:ring-teal/15 ${errors[f.name] ? "border-destructive" : "border-border"}`} />
+                          <input placeholder=" " {...register(f.name)} type={f.type} className={`w-full h-12 px-4 border rounded-lg bg-card outline-none transition-all focus:border-teal focus:ring-2 focus:ring-teal/15 ${errors[f.name] ? "border-destructive" : "border-border"}`} />
                         </div>
                       ))}
                       <div>
                         <label className="text-sm font-medium text-text-dark mb-1 block">Industry</label>
-                        <select {...register("industry")} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal">
+                        <select {...register("industry")} className="global-card w-full h-12 outline-none focus:">
                           <option value="">Select</option>
                           {["Technology", "Finance", "Manufacturing", "Healthcare", "FMCG", "Real Estate", "Other"].map(o => <option key={o} value={o}>{o}</option>)}
                         </select>
@@ -126,7 +126,7 @@ const CSRPartnership = () => {
                       <h3 className="heading-3 mb-4">CSR Budget & Focus</h3>
                       <div>
                         <label className="text-sm font-medium text-text-dark mb-1 block">Annual CSR Budget</label>
-                        <select {...register("budgetRange")} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal">
+                        <select {...register("budgetRange")} className="global-card w-full h-12 outline-none focus:">
                           <option value="">Select range</option>
                           {["Below ₹5 Lakh", "₹5L–₹25L", "₹25L–₹1 Cr", "Above ₹1 Cr"].map(o => <option key={o} value={o}>{o}</option>)}
                         </select>
@@ -140,14 +140,14 @@ const CSRPartnership = () => {
                           { name: "focusVolunteering" as const, label: "Employee Volunteering" },
                         ].map(c => (
                           <label key={c.name} className="flex items-center gap-3 py-2 cursor-pointer">
-                            <input {...register(c.name)} type="checkbox" className="w-4 h-4 accent-teal" />
+                            <input placeholder=" " {...register(c.name)} type="checkbox" className="w-4 h-4 accent-teal" />
                             <span className="text-sm text-text-mid">{c.label}</span>
                           </label>
                         ))}
                       </div>
                       <div>
                         <label className="text-sm font-medium text-text-dark mb-1 block">Timeline</label>
-                        <select {...register("timeline")} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal">
+                        <select {...register("timeline")} className="global-card w-full h-12 outline-none focus:">
                           <option value="">Select</option>
                           {["This Quarter", "This Financial Year", "Next Year", "Flexible"].map(o => <option key={o} value={o}>{o}</option>)}
                         </select>
@@ -161,7 +161,7 @@ const CSRPartnership = () => {
                   {step === 3 && (
                     <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                       <h3 className="heading-3 mb-4">Confirm & Submit</h3>
-                      <div className="bg-card border border-border rounded-xl p-6 space-y-3 text-sm">
+                      <div className="global-card space-y-3 text-sm">
                         {[
                           ["Company", data.companyName],
                           ["Contact", data.contactName],
@@ -176,7 +176,7 @@ const CSRPartnership = () => {
                         ))}
                       </div>
                       <label className="flex items-start gap-3 py-2 cursor-pointer">
-                        <input {...register("consent")} type="checkbox" className="w-4 h-4 accent-teal mt-0.5" />
+                        <input placeholder=" " {...register("consent")} type="checkbox" className="w-4 h-4 accent-teal mt-0.5" />
                         <span className="text-sm text-text-mid">I agree to be contacted by AGSWS regarding this enquiry</span>
                       </label>
                       <div className="flex gap-3 mt-4">
@@ -193,7 +193,7 @@ const CSRPartnership = () => {
 
             {/* Live proposal preview */}
             <div className="hidden lg:block">
-              <div className="sticky top-24 bg-card border border-border rounded-xl shadow-brand-lg overflow-hidden" style={{ aspectRatio: "3/4" }}>
+              <div className="global-card sticky top-24" style={{ aspectRatio: "3/4" }}>
                 <div className="bg-teal p-5">
                   <p className="text-xs font-bold text-primary-foreground/60 uppercase tracking-widest">AGSWS CSR Proposal</p>
                   <p className="text-primary-foreground font-bold mt-1">{data.companyName || "Your Company"}</p>

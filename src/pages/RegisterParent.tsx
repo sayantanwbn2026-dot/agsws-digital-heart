@@ -43,7 +43,7 @@ const RegisterParent = () => {
       </section>
 
       {/* Stepper */}
-      <div className="bg-card border-b border-border py-8">
+      <div className="global-card">
         <div className="max-w-[700px] mx-auto px-6">
           <div className="flex items-center justify-between">
             {steps.map((label, i) => (
@@ -84,12 +84,12 @@ const RegisterParent = () => {
                   {[["Your Name", "yourName"], ["Your City (outside Kolkata)", "yourCity"], ["Your Phone", "yourPhone"], ["Your Email", "yourEmail"]].map(([label, name]) => (
                     <div key={name}>
                       <label className="text-sm font-medium text-text-dark mb-1 block">{label}</label>
-                      <input {...register(name)} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal focus:ring-2 focus:ring-teal/15 transition-all" />
+                      <input placeholder=" " {...register(name)} className="global-card w-full h-12 outline-none focus: focus:ring-2 focus:ring-teal/15" />
                     </div>
                   ))}
                   <div>
                     <label className="text-sm font-medium text-text-dark mb-1 block">Relation to Parent</label>
-                    <select {...register("relation")} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal text-text-dark">
+                    <select {...register("relation")} className="global-card w-full h-12 outline-none focus: text-text-dark">
                       <option value="">Select</option>
                       <option>Son</option><option>Daughter</option><option>Relative</option><option>Other</option>
                     </select>
@@ -106,16 +106,16 @@ const RegisterParent = () => {
                   {[["Parent's Full Name", "parentName"], ["Age", "parentAge"], ["Emergency Contact in Kolkata (Name)", "emergencyName"], ["Emergency Contact Phone", "emergencyPhone"]].map(([label, name]) => (
                     <div key={name}>
                       <label className="text-sm font-medium text-text-dark mb-1 block">{label}</label>
-                      <input {...register(name)} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal focus:ring-2 focus:ring-teal/15 transition-all" />
+                      <input placeholder=" " {...register(name)} className="global-card w-full h-12 outline-none focus: focus:ring-2 focus:ring-teal/15" />
                     </div>
                   ))}
                   <div>
                     <label className="text-sm font-medium text-text-dark mb-1 block">Address in Kolkata</label>
-                    <textarea {...register("parentAddress")} rows={3} className="w-full px-4 py-3 border border-border rounded-lg bg-card outline-none focus:border-teal focus:ring-2 focus:ring-teal/15 transition-all" />
+                    <textarea placeholder=" " {...register("parentAddress")} rows={3} className="global-card w-full outline-none focus: focus:ring-2 focus:ring-teal/15" />
                   </div>
                   <div>
                     <label className="text-sm font-medium text-text-dark mb-1 block">Primary Medical Condition</label>
-                    <select {...register("medicalCondition")} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal text-text-dark">
+                    <select {...register("medicalCondition")} className="global-card w-full h-12 outline-none focus: text-text-dark">
                       <option value="">Select</option>
                       <option>Cardiac</option><option>Diabetes</option><option>Respiratory</option><option>Orthopedic</option><option>Other</option>
                     </select>
@@ -139,7 +139,7 @@ const RegisterParent = () => {
               {currentStep === 3 && (
                 <div className="space-y-6">
                   <h3 className="heading-3 text-text-dark mb-6">Confirm & Pay ₹100</h3>
-                  <div className="bg-card border border-border rounded-xl p-6 shadow-brand-md">
+                  <div className="global-card">
                     <h4 className="font-semibold text-text-dark mb-4">Registration Summary</h4>
                     <div className="space-y-3">
                       {[["Registrant", getValues("yourName") || "—"], ["Parent", getValues("parentName") || "—"], ["City", getValues("yourCity") || "—"], ["Condition", getValues("medicalCondition") || "—"]].map(([l, v]) => (
@@ -151,7 +151,7 @@ const RegisterParent = () => {
                     </div>
                   </div>
 
-                  <details className="bg-card border border-border rounded-lg">
+                  <details className="global-card">
                     <summary className="flex items-center justify-between p-4 cursor-pointer text-sm font-medium text-text-dark">
                       Why ₹100? <ChevronDown size={16} />
                     </summary>
@@ -172,7 +172,7 @@ const RegisterParent = () => {
 
           <div className="flex justify-between mt-8">
             {currentStep > 0 && (
-              <button onClick={prevStep} className="px-6 py-2.5 border border-border rounded-full text-sm font-medium text-text-mid hover:bg-card transition-colors">
+              <button onClick={prevStep} className="global-card .5 text-sm font-medium text-text-mid hover:">
                 ← Back
               </button>
             )}

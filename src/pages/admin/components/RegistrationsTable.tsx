@@ -1,15 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Download, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-
-const mockRegistrations = [
-  { regId: "REG-2025-0001", registrant: "Arjun Mehra", parent: "Kamala Mehra", city: "Bengaluru", date: "2025-03-01", status: "Active" },
-  { regId: "REG-2025-0002", registrant: "Priya Sinha", parent: "Ratan Sinha", city: "London", date: "2025-02-20", status: "Pending" },
-  { regId: "REG-2025-0003", registrant: "Rohit Das", parent: "Geeta Das", city: "Mumbai", date: "2025-02-15", status: "Active" },
-  { regId: "REG-2025-0004", registrant: "Sneha Roy", parent: "Harihar Roy", city: "Delhi", date: "2025-01-10", status: "Emergency" },
-];
+import { useAdminAPI } from "@/hooks/useAdminAPI";
 
 const statusColors: Record<string, string> = {
+  active: "bg-teal-light text-teal",
+  pending: "bg-yellow-light text-yellow",
+  closed: "bg-background text-text-light",
+  emergency: "bg-destructive/10 text-destructive",
   Active: "bg-teal-light text-teal",
   Pending: "bg-yellow-light text-yellow",
   Closed: "bg-background text-text-light",
@@ -17,16 +15,28 @@ const statusColors: Record<string, string> = {
 };
 
 const RegistrationsTable = () => {
+  const { adminFetch } = useAdminAPI();
+  const [registrations, setRegistrations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [drawerItem, setDrawerItem] = useState<typeof mockRegistrations[0] | null>(null);
+  const [drawerItem, setDrawerItem] = useState<any | null>(null);
 
-  const filtered = mockRegistrations.filter((r) =>
-    r.registrant.toLowerCase().includes(search.toLowerCase()) || r.regId.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    adminFetch("/api/admin/registrations", "GET")
+      .then(data => { if (Array.isArray(data)) setRegistrations(data); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = registrations.filter((r) => {
+    const name = r.registrant_name ?? r.registrant ?? "";
+    const id = r.registration_id ?? r.regId ?? "";
+    return name.toLowerCase().includes(search.toLowerCase()) || id.toLowerCase().includes(search.toLowerCase());
+  });
 
   return (
     <>
-      <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+      <div className="global-card">
         <div className="flex items-center justify-between p-5 border-b border-border">
           <h3 className="font-semibold text-text-dark">Parent Registrations</h3>
           <button className="border border-teal text-teal text-xs font-medium px-4 py-2 rounded-full hover:bg-teal-light transition-colors flex items-center gap-1.5">
@@ -36,7 +46,7 @@ const RegistrationsTable = () => {
         <div className="p-4 border-b border-border bg-background">
           <div className="relative max-w-xs">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or ID" className="w-full h-9 pl-9 pr-3 text-sm border border-border rounded-lg bg-card outline-none focus:border-teal" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or ID" className="global-card w-full h-9 pl-9 pr-3 text-sm outline-none" />
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -49,19 +59,27 @@ const RegistrationsTable = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((r, i) => (
-                <tr key={r.regId} className={`border-b border-border last:border-0 ${i % 2 ? "bg-background" : ""} hover:bg-teal-light/30 transition-colors`}>
-                  <td className="px-4 py-3 font-mono text-xs text-teal font-semibold">{r.regId}</td>
-                  <td className="px-4 py-3 font-medium text-text-dark">{r.registrant}</td>
-                  <td className="px-4 py-3 text-text-mid">{r.parent}</td>
-                  <td className="px-4 py-3 text-text-mid">{r.city}</td>
-                  <td className="px-4 py-3 text-text-light text-xs">{r.date}</td>
-                  <td className="px-4 py-3"><span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColors[r.status]}`}>{r.status}</span></td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => setDrawerItem(r)} className="text-xs border border-teal text-teal px-3 py-1 rounded-full hover:bg-teal-light transition-colors">View</button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((r, i) => {
+                const regId = r.registration_id ?? r.regId ?? "";
+                const registrant = r.registrant_name ?? r.registrant ?? "";
+                const parent = r.parent_name ?? r.parent ?? "";
+                const city = r.registrant_city ?? r.city ?? "";
+                const date = r.created_at ? new Date(r.created_at).toLocaleDateString("en-IN") : r.date ?? "";
+                const status = r.case_status ?? r.status ?? "pending";
+                return (
+                  <tr key={regId || i} className={`border-b border-border last:border-0 ${i % 2 ? "bg-background" : ""} hover:bg-teal-light/30 transition-colors`}>
+                    <td className="px-4 py-3 font-mono text-xs text-teal font-semibold">{regId}</td>
+                    <td className="px-4 py-3 font-medium text-text-dark">{registrant}</td>
+                    <td className="px-4 py-3 text-text-mid">{parent}</td>
+                    <td className="px-4 py-3 text-text-mid">{city}</td>
+                    <td className="px-4 py-3 text-text-light text-xs">{date}</td>
+                    <td className="px-4 py-3"><span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColors[status] ?? ""}`}>{status}</span></td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => setDrawerItem(r)} className="text-xs border border-teal text-teal px-3 py-1 rounded-full hover:bg-teal-light transition-colors">View</button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -77,7 +95,7 @@ const RegistrationsTable = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-0 h-full w-[400px] bg-card border-l border-border shadow-lg z-50 overflow-auto p-8"
+              className="global-card fixed right-0 top-0 h-full w-[400px] z-50 overflow-auto"
             >
               <button onClick={() => setDrawerItem(null)} className="absolute top-4 right-4 text-text-light hover:text-text-dark"><X size={20} /></button>
               <h3 className="text-xl font-bold text-teal mb-1">{drawerItem.regId}</h3>
@@ -100,7 +118,7 @@ const RegistrationsTable = () => {
 
               <div className="mt-8">
                 <label className="text-xs font-semibold uppercase text-text-light tracking-wide mb-2 block">Admin Notes</label>
-                <textarea rows={3} placeholder="Add internal notes..." className="w-full px-4 py-3 border border-border rounded-lg bg-card outline-none focus:border-teal text-sm" />
+                <textarea rows={3} placeholder="Add internal notes..." className="global-card w-full outline-none focus: text-sm" />
                 <button className="mt-2 bg-teal text-primary-foreground text-xs font-medium px-4 py-2 rounded-full">Save Notes</button>
               </div>
             </motion.div>

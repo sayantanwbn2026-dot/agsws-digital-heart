@@ -19,7 +19,7 @@ const ScrollingStoriesStrip = () => (
         {[...storyPills, ...storyPills].map((pill, i) => (
           <div
             key={i}
-            className="flex-shrink-0 mx-3 flex items-center gap-3 bg-card shadow-brand-sm border border-border rounded-full px-5 py-2.5 hover:scale-[1.04] hover:shadow-brand-md transition-all duration-200 cursor-default"
+            className="global-card flex-shrink-0 mx-3 flex items-center gap-3 .5 hover:scale-[1.04] hover: cursor-default"
           >
             <ImagePlaceholder category={pill.category} className="w-8 h-8 rounded-full flex-shrink-0" />
             <span className="text-[13px] text-text-mid whitespace-nowrap">

@@ -57,7 +57,7 @@ const VolunteerPortal = () => {
       <section className="bg-background py-16">
         <div className="max-w-[480px] mx-auto px-6">
           <div className="flex gap-2">
-            <input value={volId} onChange={(e) => setVolId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. VOL-2025-0042" className="flex-1 h-[52px] px-4 border border-border rounded-lg text-base font-medium bg-card focus:border-teal focus:ring-2 focus:ring-teal/15 outline-none" />
+            <input placeholder=" " value={volId} onChange={(e) => setVolId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. VOL-2025-0042" className="global-card flex-1 h-[52px] text-base font-medium focus: focus:ring-2 focus:ring-teal/15 outline-none" />
             <button onClick={handleSearch} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2">
               <Search size={18} /> View
             </button>
@@ -77,7 +77,7 @@ const VolunteerPortal = () => {
 
           {result && (
             <motion.div key="res" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-[560px] mx-auto mt-8 px-6">
-              <div className="bg-card border border-border rounded-xl shadow-brand-lg p-8">
+              <div className="global-card">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 rounded-full bg-teal flex items-center justify-center text-primary-foreground font-bold text-2xl">{result.name[0]}</div>
                   <div>

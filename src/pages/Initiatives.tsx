@@ -51,11 +51,11 @@ const Initiatives = () => {
       </section>
 
       <section className="bg-card py-24">
-        <div className="max-w-[1000px] mx-auto px-6 space-y-16">
+        <div className="max-w-[1200px] mx-auto px-6 space-y-16">
           {initiatives.map((item, i) => (
             <FadeInUp key={item.title} delay={i * 0.1}>
               <motion.div
-                className="grid grid-cols-1 lg:grid-cols-[120px_1fr] gap-8 bg-card border border-border rounded-xl p-8 shadow-brand-md hover:shadow-brand-lg transition-shadow"
+                className="global-card grid grid-cols-1 lg:grid-cols-[120px_1fr] gap-8 hover:"
                 whileHover={{ y: -4 }}
               >
                 <div className={`w-20 h-20 ${colorBg[item.color]} rounded-2xl flex items-center justify-center`}>

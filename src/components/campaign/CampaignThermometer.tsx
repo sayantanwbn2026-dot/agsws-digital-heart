@@ -35,7 +35,7 @@ const CampaignThermometer = ({ goalAmount, raisedAmount, deadlineDate, campaignN
 
   if (compact) {
     return (
-      <div ref={ref} className="bg-card border border-border rounded-xl p-4 shadow-brand-sm">
+      <div ref={ref} className="global-card">
         <p className="text-xs font-semibold text-text-light uppercase tracking-wider mb-2">{campaignName}</p>
         <div className="flex justify-between text-sm mb-1">
           <span className="font-bold text-teal">₹{raisedAmount.toLocaleString()}</span>
@@ -53,7 +53,7 @@ const CampaignThermometer = ({ goalAmount, raisedAmount, deadlineDate, campaignN
   }
 
   return (
-    <div ref={ref} className="bg-card border border-border rounded-xl p-6 shadow-brand-sm">
+    <div ref={ref} className="global-card">
       <p className="text-sm font-semibold text-text-dark mb-4">{campaignName}</p>
       <div className="flex items-end gap-5">
         {/* Thermometer */}

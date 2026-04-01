@@ -84,8 +84,8 @@ const ImpactReport = () => {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span className="text-[360px] font-extrabold text-teal/[0.03] leading-none">2024</span>
         </div>
-        <div className="max-w-[1100px] mx-auto px-6 py-24 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-16">
+        <div className="max-w-[1200px] mx-auto px-6 py-24 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-3  gap-3 md:gap-4 lg:gap-6">
             <StatBlock value={2400} suffix="+" label="Patients Supported" />
             <StatBlock value={850} suffix="+" label="Children Educated" />
             <StatBlock value={120} suffix="+" label="Families Registered" />
@@ -102,7 +102,7 @@ const ImpactReport = () => {
             <ImagePlaceholder key={i} category={c as any} className="w-full h-full" />
           ))}
         </div>
-        <div className="max-w-[1100px] mx-auto px-6 py-24 relative z-10">
+        <div className="max-w-[1200px] mx-auto px-6 py-24 relative z-10">
           <div className="max-w-lg">
             <span className="inline-block bg-yellow/20 text-yellow text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest mb-4">Medical Aid</span>
             <h2 className="text-4xl font-bold text-white mb-8">2,400 patients supported this year.</h2>
@@ -114,7 +114,7 @@ const ImpactReport = () => {
                 </div>
               ))}
             </div>
-            <Link to="/donate/medical" className="inline-block border border-white/40 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors">
+            <Link to="/donate/medical" className="global-card inline-block /40 text-white font-semibold hover:/10">
               Donate to Medical Aid →
             </Link>
           </div>
@@ -128,7 +128,7 @@ const ImpactReport = () => {
             <ImagePlaceholder key={i} category={c as any} className="w-full h-full" />
           ))}
         </div>
-        <div className="max-w-[1100px] mx-auto px-6 py-24 relative z-10 flex justify-end">
+        <div className="max-w-[1200px] mx-auto px-6 py-24 relative z-10 flex justify-end">
           <div className="max-w-lg">
             <span className="inline-block bg-yellow/20 text-yellow text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-widest mb-4">Education</span>
             <h2 className="text-4xl font-bold text-white mb-8">850 children kept in school.</h2>
@@ -140,7 +140,7 @@ const ImpactReport = () => {
                 </div>
               ))}
             </div>
-            <Link to="/donate/education" className="inline-block border border-white/40 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors">
+            <Link to="/donate/education" className="global-card inline-block /40 text-white font-semibold hover:/10">
               Sponsor a Child →
             </Link>
           </div>
@@ -149,7 +149,7 @@ const ImpactReport = () => {
 
       {/* S4: Registration */}
       <section id="impact-s4" className="min-h-screen flex items-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, hsl(28 22% 62%), hsl(187 70% 39%))" }}>
-        <div className="max-w-[1100px] mx-auto px-6 py-24 relative z-10 text-center">
+        <div className="max-w-[1200px] mx-auto px-6 py-24 relative z-10 text-center">
           {/* Simplified India map represented by dots */}
           <div className="relative w-[300px] h-[300px] mx-auto mb-12">
             {[
@@ -173,7 +173,7 @@ const ImpactReport = () => {
 
       {/* S5: Story of the Year */}
       <section id="impact-s5" className="min-h-screen flex items-center bg-[#0A0A0A] relative overflow-hidden">
-        <div className="max-w-[1100px] mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-[1200px] mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2  gap-5 lg:gap-8 items-center">
           <ImagePlaceholder category="elderly" className="w-full h-[400px] rounded-xl" />
           <div>
             <span className="text-[96px] font-extrabold text-white/[0.06] absolute -top-4 left-0">"</span>
@@ -182,7 +182,7 @@ const ImpactReport = () => {
             </p>
             <p className="font-semibold text-white">Priya Sengupta</p>
             <p className="text-sm text-white/50">Registered daughter, since 2023</p>
-            <Link to="/blog/ranu-mondal-emergency-care" className="inline-block mt-6 border border-white/40 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors">
+            <Link to="/blog/ranu-mondal-emergency-care" className="global-card inline-block mt-6 /40 text-white font-semibold hover:/10">
               Read Full Story →
             </Link>
           </div>
@@ -201,7 +201,7 @@ const ImpactReport = () => {
               { pct: "12%", label: "Operations", amount: "₹5.8L", color: "bg-purple" },
               { pct: "10%", label: "Administration", amount: "₹4.8L", color: "bg-beige" },
             ].map(item => (
-              <div key={item.label} className="bg-card border border-border rounded-lg p-4 shadow-brand-sm">
+              <div key={item.label} className="global-card">
                 <span className={`inline-block w-3 h-3 rounded-full ${item.color} mb-2`} />
                 <p className="text-2xl font-bold text-text-dark">{item.pct}</p>
                 <p className="text-sm font-medium text-text-mid">{item.label}</p>
@@ -226,7 +226,7 @@ const ImpactReport = () => {
               { amount: "₹5,000", impact: "Surgery support", to: "/donate/medical" },
               { amount: "₹12,000", impact: "Child's full school year", to: "/donate/education" },
             ].map(tier => (
-              <Link key={tier.amount} to={tier.to} className="bg-white/10 border border-white/20 rounded-xl px-6 py-4 hover:bg-white/20 transition-colors">
+              <Link key={tier.amount} to={tier.to} className="global-card /10 /20 hover:/20">
                 <p className="text-xl font-bold text-white">{tier.amount}</p>
                 <p className="text-sm text-white/70">{tier.impact}</p>
               </Link>

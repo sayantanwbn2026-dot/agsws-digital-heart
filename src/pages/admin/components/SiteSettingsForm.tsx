@@ -36,16 +36,16 @@ const SiteSettingsForm = () => {
       <section>
         <h3 className="font-semibold text-text-dark mb-4">Contact & Basic Info</h3>
         <div className="space-y-4">
-          <div><label className="text-xs text-text-light mb-1 block">NGO Name</label><input value={settings.name} onChange={(e) => update("name", e.target.value)} className={inputClass} /></div>
-          <div><label className="text-xs text-text-light mb-1 block">Tagline</label><input value={settings.tagline} onChange={(e) => update("tagline", e.target.value)} className={inputClass} /></div>
-          <div><label className="text-xs text-text-light mb-1 block">Phone</label><input value={settings.phone} onChange={(e) => update("phone", e.target.value)} className={inputClass} /></div>
+          <div><label className="text-xs text-text-light mb-1 block">NGO Name</label><input placeholder=" " value={settings.name} onChange={(e) => update("name", e.target.value)} className={inputClass} /></div>
+          <div><label className="text-xs text-text-light mb-1 block">Tagline</label><input placeholder=" " value={settings.tagline} onChange={(e) => update("tagline", e.target.value)} className={inputClass} /></div>
+          <div><label className="text-xs text-text-light mb-1 block">Phone</label><input placeholder=" " value={settings.phone} onChange={(e) => update("phone", e.target.value)} className={inputClass} /></div>
           <div className="bg-yellow-light border border-yellow rounded-lg p-4">
             <label className="text-xs text-text-light mb-1 block font-semibold">Emergency Hotline</label>
-            <input value={settings.emergencyHotline} onChange={(e) => update("emergencyHotline", e.target.value)} className={inputClass} />
+            <input placeholder=" " value={settings.emergencyHotline} onChange={(e) => update("emergencyHotline", e.target.value)} className={inputClass} />
             <p className="text-xs text-text-light mt-1">This number is shown in registration confirmation emails</p>
           </div>
-          <div><label className="text-xs text-text-light mb-1 block">Email</label><input value={settings.email} onChange={(e) => update("email", e.target.value)} className={inputClass} /></div>
-          <div><label className="text-xs text-text-light mb-1 block">Address</label><textarea value={settings.address} onChange={(e) => update("address", e.target.value)} rows={2} className="w-full px-4 py-3 border border-border rounded-lg bg-card outline-none focus:border-teal text-sm" /></div>
+          <div><label className="text-xs text-text-light mb-1 block">Email</label><input placeholder=" " value={settings.email} onChange={(e) => update("email", e.target.value)} className={inputClass} /></div>
+          <div><label className="text-xs text-text-light mb-1 block">Address</label><textarea placeholder=" " value={settings.address} onChange={(e) => update("address", e.target.value)} rows={2} className="global-card w-full outline-none focus: text-sm" /></div>
         </div>
       </section>
 
@@ -61,7 +61,7 @@ const SiteSettingsForm = () => {
           ].map(({ key, icon: Icon, label }) => (
             <div key={key} className="relative">
               <Icon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light" />
-              <input value={(settings as any)[key]} onChange={(e) => update(key, e.target.value)} placeholder={label} className="w-full h-12 pl-12 pr-4 border border-border rounded-lg bg-card outline-none focus:border-teal text-sm" />
+              <input placeholder=" " value={(settings as any)[key]} onChange={(e) => update(key, e.target.value)} placeholder={label} className="global-card w-full h-12 pl-12 pr-4 outline-none focus: text-sm" />
             </div>
           ))}
         </div>
@@ -79,7 +79,7 @@ const SiteSettingsForm = () => {
           ].map(({ key, label }) => (
             <div key={key}>
               <label className="text-xs text-text-light mb-1 block">{label}</label>
-              <input value={(settings as any)[key]} onChange={(e) => update(key, e.target.value)} className={inputClass} />
+              <input placeholder=" " value={(settings as any)[key]} onChange={(e) => update(key, e.target.value)} className={inputClass} />
               <p className="text-[11px] text-text-light mt-0.5">Displayed publicly on website and in receipts</p>
             </div>
           ))}
@@ -90,11 +90,11 @@ const SiteSettingsForm = () => {
       <section>
         <h3 className="font-semibold text-text-dark mb-4">Announcement Bar</h3>
         <label className="flex items-center gap-2 cursor-pointer mb-3">
-          <input type="checkbox" checked={settings.showAnnouncement} onChange={(e) => update("showAnnouncement", e.target.checked)} className="w-4 h-4 accent-teal" />
+          <input placeholder=" " type="checkbox" checked={settings.showAnnouncement} onChange={(e) => update("showAnnouncement", e.target.checked)} className="w-4 h-4 accent-teal" />
           <span className="text-sm text-text-mid">Show announcement bar above navbar</span>
         </label>
         <div className="relative">
-          <input value={settings.announcementText} onChange={(e) => update("announcementText", e.target.value.slice(0, 120))} className={inputClass} maxLength={120} />
+          <input placeholder=" " value={settings.announcementText} onChange={(e) => update("announcementText", e.target.value.slice(0, 120))} className={inputClass} maxLength={120} />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-text-light">{settings.announcementText.length}/120</span>
         </div>
       </section>

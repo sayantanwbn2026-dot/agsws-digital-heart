@@ -27,7 +27,7 @@ const CookieConsent = () => {
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="fixed bottom-0 left-0 right-0 z-[70] bg-card border-t-2 border-teal shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
+          className="global-card fixed bottom-0 left-0 right-0 z-[70] 2 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
         >
           <div className="max-w-[1200px] mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">

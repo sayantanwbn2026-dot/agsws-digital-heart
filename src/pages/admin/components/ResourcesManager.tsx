@@ -13,7 +13,7 @@ const ResourcesManager = () => {
 
   return (
     <>
-      <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+      <div className="global-card">
         <div className="flex items-center justify-between p-5 border-b border-border">
           <h3 className="font-semibold text-text-dark">Resources</h3>
           <button onClick={() => setShowModal(true)} className="bg-yellow text-text-dark text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-1.5 shadow-yellow">
@@ -53,18 +53,18 @@ const ResourcesManager = () => {
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black z-40" onClick={() => setShowModal(false)} />
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-card rounded-xl shadow-lg border border-border p-8 w-full max-w-[560px]">
+              <div className="global-card w-full max-w-[560px]">
                 <h3 className="font-semibold text-text-dark mb-6">Upload Resource</h3>
                 <div className="space-y-4">
-                  <input placeholder="Title" className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal text-sm" />
-                  <select className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal text-sm">
+                  <input placeholder="Title" className="global-card w-full h-12 outline-none focus: text-sm" />
+                  <select className="global-card w-full h-12 outline-none focus: text-sm">
                     <option>Annual Report</option>
                     <option>Audit Report</option>
                     <option>Certificate</option>
                     <option>Policy Document</option>
                   </select>
-                  <input type="number" placeholder="Year" className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal text-sm" />
-                  <textarea placeholder="Description" rows={3} className="w-full px-4 py-3 border border-border rounded-lg bg-card outline-none focus:border-teal text-sm" />
+                  <input type="number" placeholder="Year" className="global-card w-full h-12 outline-none focus: text-sm" />
+                  <textarea placeholder="Description" rows={3} className="global-card w-full outline-none focus: text-sm" />
                   <div className="border-2 border-dashed border-border rounded-lg p-8 text-center text-text-light text-sm cursor-pointer hover:border-teal transition-colors">
                     Click or drag a PDF file here
                   </div>

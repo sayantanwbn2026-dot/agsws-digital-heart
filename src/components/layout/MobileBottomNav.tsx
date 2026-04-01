@@ -15,7 +15,7 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border z-50 flex items-center justify-around md:hidden shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
+    <nav className="fixed bottom-0 left-0 right-0 h-[64px] z-[996] flex items-center justify-around md:hidden bg-white border-t border-[var(--border-color)] shadow-[0_-2px_12px_rgba(0,0,0,0.06)] px-2">
       {items.map((item) => {
         const isActive = item.path ? pathname === item.path : false;
         if (item.center) {
@@ -23,19 +23,19 @@ const MobileBottomNav = () => {
             <button
               key="donate"
               onClick={() => { if (navigator.vibrate) navigator.vibrate(8); item.action?.(); }}
-              className="flex flex-col items-center -mt-6"
+              className="flex flex-col items-center mt-[-14px]"
             >
-              <div className="w-14 h-14 rounded-full bg-yellow flex items-center justify-center shadow-yellow">
-                <Heart size={22} className="text-text-dark" />
+              <div className="w-[52px] h-[52px] rounded-full bg-[var(--yellow)] flex items-center justify-center shadow-[var(--shadow-yellow)] border-4 border-white">
+                <Heart size={22} className="text-[var(--dark)]" />
               </div>
-              <span className="text-[10px] font-medium text-text-dark mt-0.5">{item.label}</span>
+              <span className="text-[10px] font-['Inter'] font-[500] text-[var(--dark)] mt-[2px]">{item.label}</span>
             </button>
           );
         }
         return (
-          <Link key={item.path} to={item.path!} className="flex flex-col items-center gap-0.5">
-            <item.icon size={20} className={isActive ? "text-teal" : "text-text-light"} />
-            <span className={`text-[10px] font-medium ${isActive ? "text-teal" : "text-text-light"}`}>{item.label}</span>
+          <Link key={item.path} to={item.path!} className="flex flex-col items-center gap-[2px]">
+            <item.icon size={20} className={isActive ? "text-[var(--teal)]" : "text-[var(--light)]"} />
+            <span className={`text-[10px] font-['Inter'] font-[500] ${isActive ? "text-[var(--teal)]" : "text-[var(--light)]"}`}>{item.label}</span>
           </Link>
         );
       })}

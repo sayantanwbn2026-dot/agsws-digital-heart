@@ -13,7 +13,7 @@ const config: Record<Category, { gradient: string; Icon: typeof Heart; defaultLa
   education: { gradient: "from-[hsl(242,29%,50%)] to-[hsl(242,40%,70%)]", Icon: BookOpen, defaultLabel: "Education" },
   elderly:   { gradient: "from-[hsl(28,22%,62%)] to-[hsl(187,70%,39%)]", Icon: Users, defaultLabel: "Elder Care" },
   community: { gradient: "from-[hsl(187,70%,39%)] to-[hsl(44,60%,55%)]", Icon: HandHeart, defaultLabel: "Community" },
-  child:     { gradient: "from-[hsl(44,95%,93%)] to-[hsl(187,52%,93%)]", Icon: Baby, defaultLabel: "Child Support" },
+  child:     { gradient: "from-[hsl(29,80%,52%)] to-[hsl(187,52%,45%)]", Icon: Baby, defaultLabel: "Child Support" },
   hospital:  { gradient: "from-[hsl(187,68%,27%)] to-[hsl(200,20%,15%)]", Icon: Building2, defaultLabel: "Hospital" },
   classroom: { gradient: "from-[hsl(242,40%,95%)] to-[hsl(242,29%,50%)]", Icon: GraduationCap, defaultLabel: "Classroom" },
 };

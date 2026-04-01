@@ -40,7 +40,7 @@ const incomeOptions = ["Below ₹5,000", "₹5,000–₹15,000", "₹15,000–�
 const InputField = ({ label, error, ...props }: any) => (
   <div>
     <label className="text-sm font-medium text-text-dark mb-1 block">{label}</label>
-    <input {...props} className={`w-full h-12 px-4 border rounded-lg bg-card outline-none transition-all focus:border-teal focus:ring-2 focus:ring-teal/15 ${error ? "border-destructive" : "border-border"}`} />
+    <input placeholder=" " {...props} className={`w-full h-12 px-4 border rounded-lg bg-card outline-none transition-all focus:border-teal focus:ring-2 focus:ring-teal/15 ${error ? "border-destructive" : "border-border"}`} />
     {error && <p className="text-xs text-destructive mt-1">{error}</p>}
   </div>
 );
@@ -86,9 +86,9 @@ const ApplyForSupport = () => {
       </section>
 
       <section className="bg-background py-16">
-        <div className="max-w-[900px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="max-w-[900px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2  gap-5 lg:gap-8">
           {/* Medical */}
-          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-brand-sm">
+          <div className="global-card">
             <div className="bg-gradient-to-r from-teal-dark to-teal h-[140px] flex items-center justify-center">
               <Heart size={40} className="text-primary-foreground" />
             </div>
@@ -107,19 +107,19 @@ const ApplyForSupport = () => {
                     <InputField label="Patient Age" type="number" {...med.register("patientAge")} error={med.formState.errors.patientAge?.message} />
                     <div>
                       <label className="text-sm font-medium text-text-dark mb-1 block">Medical Condition</label>
-                      <textarea {...med.register("condition")} rows={3} className="w-full px-4 py-3 border border-border rounded-lg bg-card outline-none focus:border-teal focus:ring-2 focus:ring-teal/15 text-sm" />
+                      <textarea placeholder=" " {...med.register("condition")} rows={3} className="global-card w-full outline-none focus: focus:ring-2 focus:ring-teal/15 text-sm" />
                     </div>
                     <InputField label="Hospital Name (if admitted)" {...med.register("hospitalName")} />
                     <div>
                       <label className="text-sm font-medium text-text-dark mb-1 block">Approximate Monthly Family Income</label>
-                      <select {...med.register("income")} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal">
+                      <select {...med.register("income")} className="global-card w-full h-12 outline-none focus:">
                         <option value="">Select</option>
                         {incomeOptions.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-text-dark mb-1 block">Kolkata Contact Address</label>
-                      <textarea {...med.register("address")} rows={2} className="w-full px-4 py-3 border border-border rounded-lg bg-card outline-none focus:border-teal focus:ring-2 focus:ring-teal/15 text-sm" />
+                      <textarea placeholder=" " {...med.register("address")} rows={2} className="global-card w-full outline-none focus: focus:ring-2 focus:ring-teal/15 text-sm" />
                     </div>
                     <InputField label="Your Name (if different)" {...med.register("contactName")} />
                     <InputField label="Your Phone" type="tel" {...med.register("phone")} error={med.formState.errors.phone?.message} />
@@ -132,7 +132,7 @@ const ApplyForSupport = () => {
           </div>
 
           {/* Education */}
-          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-brand-sm">
+          <div className="global-card">
             <div className="bg-gradient-to-r from-purple to-purple/80 h-[140px] flex items-center justify-center">
               <GraduationCap size={40} className="text-primary-foreground" />
             </div>
@@ -161,7 +161,7 @@ const ApplyForSupport = () => {
                         { name: "needExamFees" as const, label: "Exam fees" },
                       ].map(c => (
                         <label key={c.name} className="flex items-center gap-2 py-1 cursor-pointer">
-                          <input {...edu.register(c.name)} type="checkbox" className="w-4 h-4 accent-purple" />
+                          <input placeholder=" " {...edu.register(c.name)} type="checkbox" className="w-4 h-4 accent-purple" />
                           <span className="text-sm text-text-mid">{c.label}</span>
                         </label>
                       ))}
@@ -171,14 +171,14 @@ const ApplyForSupport = () => {
                     <InputField label="Parent Email" type="email" {...edu.register("parentEmail")} error={edu.formState.errors.parentEmail?.message} />
                     <div>
                       <label className="text-sm font-medium text-text-dark mb-1 block">Monthly Family Income</label>
-                      <select {...edu.register("income")} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-purple">
+                      <select {...edu.register("income")} className="global-card w-full h-12 outline-none focus:">
                         <option value="">Select</option>
                         {incomeOptions.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-text-dark mb-1 block">Brief reason (optional)</label>
-                      <textarea {...edu.register("reason")} rows={2} maxLength={300} className="w-full px-4 py-3 border border-border rounded-lg bg-card outline-none focus:border-purple focus:ring-2 focus:ring-purple/15 text-sm" />
+                      <textarea placeholder=" " {...edu.register("reason")} rows={2} maxLength={300} className="global-card w-full outline-none focus: focus:ring-2 focus:ring-purple/15 text-sm" />
                     </div>
                     <button type="submit" className="w-full bg-purple text-primary-foreground font-bold py-3 rounded-lg mt-2">Submit Application</button>
                   </form>

@@ -72,7 +72,7 @@ const TransparencyPage = () => {
 
       {/* Fund Utilisation */}
       <section className="bg-card py-24">
-        <div className="max-w-[1100px] mx-auto px-6">
+        <div className="max-w-[1200px] mx-auto px-6">
           <FadeInUp className="text-center mb-16">
             <span className="label-text text-teal">Financial Breakdown</span>
             <h2 className="heading-2 text-text-dark mt-3">How Every Rupee Is Used</h2>
@@ -106,14 +106,14 @@ const TransparencyPage = () => {
 
       {/* Quarterly Summary */}
       <section className="bg-background py-24">
-        <div className="max-w-[1100px] mx-auto px-6">
+        <div className="max-w-[1200px] mx-auto px-6">
           <FadeInUp className="text-center mb-12">
             <span className="label-text text-teal">Quarterly Report</span>
             <h2 className="heading-2 text-text-dark mt-3">Financial Transparency — FY 2024–25</h2>
           </FadeInUp>
 
           <FadeInUp>
-            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="global-card">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b-2 border-teal">
@@ -153,7 +153,7 @@ const TransparencyPage = () => {
 
       {/* Gateway Breakdown */}
       <section className="bg-card py-24">
-        <div className="max-w-[1100px] mx-auto px-6">
+        <div className="max-w-[1200px] mx-auto px-6">
           <FadeInUp className="text-center mb-12">
             <span className="label-text text-teal">Gateway Breakdown</span>
             <h2 className="heading-2 text-text-dark mt-3">How Each Gateway's Funds Are Used</h2>
@@ -175,7 +175,7 @@ const TransparencyPage = () => {
 
       {/* Compliance */}
       <section className="bg-background py-24">
-        <div className="max-w-[1100px] mx-auto px-6">
+        <div className="max-w-[1200px] mx-auto px-6">
           <FadeInUp className="text-center mb-12">
             <span className="label-text text-teal">Verification</span>
             <h2 className="heading-2 text-text-dark mt-3">Third-Party Verified</h2>
@@ -184,7 +184,7 @@ const TransparencyPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {compliance.map((c, i) => (
               <FadeInUp key={c.title} delay={i * 0.1}>
-                <div className="bg-card border border-border rounded-xl p-6">
+                <div className="global-card">
                   <c.icon size={28} className="text-teal mb-3" />
                   <h4 className="font-semibold text-text-dark mb-2">{c.title}</h4>
                   <p className="text-sm text-text-mid">{c.desc}</p>
@@ -197,7 +197,7 @@ const TransparencyPage = () => {
 
       {/* Download CTA */}
       <section className="bg-teal py-16">
-        <div className="max-w-[1100px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="max-w-[1200px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <p className="text-primary-foreground font-semibold text-lg">Read our complete Annual Report and Financial Statements</p>
           <Link to="/resources" className="bg-yellow text-text-dark font-bold px-8 py-3 rounded-full shadow-yellow flex items-center gap-2 hover:scale-[1.02] transition-transform whitespace-nowrap">
             Download Reports <ArrowRight size={18} />

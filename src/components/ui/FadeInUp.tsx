@@ -1,28 +1,37 @@
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { ReactNode } from "react";
+import { motion, useInView } from 'framer-motion'
+import { useRef } from 'react'
 
-interface FadeInUpProps {
-  children: ReactNode;
-  delay?: number;
-  duration?: number;
-  className?: string;
+interface Props {
+  children: React.ReactNode
+  delay?: number
+  y?: number
+  duration?: number
+  className?: string
+  once?: boolean
 }
 
-const FadeInUp = ({ children, delay = 0, duration = 0.5, className = "" }: FadeInUpProps) => {
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+export function FadeInUp({
+  children, delay = 0, y = 28,
+  duration = 0.5, className, once = true
+}: Props) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once, margin: '-60px 0px' })
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration, delay, ease: "easeOut" }}
       className={className}
+      initial={{ opacity: 0, y }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
+      transition={{
+        duration,
+        delay,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }}
     >
       {children}
     </motion.div>
-  );
-};
+  )
+}
 
 export default FadeInUp;

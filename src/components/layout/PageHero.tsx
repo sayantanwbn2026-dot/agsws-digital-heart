@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ReactNode } from "react";
 
@@ -20,17 +19,17 @@ interface PageHeroProps {
 }
 
 const bgGradients: Record<string, string> = {
-  teal: "from-[hsl(187,70%,39%)] to-[hsl(187,68%,27%)]",
-  "teal-dark": "from-[hsl(187,68%,27%)] to-[hsl(187,68%,8%)]",
-  warm: "from-[hsl(28,22%,62%)] to-[hsl(187,70%,39%)]",
-  purple: "from-[hsl(242,29%,50%)] to-[hsl(187,70%,39%)]",
-  dark: "from-[hsl(187,68%,10%)] to-[hsl(187,68%,27%)]",
+  teal: "from-[#1F9AA8] to-[#156B75]",
+  "teal-dark": "from-[#156B75] to-[#0D1B1C]",
+  warm: "from-[#B6A388] to-[#1F9AA8]",
+  purple: "from-[#5C5AA6] to-[#1F9AA8]",
+  dark: "from-[#0F1F20] to-[#156B75]",
 };
 
 const sizePadding: Record<string, string> = {
-  sm: "pt-32 pb-12 sm:pt-36 sm:pb-14",
-  md: "pt-36 pb-16 sm:pt-40 sm:pb-18",
-  lg: "pt-40 pb-20 sm:pt-48 sm:pb-24",
+  sm: "pt-[120px] pb-[48px]",
+  md: "pt-[140px] pb-[64px]",
+  lg: "pt-[160px] pb-[80px]",
 };
 
 const PageHero = ({
@@ -40,75 +39,93 @@ const PageHero = ({
   bgVariant = "teal",
   breadcrumb,
   size = "md",
-  align = "left",
+  align = "left", // Note: User requested left alignment exclusively even if center is passed (ignoring custom align mostly, but I'll keep it local if ever requested)
   children,
 }: PageHeroProps) => {
-  const alignClass = align === "center" ? "text-center items-center" : "text-left items-start";
-
   return (
-    <section className={`relative bg-gradient-to-br ${bgGradients[bgVariant]} overflow-hidden ${sizePadding[size]}`}>
-      {/* Geometric accents */}
-      <svg className="absolute -top-[60px] -right-[60px] w-[300px] h-[300px] opacity-10 pointer-events-none" viewBox="0 0 300 300">
-        <circle cx="150" cy="150" r="140" stroke="hsl(187,52%,93%)" strokeWidth="1" fill="none" />
+    <section className={`relative overflow-hidden ${sizePadding[size]} bg-gradient-to-br ${bgGradients[bgVariant]}`}>
+      {/* GEOMETRIC ACCENTS */}
+      <svg 
+        className="absolute top-[-60px] right-[-60px] w-[300px] h-[300px] opacity-[0.10] pointer-events-none" 
+        viewBox="0 0 300 300"
+      >
+        <circle cx="150" cy="150" r="140" stroke="var(--teal-light)" strokeWidth="2" fill="none" />
       </svg>
-      <div className="absolute -bottom-[30px] left-10 w-[120px] h-[120px] rounded-full bg-[hsl(187,52%,93%)]/5 pointer-events-none" />
+      <div className="absolute bottom-[-30px] left-[40px] w-[120px] h-[120px] rounded-full bg-[var(--teal-light)] opacity-[0.05] pointer-events-none" />
 
-      {/* Grain */}
-      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
-      }} />
+      {/* NOISE OVERLAY */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" 
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+        }} 
+      />
 
-      <div className={`relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col ${alignClass}`}>
+      {/* CONTENT */}
+      {/* Alignment explicitly left on desktop and left on mobile per spec */}
+      <div className="relative z-10 w-full max-w-[var(--container)] mx-auto px-[16px] lg:px-[var(--container-px)] text-left flex flex-col items-start">
+        
+        {/* BREADCRUMB */}
         {breadcrumb && (
           <motion.nav
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-            className="flex items-center gap-1.5 mb-4 flex-wrap"
+            transition={{ duration: 0.35, delay: 0, ease: "easeOut" }}
+            className="flex flex-row items-center gap-[8px] mb-[12px] flex-wrap"
             aria-label="Breadcrumb"
           >
-            {breadcrumb.map((crumb, i) => (
-              <span key={i} className="flex items-center gap-1.5">
-                {i === 0 && <Home size={12} className="text-primary-foreground/65" />}
-                {crumb.href ? (
-                  <Link to={crumb.href} className="text-xs text-primary-foreground/65 hover:text-primary-foreground hover:underline transition-opacity">
-                    {crumb.label}
-                  </Link>
-                ) : (
-                  <span className="text-xs text-primary-foreground/85">{crumb.label}</span>
-                )}
-                {i < breadcrumb.length - 1 && <span className="text-xs text-primary-foreground/35">/</span>}
-              </span>
-            ))}
+            {breadcrumb.map((crumb, i) => {
+              const isLast = i === breadcrumb.length - 1;
+              return (
+                <span key={i} className="flex items-center gap-[8px]">
+                  {crumb.href ? (
+                    <Link 
+                      to={crumb.href} 
+                      className="text-[12px] font-[400] text-white opacity-[0.65] hover:opacity-100 hover:underline transition-opacity"
+                    >
+                      {crumb.label}
+                    </Link>
+                  ) : (
+                    <span className={`text-[12px] font-[400] text-white ${isLast ? 'opacity-[0.90]' : 'opacity-[0.65]'}`}>
+                      {crumb.label}
+                    </span>
+                  )}
+                  {!isLast && <span className="text-[12px] text-white opacity-[0.35]">/</span>}
+                </span>
+              );
+            })}
           </motion.nav>
         )}
 
+        {/* LABEL */}
         {label && (
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.08 }}
-            className="inline-block text-[11px] font-semibold uppercase tracking-[0.08em] text-primary-foreground bg-primary-foreground/15 border border-primary-foreground/20 rounded-full px-3.5 py-1 mb-3"
+            transition={{ duration: 0.4, delay: 0.08, ease: "easeOut" }}
+            className="inline-block mb-[12px] bg-white/[0.12] border border-white/[0.20] rounded-[var(--radius-full)] px-[14px] py-[4px] text-[11px] font-[600] text-white uppercase tracking-[0.09em]"
           >
             {label}
           </motion.span>
         )}
 
+        {/* TITLE H1 */}
         <motion.h1
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.14, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-[clamp(28px,4vw,48px)] font-bold tracking-[-0.02em] leading-[1.15] text-primary-foreground"
+          transition={{ duration: 0.5, delay: 0.14, ease: "easeOut" }}
+          className="text-[clamp(28px,4vw,44px)] font-[700] text-white tracking-[-0.02em] leading-[1.15] max-w-[640px]"
         >
           {title}
         </motion.h1>
 
+        {/* SUBTITLE */}
         {subtitle && (
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.22 }}
-            className="text-[clamp(14px,1.8vw,17px)] text-primary-foreground/80 leading-[1.65] max-w-[560px] mt-3"
+            transition={{ duration: 0.4, delay: 0.22, ease: "easeOut" }}
+            className="text-[clamp(14px,1.8vw,17px)] font-[400] text-white opacity-[0.82] leading-[1.65] mt-[12px] max-w-[520px]"
           >
             {subtitle}
           </motion.p>
@@ -119,7 +136,7 @@ const PageHero = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="mt-4"
+            className="mt-6 w-full"
           >
             {children}
           </motion.div>

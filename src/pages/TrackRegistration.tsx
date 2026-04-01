@@ -1,51 +1,56 @@
 import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, CheckCircle, User, Heart, Shield, Phone, AlertCircle } from "lucide-react";
-
-const mockData: Record<string, any> = {
-  "REG-2025-0001": {
-    parentName: "Sumitra",
-    status: "Active",
-    createdAt: "2025-01-15",
-    coordinatorName: "Priya D.",
-    coordinatorPhone: "+919876543210",
-    steps: [
-      { label: "Registration Confirmed", completed: true, date: "15 Jan 2025", desc: "Your registration and ₹100 payment received." },
-      { label: "Coordinator Assigned", completed: true, date: "16 Jan 2025", desc: "A local AGSWS coordinator has been assigned." },
-      { label: "First Wellness Check", completed: true, date: "22 Jan 2025", desc: "Your parent has been visited and briefed." },
-      { label: "Emergency Support Active", completed: true, date: "22 Jan 2025", desc: "24/7 emergency response is now active for your parent." },
-    ],
-  },
-  "REG-2025-0042": {
-    parentName: "Ramesh",
-    status: "Pending",
-    createdAt: "2025-03-10",
-    coordinatorName: null,
-    coordinatorPhone: null,
-    steps: [
-      { label: "Registration Confirmed", completed: true, date: "10 Mar 2025", desc: "Your registration and ₹100 payment received." },
-      { label: "Coordinator Assigned", completed: false, date: null, desc: "A local AGSWS coordinator will be assigned within 24 hours." },
-      { label: "First Wellness Check", completed: false, date: null, desc: "Your parent will be visited and briefed." },
-      { label: "Emergency Support Active", completed: false, date: null, desc: "24/7 emergency response activation pending." },
-    ],
-  },
-};
+import { Search, CheckCircle, User, Heart, Shield, Phone, AlertCircle, Loader2 } from "lucide-react";
 
 const stepIcons = [CheckCircle, User, Heart, Shield];
+
+const STEP_META = [
+  { label: "Registration Confirmed", pendingDesc: "Your registration and ₹100 payment received." },
+  { label: "Coordinator Assigned", pendingDesc: "A local AGSWS coordinator will be assigned within 24 hours." },
+  { label: "First Wellness Check", pendingDesc: "Your parent will be visited and briefed." },
+  { label: "Emergency Support Active", pendingDesc: "24/7 emergency response activation pending." },
+];
+
+function buildStepsFromStatus(result: any) {
+  const caseStatus = result.case_status ?? "pending";
+  const completedCount =
+    caseStatus === "active" || caseStatus === "emergency" ? 4 :
+    caseStatus === "pending" ? 1 : 2;
+  return STEP_META.map((meta, i) => ({
+    label: meta.label,
+    completed: i < completedCount,
+    date: i < completedCount ? (i === 0 ? (result.created_at ? new Date(result.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : null) : null) : null,
+    desc: i < completedCount ? meta.pendingDesc : meta.pendingDesc,
+  }));
+}
 
 const TrackRegistration = () => {
   useSEO("Track Registration", "Track your parent's AGSWS registration status.");
   const [regId, setRegId] = useState("");
   const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
+    if (!regId.trim()) return;
+    setLoading(true);
+    setError("");
+    setResult(null);
     setSearched(true);
-    const data = mockData[regId.trim().toUpperCase()];
-    if (data) { setResult(data); setError(false); }
-    else { setResult(null); setError(true); }
+    try {
+      const res = await fetch(`/api/track/registration?id=${encodeURIComponent(regId.trim())}`);
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setError("Registration ID not found. Please check the ID in your confirmation email.");
+      } else {
+        setResult(data);
+      }
+    } catch {
+      setError("Connection error. Please try again.");
+    }
+    setLoading(false);
   };
 
   const statusColor = result?.status === "Active" ? "bg-green-500" : result?.status === "Emergency" ? "bg-red-500" : "bg-yellow";
@@ -63,7 +68,7 @@ const TrackRegistration = () => {
       <section className="bg-background py-16">
         <div className="max-w-[480px] mx-auto px-6">
           <div className="flex gap-2">
-            <input value={regId} onChange={(e) => setRegId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. REG-2025-0001" className="flex-1 h-[52px] px-4 border border-border rounded-lg text-base font-medium bg-card focus:border-teal focus:ring-2 focus:ring-teal/15 outline-none" />
+            <input value={regId} onChange={(e) => setRegId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. REG-2025-0001" className="global-card flex-1 h-[52px] px-4 text-base font-medium focus:ring-2 focus:ring-teal/15 outline-none" />
             <button onClick={handleSearch} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2 hover:bg-teal-dark transition-colors">
               <Search size={18} /> Track
             </button>
@@ -86,7 +91,7 @@ const TrackRegistration = () => {
 
           {result && (
             <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-[560px] mx-auto mt-8 px-6">
-              <div className="bg-card border border-border rounded-xl shadow-brand-lg p-8">
+              <div className="global-card">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="heading-3 text-teal">Registration for {result.parentName}</h3>
                   <span className={`text-xs font-semibold text-primary-foreground px-3 py-1 rounded-full ${statusColor}`}>{result.status}</span>

@@ -5,11 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle, Shield, Gift } from "lucide-react";
-import { recentDonations } from "@/data/recentDonations";
+import { CheckCircle, Shield, Gift, Loader2 } from "lucide-react";
 import ImpactVisualiser from "@/components/donation/ImpactVisualiser";
 import CampaignThermometer from "@/components/campaign/CampaignThermometer";
-
+import PageHero from "@/components/layout/PageHero";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const donorSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -29,16 +30,28 @@ const amounts = [
   { value: 500, label: "₹500", impact: "Medicines for 1 child for 1 month" },
   { value: 1000, label: "₹1,000", impact: "Emergency transport + specialist consultation" },
   { value: 5000, label: "₹5,000", impact: "Surgery support + hospital operational costs for 1 day" },
-  { value: 10000, label: "₹10,000", impact: "Full treatment cycle — admission, surgery, medicines, post-discharge care, and hospital operations" },
+  { value: 10000, label: "₹10,000", impact: "Full treatment cycle — admission, surgery, medicines, post-discharge care" },
 ];
 
 const slabs = [5, 20, 30];
 
+const loadRazorpayScript = () =>
+  new Promise<void>((resolve) => {
+    if (document.querySelector('script[src*="razorpay"]')) { resolve(); return; }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve();
+    document.body.appendChild(script);
+  });
+
 const DonateMedical = () => {
   useSEO("Donate Medical Aid", "Donate to AGSWS Medical Aid — fund emergency care and treatment in Kolkata.");
+  const navigate = useNavigate();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
   const [frequency, setFrequency] = useState<"once" | "monthly">("once");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recentFeed, setRecentFeed] = useState<any[]>([]);
   const [taxSlab, setTaxSlab] = useState(() => {
     const saved = localStorage.getItem("agsws_tax_slab");
     return saved ? parseInt(saved) : 30;
@@ -49,12 +62,7 @@ const DonateMedical = () => {
     defaultValues: { showOnWall: true, isGift: false },
   });
 
-  const isGift = watch("isGift");
-  const currentAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
-  const taxSaving = currentAmount > 0 ? Math.round(currentAmount * 0.5 * (taxSlab / 100)) : 0;
-  const netCost = currentAmount - taxSaving;
-
-  // Donor memory
+  // Donor memory pre-fill
   useEffect(() => {
     const saved = localStorage.getItem("agsws_donor");
     if (saved) {
@@ -68,52 +76,185 @@ const DonateMedical = () => {
     }
   }, [setValue]);
 
+  // Pending donation recovery
+  useEffect(() => {
+    const pending = localStorage.getItem("agsws_pending_donation");
+    if (pending) {
+      try {
+        const p = JSON.parse(pending);
+        if (p.gateway === "medical") {
+          if (p.amount) setSelectedAmount(p.amount);
+          if (p.frequency) setFrequency(p.frequency);
+          toast("Resuming your previous donation session.", { icon: "↩️" });
+        }
+      } catch { /* ignore */ }
+    }
+  }, []);
+
+  // Load live feed
+  useEffect(() => {
+    fetch("/api/live-feed?limit=4")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setRecentFeed(data); })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     localStorage.setItem("agsws_tax_slab", String(taxSlab));
   }, [taxSlab]);
 
-  const onSubmit = (data: any) => {
-    localStorage.setItem("agsws_donor", JSON.stringify({
-      name: data.name, email: data.email, phone: data.phone, pan: data.pan,
-      lastAmount: currentAmount, lastGateway: "Medical Aid", lastDate: new Date().toLocaleDateString(),
-    }));
-    window.location.href = `/thank-you?amount=${currentAmount}&name=${encodeURIComponent(data.name)}&gateway=medical`;
+  const isGift = watch("isGift");
+  const currentAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
+  const taxSaving = currentAmount > 0 ? Math.round(currentAmount * 0.5 * (taxSlab / 100)) : 0;
+  const netCost = currentAmount - taxSaving;
+
+  // Save pending state on every change
+  useEffect(() => {
+    if (currentAmount > 0) {
+      localStorage.setItem("agsws_pending_donation",
+        JSON.stringify({ gateway: "medical", amount: currentAmount, frequency }));
+    }
+  }, [currentAmount, frequency]);
+
+  const onSubmit = async (data: DonorFormData) => {
+    if (!currentAmount || currentAmount < 1) {
+      toast.error("Please select or enter a donation amount.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const orderRes = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gateway: "medical",
+          amount: currentAmount * 100,
+          frequency,
+          donor_name: data.name,
+          donor_email: data.email,
+          donor_phone: data.phone,
+          pan_number: data.pan ?? "",
+          is_gift: data.isGift ?? false,
+          gift_recipient_name: data.giftRecipientName ?? "",
+          gift_recipient_email: data.giftRecipientEmail ?? "",
+          gift_message: data.giftMessage ?? "",
+          show_on_wall: data.showOnWall ?? true,
+          referrer_code: new URLSearchParams(window.location.search).get("ref") ?? "",
+        }),
+      });
+      const { order_id, amount: rzpAmount, key_id } = await orderRes.json();
+      if (!order_id) throw new Error("Order creation failed");
+
+      localStorage.setItem("agsws_donor", JSON.stringify({
+        name: data.name, email: data.email, phone: data.phone, pan: data.pan ?? "",
+        lastAmount: currentAmount, lastGateway: "Medical Aid",
+        lastDate: new Date().toLocaleDateString("en-IN"),
+      }));
+      localStorage.removeItem("agsws_pending_donation");
+
+      await loadRazorpayScript();
+
+      const rzp = new (window as any).Razorpay({
+        key: key_id,
+        amount: rzpAmount,
+        order_id,
+        name: "AGSWS — Social Welfare Society",
+        description: "Medical Aid Donation",
+        image: "/icon-192.png",
+        prefill: { name: data.name, email: data.email, contact: data.phone },
+        theme: { color: "#1F9AA8" },
+        handler: (response: any) => {
+          navigate(
+            `/thank-you?payment_id=${response.razorpay_payment_id}` +
+            `&amount=${currentAmount}&gateway=medical` +
+            `&name=${encodeURIComponent(data.name)}`
+          );
+        },
+        modal: {
+          ondismiss: () => {
+            setIsSubmitting(false);
+            toast.error("Payment cancelled.");
+          },
+        },
+      });
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <main id="main-content">
-      <section className="h-[300px] bg-gradient-to-br from-teal-dark via-teal to-teal flex items-center justify-center relative">
-        <div className="absolute inset-0 bg-[#0D1B1C]/30" />
-        <div className="relative z-10 text-center">
-          <h1 className="heading-1 text-primary-foreground">Donate Medical Aid</h1>
-          <p className="text-sm text-primary-foreground/60 mt-3">Every rupee funds direct patient care</p>
-        </div>
-      </section>
+      <PageHero 
+        title="Donate Medical Aid" 
+        subtitle="Every rupee funds direct patient care for underprivileged families in Kolkata."
+        bgVariant="teal"
+        breadcrumb={[{label: "Home", href: "/"}, {label: "Initiatives", href: "/initiatives/medical"}, {label: "Donate"}]}
+      />
 
-      <section className="bg-background py-16">
-        <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
+      <section className="bg-[var(--bg)] py-[64px] lg:py-[96px]">
+        <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-[6fr_4fr] gap-[40px]">
+          
+          {/* Form Left Side */}
           <div>
             <FadeInUp>
-              <div className="flex gap-2 mb-8">
-                {(["once", "monthly"] as const).map((f) => (
-                  <button key={f} onClick={() => setFrequency(f)} className={`px-6 py-2.5 rounded-full text-sm font-medium border transition-all duration-300 ${frequency === f ? "bg-teal text-primary-foreground border-teal" : "bg-card text-text-mid border-border"}`}>
-                    {f === "once" ? "One-Time" : "Monthly"}
-                  </button>
-                ))}
+              <div className="mb-8">
+                <div className="bg-[var(--bg)] rounded-[var(--radius-full)] p-[4px] inline-flex relative shadow-inner border border-[var(--border-color)]">
+                  {(["once", "monthly"] as const).map((f) => {
+                    const isActive = frequency === f;
+                    return (
+                      <button 
+                        key={f} 
+                        onClick={() => setFrequency(f)} 
+                        className={`relative px-[20px] py-[8px] rounded-[var(--radius-full)] font-['Inter'] font-[600] text-[13px] transition-colors duration-200 z-10 ${isActive ? "text-white" : "text-[var(--mid)]"}`}
+                      >
+                        {isActive && (
+                          <motion.div 
+                            layoutId="freqBgMed" 
+                            className="absolute inset-0 bg-[var(--teal)] rounded-[var(--radius-full)] z-[-1]" 
+                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                          />
+                        )}
+                        {f === "once" ? "One-Time" : "Monthly"}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {amounts.map((a) => (
-                  <button key={a.value} onClick={() => { setSelectedAmount(a.value); setCustomAmount(""); }} className={`p-4 rounded-xl border text-left transition-all duration-300 ${selectedAmount === a.value ? "bg-teal text-primary-foreground border-teal shadow-brand-md scale-[1.02]" : "bg-card text-text-dark border-border hover:bg-teal-light hover:border-teal"}`}>
-                    <span className="font-bold text-xl">{a.label}</span>
-                    <p className={`text-xs mt-1 ${selectedAmount === a.value ? "text-primary-foreground/80" : "text-text-mid"}`}>{a.impact}</p>
-                  </button>
-                ))}
+
+              <div className="grid grid-cols-2 gap-[12px] mb-6">
+                {amounts.map((a) => {
+                  const isSelected = selectedAmount === a.value;
+                  return (
+                    <motion.button 
+                      key={a.value} 
+                      onClick={() => { setSelectedAmount(a.value); setCustomAmount(""); }} 
+                      className={`flex flex-col justify-center min-h-[72px] lg:min-h-[64px] p-4 rounded-[var(--radius-lg)] border-[1.5px] text-left transition-colors duration-200 ${isSelected ? "bg-[var(--teal)] border-[var(--teal)] text-white shadow-[var(--shadow-md)]" : "bg-white text-[var(--dark)] border-[var(--border-color)] hover:bg-[var(--teal-light)] hover:border-[var(--teal)]"}`}
+                      animate={{ scale: isSelected ? 1.02 : 1 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <span className="font-['Inter'] font-[700] text-[20px] leading-tight">{a.label}</span>
+                      <p className={`font-['Inter'] font-[400] text-[11px] leading-tight mt-1 transition-opacity ${isSelected ? "opacity-[0.85] text-white" : "opacity-[0.80] text-[var(--mid)]"}`}>
+                        {a.impact}
+                      </p>
+                    </motion.button>
+                  );
+                })}
               </div>
-              <div className="mb-6">
-                <label className="text-sm text-text-mid mb-2 block">Or enter custom amount</label>
+
+              <div className="mb-8">
+                <label className="text-[14px] text-[var(--mid)] mb-2 block font-medium">Or enter custom amount</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-medium text-text-mid">₹</span>
-                  <input type="number" value={customAmount} onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(null); }} className="w-full h-12 pl-10 pr-4 border border-border rounded-lg text-lg font-medium bg-card focus:border-teal focus:ring-2 focus:ring-teal/15 outline-none transition-all" placeholder="Enter amount" />
+                  <span className="absolute left-[14px] top-1/2 -translate-y-1/2 text-[16px] font-[600] font-['Inter'] text-[var(--teal)]">₹</span>
+                  <input 
+                    type="number" 
+                    value={customAmount} 
+                    onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(null); }} 
+                    className="w-full h-[52px] pl-[28px] pr-[16px] border-[1.5px] border-[var(--border-color)] rounded-[var(--radius-md)] text-[18px] font-[500] font-['Inter'] text-[var(--dark)] focus:border-[var(--teal)] focus:shadow-[0_0_0_3px_rgba(31,154,168,0.12)] outline-none transition-all no-float" 
+                    placeholder="Enter amount" 
+                  />
                 </div>
               </div>
             </FadeInUp>
@@ -121,30 +262,36 @@ const DonateMedical = () => {
             {/* Tax Calculator */}
             {currentAmount > 0 && (
               <FadeInUp>
-                <div className="bg-card border border-border rounded-xl p-5 shadow-brand-sm mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm font-semibold text-text-dark">80G Tax Saving Calculator</p>
-                    <div className="flex gap-1">
+                <div className="bg-[var(--teal-light)] border border-[rgba(31,154,168,0.2)] rounded-[var(--radius-xl)] px-[24px] py-[20px] mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[14px] font-[600] text-[var(--dark)]">80G Tax Saving Calculator</p>
+                    <div className="flex bg-white rounded-full p-1 border border-black/5">
                       {slabs.map(s => (
-                        <button key={s} onClick={() => setTaxSlab(s)} className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${taxSlab === s ? "bg-teal text-primary-foreground" : "bg-background text-text-mid border border-border"}`}>{s}%</button>
+                        <button 
+                          key={s} 
+                          onClick={() => setTaxSlab(s)} 
+                          className={`px-3 py-1 rounded-full text-[12px] font-medium transition-colors ${taxSlab === s ? "bg-[var(--teal)] text-white" : "text-[var(--mid)] hover:text-[var(--dark)]"}`}
+                        >
+                          {s}%
+                        </button>
                       ))}
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-teal-light rounded-lg p-3 text-center">
-                      <p className="text-xs text-text-light">You donate</p>
-                      <p className="text-lg font-bold text-teal">₹{currentAmount.toLocaleString()}</p>
+                  <div className="flex flex-row gap-[12px]">
+                    <div className="flex-1 bg-white rounded-[var(--radius-md)] p-[12px_16px] text-center shadow-sm">
+                      <p className="text-[10px] font-[600] uppercase tracking-[0.06em] text-[var(--mid)] font-['Inter'] mb-1">You Donate</p>
+                      <p className="text-[20px] font-[700] font-['Inter'] text-[var(--teal)]">₹{currentAmount.toLocaleString()}</p>
                     </div>
-                    <div className="bg-teal-light rounded-lg p-3 text-center">
-                      <p className="text-xs text-text-light">Tax saving</p>
-                      <p className="text-lg font-bold text-green-600">₹{taxSaving.toLocaleString()}</p>
+                    <div className="flex-1 bg-white rounded-[var(--radius-md)] p-[12px_16px] text-center shadow-sm">
+                      <p className="text-[10px] font-[600] uppercase tracking-[0.06em] text-[var(--mid)] font-['Inter'] mb-1">Tax Saving</p>
+                      <p className="text-[20px] font-[700] font-['Inter'] text-[#16A34A]">₹{taxSaving.toLocaleString()}</p>
                     </div>
-                    <div className="bg-teal-light rounded-lg p-3 text-center">
-                      <p className="text-xs text-text-light">Net cost</p>
-                      <p className="text-lg font-bold text-text-dark">₹{netCost.toLocaleString()}</p>
+                    <div className="flex-1 bg-white rounded-[var(--radius-md)] p-[12px_16px] text-center shadow-sm">
+                      <p className="text-[10px] font-[600] uppercase tracking-[0.06em] text-[var(--mid)] font-['Inter'] mb-1">Net Cost</p>
+                      <p className="text-[20px] font-[700] font-['Inter'] text-[var(--dark)]">₹{netCost.toLocaleString()}</p>
                     </div>
                   </div>
-                  <p className="text-[11px] text-text-light text-center mt-2 italic">Under Section 80G of the Income Tax Act. Consult your CA for exact figures.</p>
+                  <p className="text-[11px] text-[var(--light)] text-center mt-3">Under Section 80G of the Income Tax Act. Consult your CA for exact figures.</p>
                 </div>
               </FadeInUp>
             )}
@@ -154,53 +301,71 @@ const DonateMedical = () => {
               {currentAmount >= 500 && <ImpactVisualiser amount={currentAmount} gateway="medical" />}
             </AnimatePresence>
 
-            {/* Donor Form */}
+            {/* Donor Form Details */}
             <AnimatePresence>
               {currentAmount > 0 && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    {[
-                      { name: "name" as const, label: "Full Name", type: "text" },
-                      { name: "email" as const, label: "Email Address", type: "email" },
-                      { name: "phone" as const, label: "Phone Number", type: "tel" },
-                    ].map((field) => (
-                      <div key={field.name}>
-                        <label className="text-sm font-medium text-text-dark mb-1 block">{field.label}</label>
-                        <input {...register(field.name)} type={field.type} className={`w-full h-12 px-4 border rounded-lg bg-card outline-none transition-all focus:border-teal focus:ring-2 focus:ring-teal/15 ${errors[field.name] ? "border-destructive" : "border-border"}`} />
-                        {errors[field.name] && <p className="text-xs text-destructive mt-1">{String(errors[field.name]?.message)}</p>}
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2  gap-5 lg:gap-8">
+                      {([["name", "Full Name", "text"], ["email", "Email Address", "email"]] as const).map(([name, label, type]) => (
+                        <div key={name}>
+                          <label className="text-sm font-medium text-[var(--dark)] mb-1 block">{label}</label>
+                          <input placeholder=" " {...register(name)} type={type} className={`w-full h-12 px-4 border rounded-lg bg-white outline-none transition-all focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/15 ${errors[name] ? "border-[#DC2626]" : "border-[var(--border-color)]"}`} />
+                          {errors[name] && <p className="text-xs text-[#DC2626] mt-1">{String(errors[name]?.message)}</p>}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2  gap-5 lg:gap-8">
+                      <div>
+                        <label className="text-sm font-medium text-[var(--dark)] mb-1 block">Phone Number</label>
+                        <input placeholder=" " {...register("phone")} type="tel" className={`w-full h-12 px-4 border rounded-lg bg-white outline-none transition-all focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/15 ${errors.phone ? "border-[#DC2626]" : "border-[var(--border-color)]"}`} />
+                        {errors.phone && <p className="text-xs text-[#DC2626] mt-1">{String(errors.phone?.message)}</p>}
                       </div>
-                    ))}
-                    <div>
-                      <label className="text-sm font-medium text-text-dark mb-1 block">PAN Number <span className="text-text-light">(optional)</span></label>
-                      <input {...register("pan")} className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal focus:ring-2 focus:ring-teal/15 transition-all" />
+                      <div>
+                        <label className="text-sm font-medium text-[var(--dark)] mb-1 block">PAN Number <span className="text-[var(--light)] font-normal text-xs">(Req for 80G)</span></label>
+                        <input placeholder=" " {...register("pan")} className="w-full h-12 px-4 border border-[var(--border-color)] rounded-lg bg-white outline-none transition-all focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/15" />
+                      </div>
                     </div>
 
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input {...register("showOnWall")} type="checkbox" className="w-4 h-4 accent-teal" />
-                      <span className="text-sm text-text-mid">Add my first name and city to the AGSWS Donor Wall</span>
+                    <label className="flex items-center gap-3 cursor-pointer py-3 mt-2">
+                      <input placeholder=" " {...register("showOnWall")} type="checkbox" className="w-[18px] h-[18px] rounded border-[1.5px] border-[var(--border-color)] text-[var(--teal)] focus:ring-[var(--teal)]" />
+                      <span className="text-[14px] text-[var(--mid)]">Add my first name and city to the AGSWS Donor Wall</span>
                     </label>
 
                     {/* Gift toggle */}
                     <div className="flex items-center gap-3 py-2">
-                      <button type="button" onClick={() => setValue("isGift", !isGift)} className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition-all ${isGift ? "bg-teal text-primary-foreground border-teal" : "bg-card text-text-mid border-border"}`}>
+                      <button type="button" onClick={() => setValue("isGift", !isGift)} className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${isGift ? "bg-[var(--teal-light)] text-[var(--teal)] border-[var(--teal)]" : "bg-transparent text-[var(--mid)] border-[var(--border-color)] hover:border-[var(--teal)] hover:text-[var(--teal)]"}`}>
                         <Gift size={16} /> Make this a gift donation
                       </button>
                     </div>
+
                     <AnimatePresence>
                       {isGift && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-3 border border-border rounded-xl p-4">
-                          <p className="label-text text-teal">Gift recipient details</p>
-                          <input {...register("giftRecipientName")} placeholder="Recipient's Name" className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal" />
-                          <input {...register("giftRecipientEmail")} placeholder="Recipient's Email" type="email" className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal" />
-                          <div className="relative">
-                            <textarea {...register("giftMessage")} placeholder="Personal message (optional)" maxLength={200} rows={3} className="w-full px-4 py-3 border border-border rounded-lg bg-card outline-none focus:border-teal text-sm" />
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-4 border border-[var(--border-color)] bg-white rounded-xl p-6 overflow-hidden">
+                          <p className="text-[13px] font-bold text-[var(--teal)] uppercase tracking-wider mb-2">Gift recipient details</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2  gap-5 lg:gap-8">
+                            <input {...register("giftRecipientName")} placeholder="Recipient's Name" className="w-full h-12 px-4 border border-[var(--border-color)] rounded-lg bg-white outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/15" />
+                            <input {...register("giftRecipientEmail")} placeholder="Recipient's Email" type="email" className="w-full h-12 px-4 border border-[var(--border-color)] rounded-lg bg-white outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/15" />
                           </div>
+                          <textarea {...register("giftMessage")} placeholder="Personal message (optional)" maxLength={200} rows={3} className="w-full p-4 border border-[var(--border-color)] rounded-lg bg-white outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/15 resize-none" />
                         </motion.div>
                       )}
                     </AnimatePresence>
 
-                    <button type="submit" className="w-full h-[52px] bg-yellow text-text-dark font-bold text-base rounded-full shadow-yellow hover:scale-[1.01] transition-transform mt-6">
-                      Complete Donation →
+                    <button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="w-full h-[52px] bg-[var(--yellow)] font-['Inter'] font-[700] text-[15px] text-[var(--dark)] rounded-[var(--radius-full)] hover:shadow-[var(--shadow-yellow)] transition-all flex items-center justify-center mt-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--yellow)] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="animate-spin mr-2 h-5 w-5" />
+                          Processing...
+                        </>
+                      ) : (
+                        `Donate ₹${currentAmount.toLocaleString()} Now →`
+                      )}
                     </button>
                   </form>
                 </motion.div>
@@ -208,30 +373,41 @@ const DonateMedical = () => {
             </AnimatePresence>
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:sticky lg:top-24 space-y-6 self-start">
+          {/* Trust Sidebar */}
+          <div className="lg:sticky lg:top-[80px] space-y-6 self-start">
             <CampaignThermometer goalAmount={500000} raisedAmount={320000} deadlineDate="2025-06-30" campaignName="Medical Aid Q2 Campaign" compact />
 
-            <div className="bg-card border border-border rounded-xl p-6 shadow-brand-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Shield size={20} className="text-teal" />
-                <span className="font-semibold text-text-dark">Your Donation is Safe</span>
+            <div className="bg-[var(--white)] border border-[var(--border-color)] rounded-[var(--radius-2xl)] p-[28px] shadow-[var(--shadow-card)]">
+              <div className="flex items-center gap-3 mb-5">
+                <Shield size={24} className="text-[var(--teal)]" />
+                <span className="font-semibold text-[var(--dark)] text-[16px]">Your Donation is Safe</span>
               </div>
               {["Patient treatment & medicines", "Surgery and specialist support", "Hospital operations & emergency care", "Field coordinator & transport"].map((text) => (
-                <div key={text} className="flex items-start gap-2 mb-3">
-                  <CheckCircle size={16} className="text-teal mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-text-mid">{text}</span>
+                <div key={text} className="flex items-start gap-3 mb-3.5">
+                  <CheckCircle size={18} className="text-[#16A34A] mt-0.5 flex-shrink-0" />
+                  <span className="text-[14px] leading-snug text-[var(--mid)]">{text}</span>
                 </div>
               ))}
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-6 shadow-brand-sm">
-              <h4 className="font-semibold text-text-dark mb-4 text-sm">Recent Donations</h4>
-              <div className="space-y-3">
-                {recentDonations.map((d, i) => (
+            <div className="bg-[var(--white)] border border-[var(--border-color)] rounded-[var(--radius-2xl)] p-[28px] shadow-[var(--shadow-card)]">
+              <h4 className="font-semibold text-[var(--dark)] mb-5 text-[15px]">Recent Support</h4>
+              <div className="space-y-4">
+                {(recentFeed.length > 0 ? recentFeed : [
+                  { city: "Kolkata", amount: "₹1,000", gateway: "Medical", time: "Just now" },
+                  { city: "Mumbai", amount: "₹5,000", gateway: "Medical", time: "5 min ago" },
+                  { city: "Delhi", amount: "₹500", gateway: "Medical", time: "12 min ago" },
+                  { city: "Pune", amount: "₹2,000", gateway: "Medical", time: "1 hr ago" },
+                ]).slice(0, 4).map((d: any, i: number) => (
                   <div key={i} className="flex items-center gap-3">
-                    <span className="w-2 h-2 rounded-full bg-teal flex-shrink-0" />
-                    <p className="text-xs text-text-mid">A donor from {d.city} donated {d.amount} — {d.time}</p>
+                    <span className="w-2.5 h-2.5 rounded-full bg-[var(--teal-light)] border-2 border-[var(--teal)] flex-shrink-0" />
+                    <p className="text-[13px] text-[var(--mid)] leading-tight flex-1">
+                      A donor from <span className="font-medium text-[var(--dark)]">{d.city ?? "India"}</span> donated{" "}
+                      <span className="font-semibold text-[var(--teal)]">
+                        {d.amount ? (typeof d.amount === "number" ? `₹${(d.amount).toLocaleString("en-IN")}` : d.amount) : "—"}
+                      </span>{" "}
+                      <span className="text-[var(--light)] text-[11px] block mt-0.5">{d.time ?? d.created_at ?? ""}</span>
+                    </p>
                   </div>
                 ))}
               </div>

@@ -21,17 +21,29 @@ const impactStatements: Record<string, Record<string, string>> = {
 const ThankYou = () => {
   useSEO("Thank You", "Thank you for your donation to AGSWS.");
   const [params] = useSearchParams();
+  const paymentId = params.get("payment_id") ?? "";
   const name = params.get("name") || "Friend";
   const amount = params.get("amount") || "0";
   const gateway = params.get("gateway") || "medical";
   const amountNum = parseInt(amount);
   const [countdown, setCountdown] = useState(60);
 
+  // Confetti on mount
+  useEffect(() => {
+    import("canvas-confetti").then(({ default: confetti }) => {
+      confetti({ particleCount: 120, spread: 80, colors: ["#1F9AA8","#F2B705","#5C5AA6","#B6A388","#FFFFFF"], origin: { y: 0.5 } });
+    });
+  }, []);
+
   useEffect(() => {
     if (countdown <= 0) return;
     const timer = setInterval(() => setCountdown(c => c - 1), 1000);
     return () => clearInterval(timer);
   }, [countdown]);
+
+  // Referral URL
+  const referralCode = `${name.split(" ")[0].toLowerCase()}${new Date().getFullYear()}`;
+  const referralUrl = `${window.location.origin}/donate/${gateway}?ref=${referralCode}`;
 
   let impact = "general community support";
   if (amountNum >= 10000) impact = "a full treatment cycle for a patient";
@@ -43,9 +55,16 @@ const ThankYou = () => {
     impactStatements.medical[amount] ||
     `Your ₹${amountNum.toLocaleString()} donation will fund ${impact}.`;
 
+  const donorData = (() => { try { return JSON.parse(localStorage.getItem("agsws_donor") ?? "{}"); } catch { return {}; } })();
   const siteUrl = window.location.origin;
-  const whatsappSendText = encodeURIComponent(`Your AGSWS donation receipt:\n\nAmount: ₹${amountNum.toLocaleString()}\nCause: ${gateway}\nDate: ${new Date().toLocaleDateString()}\n\nThank you for supporting children and families in Kolkata.`);
-  const whatsappShareText = encodeURIComponent(`I just donated ₹${amountNum.toLocaleString()} to AGSWS — The Ascension Group Social Welfare Society, Kolkata. They provide emergency medical care for elderly parents, school support for children, and hospital aid.\n\nJoin me: ${siteUrl}/donate/${gateway}`);
+  const whatsappSendText = encodeURIComponent(`Your AGSWS donation receipt:\n\nAmount: ₹${amountNum.toLocaleString("en-IN")}\nPayment ID: ${paymentId}\nCause: ${gateway}\nDate: ${new Date().toLocaleDateString("en-IN")}\n\nYour 80G receipt has been emailed to you.`);
+  const whatsappShareText = encodeURIComponent(`I just donated ₹${amountNum.toLocaleString("en-IN")} to AGSWS — a Kolkata NGO providing medical aid and education support.\n\nJoin me: ${referralUrl}`);
+  const whatsappSendUrl = donorData.phone ? `https://wa.me/${donorData.phone}?text=${whatsappSendText}` : `https://wa.me/?text=${whatsappSendText}`;
+
+  const handleDownload80G = () => {
+    if (paymentId) window.open(`${window.location.origin}/api/download-receipt?payment_id=${paymentId}`, "_blank");
+    else window.print();
+  };
 
   return (
     <main id="main-content" className="min-h-screen flex items-center justify-center bg-card">
@@ -70,7 +89,7 @@ const ThankYou = () => {
           <p className="text-sm text-primary-foreground/70 mt-3">Your impact update will be in your inbox within 60 seconds.</p>
         </motion.div>
 
-        <div className="bg-card border border-border rounded-xl p-6 shadow-brand-md mb-6">
+        <div className="global-card mb-6">
           <p className="text-sm text-text-light mb-1">Donation Amount</p>
           <p className="text-3xl font-bold text-teal">₹{amountNum.toLocaleString()}</p>
           <p className="text-sm text-text-mid mt-2">Impact: {impact}</p>
@@ -88,10 +107,10 @@ const ThankYou = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-3 mb-6">
-          <button onClick={() => window.print()} className="bg-yellow text-text-dark font-semibold px-5 py-3 rounded-full shadow-yellow text-sm flex items-center gap-2">
+          <button onClick={handleDownload80G} className="bg-yellow text-text-dark font-semibold px-5 py-3 rounded-full shadow-yellow text-sm flex items-center gap-2">
             <Printer size={16} /> Download 80G Receipt
           </button>
-          <a href={`https://wa.me/?text=${whatsappSendText}`} target="_blank" rel="noopener noreferrer" className="bg-[#25D366] text-primary-foreground font-semibold px-5 py-3 rounded-full text-sm flex items-center gap-2">
+          <a href={whatsappSendUrl} target="_blank" rel="noopener noreferrer" className="bg-[#25D366] text-primary-foreground font-semibold px-5 py-3 rounded-full text-sm flex items-center gap-2">
             <MessageCircle size={16} /> Send to WhatsApp
           </a>
           <a href={`https://wa.me/?text=${whatsappShareText}`} target="_blank" rel="noopener noreferrer" className="border border-[#25D366] text-[#25D366] font-semibold px-5 py-3 rounded-full text-sm flex items-center gap-2">

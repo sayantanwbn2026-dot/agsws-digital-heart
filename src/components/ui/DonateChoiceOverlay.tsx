@@ -52,7 +52,7 @@ const DonateChoiceOverlay = () => {
                 {/* Medical */}
                 <button
                   onClick={() => handleChoice("/donate/medical")}
-                  className="group text-left border border-border rounded-2xl p-6 bg-card hover:border-teal hover:bg-teal-light transition-all duration-220 hover:-translate-y-[3px] active:translate-y-[-1px] active:scale-[0.99] cursor-pointer"
+                  className="global-card group text-left hover: hover:bg-teal-light hover:-translate-y-[3px] active:translate-y-[-1px] active:scale-[0.99] cursor-pointer"
                 >
                   <div className="flex items-start gap-3 mb-3.5">
                     <div className="w-11 h-11 rounded-full bg-teal-light flex items-center justify-center flex-shrink-0">
@@ -82,7 +82,7 @@ const DonateChoiceOverlay = () => {
                 {/* Education */}
                 <button
                   onClick={() => handleChoice("/donate/education")}
-                  className="group text-left border border-border rounded-2xl p-6 bg-card hover:border-purple hover:bg-purple-light transition-all duration-220 hover:-translate-y-[3px] active:translate-y-[-1px] active:scale-[0.99] cursor-pointer"
+                  className="global-card group text-left hover: hover:bg-purple-light hover:-translate-y-[3px] active:translate-y-[-1px] active:scale-[0.99] cursor-pointer"
                 >
                   <div className="flex items-start gap-3 mb-3.5">
                     <div className="w-11 h-11 rounded-full bg-purple-light flex items-center justify-center flex-shrink-0">

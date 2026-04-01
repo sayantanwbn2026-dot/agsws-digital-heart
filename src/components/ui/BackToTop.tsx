@@ -11,6 +11,16 @@ const BackToTop = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const triggerScroll = () => {
+    // If lenis is globally available, use its scroll
+    // Otherwise fallback to native smooth scrolling
+    if ((window as any).lenis) {
+      (window as any).lenis.scrollTo(0, { duration: 1.2 });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <AnimatePresence>
       {show && (
@@ -19,11 +29,11 @@ const BackToTop = () => {
           animate={{ scale: 1 }}
           exit={{ scale: 0 }}
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-20 right-6 w-12 h-12 bg-teal text-primary-foreground rounded-full flex items-center justify-center shadow-brand-lg z-40 hover:bg-teal-dark transition-colors"
+          onClick={triggerScroll}
+          className="fixed bottom-[80px] right-[24px] w-[44px] h-[44px] bg-[var(--teal)] text-white rounded-full flex items-center justify-center shadow-[var(--shadow-md)] z-[997] hover:bg-opacity-90 transition-opacity border-none cursor-pointer"
           aria-label="Back to top"
         >
-          <ArrowUp size={20} />
+          <ArrowUp size={18} />
         </motion.button>
       )}
     </AnimatePresence>

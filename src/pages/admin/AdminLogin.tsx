@@ -55,22 +55,22 @@ const AdminLogin = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="text-sm font-medium text-text-dark mb-1 block">Email</label>
-            <input
+            <input placeholder=" "
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 px-4 border border-border rounded-lg bg-card outline-none focus:border-teal focus:ring-2 focus:ring-teal/15 transition-all"
+              className="global-card w-full h-12 outline-none focus: focus:ring-2 focus:ring-teal/15"
               required
             />
           </div>
           <div>
             <label className="text-sm font-medium text-text-dark mb-1 block">Password</label>
             <div className="relative">
-              <input
+              <input placeholder=" "
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-12 px-4 pr-12 border border-border rounded-lg bg-card outline-none focus:border-teal focus:ring-2 focus:ring-teal/15 transition-all"
+                className="global-card w-full h-12 pr-12 outline-none focus: focus:ring-2 focus:ring-teal/15"
                 required
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-light hover:text-text-mid">

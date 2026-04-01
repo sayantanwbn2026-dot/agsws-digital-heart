@@ -36,10 +36,10 @@ const Updates = () => {
 
       {/* Subscription Cards */}
       <section className="bg-background py-16">
-        <div className="max-w-[1000px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2  gap-5 lg:gap-8">
           {/* Email */}
           <FadeInUp>
-            <div className="bg-card border border-border rounded-xl p-8 shadow-brand-md h-full">
+            <div className="global-card h-full">
               <Mail size={40} className="text-teal mb-4" />
               <h3 className="heading-3 text-text-dark mb-2">Monthly Impact Letter</h3>
               <p className="text-sm text-text-mid mb-4">One email a month. Real stories. Real numbers. Zero spam.</p>
@@ -51,8 +51,8 @@ const Updates = () => {
                 ))}
               </ul>
               <form onSubmit={handleEmailSub} className="space-y-3">
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" className="w-full h-11 border border-border rounded-md px-3 text-sm focus:border-teal focus:ring-2 focus:ring-teal/15 outline-none" />
-                <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Email address" required className="w-full h-11 border border-border rounded-md px-3 text-sm focus:border-teal focus:ring-2 focus:ring-teal/15 outline-none" />
+                <input placeholder=" " value={name} onChange={e => setName(e.target.value)} placeholder="Your name" className="w-full h-11 border border-border rounded-md px-3 text-sm focus:border-teal focus:ring-2 focus:ring-teal/15 outline-none" />
+                <input placeholder=" " value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Email address" required className="w-full h-11 border border-border rounded-md px-3 text-sm focus:border-teal focus:ring-2 focus:ring-teal/15 outline-none" />
                 <button type="submit" className="w-full bg-yellow text-text-dark font-semibold py-2.5 rounded-full text-sm hover:shadow-yellow transition-shadow">Subscribe →</button>
               </form>
               <p className="text-[11px] text-text-light mt-3 text-center">500+ subscribers</p>
@@ -61,7 +61,7 @@ const Updates = () => {
 
           {/* WhatsApp */}
           <FadeInUp delay={0.1}>
-            <div className="bg-card border border-border rounded-xl p-8 shadow-brand-md h-full">
+            <div className="global-card h-full">
               <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center mb-4">
                 <Phone size={20} className="text-white" />
               </div>
@@ -77,7 +77,7 @@ const Updates = () => {
               <div className="space-y-3">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-light font-medium">+91</span>
-                  <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="98765 43210" className="w-full h-11 border border-border rounded-md pl-12 pr-3 text-sm focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/15 outline-none" />
+                  <input placeholder=" " value={phone} onChange={e => setPhone(e.target.value)} placeholder="98765 43210" className="w-full h-11 border border-border rounded-md pl-12 pr-3 text-sm focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/15 outline-none" />
                 </div>
                 <button onClick={handleWhatsApp} className="w-full bg-[#25D366] text-white font-semibold py-2.5 rounded-full text-sm hover:bg-[#20BA5B] transition-colors">Join on WhatsApp →</button>
               </div>
@@ -97,7 +97,7 @@ const Updates = () => {
           <div className="space-y-4">
             {updates.map((u, i) => (
               <FadeInUp key={u.id} delay={i * 0.04}>
-                <div className="bg-card border border-border rounded-lg p-5 hover:shadow-brand-sm transition-shadow">
+                <div className="global-card hover:">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-xs text-text-light">{new Date(u.date).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}</span>
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full text-primary-foreground ${updateCategoryColors[u.category]}`}>{u.category}</span>

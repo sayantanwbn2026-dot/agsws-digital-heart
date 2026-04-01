@@ -4,6 +4,7 @@ import FadeInUp from "@/components/ui/FadeInUp";
 import { faqs } from "@/data/faqs";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { StaggerContainer } from "@/components/ui/StaggerContainer";
 import PageHero from "@/components/layout/PageHero";
 
 const categories = ["Donations & Tax", "Parent Registration", "About AGSWS"];
@@ -36,20 +37,19 @@ const FAQ = () => {
             ))}
           </div>
 
-          <div className="space-y-3">
+          <StaggerContainer staggerDelay={0.05} className="space-y-3">
             {filtered.map((faq, i) => (
-              <FadeInUp key={i} delay={i * 0.05}>
-                <div className="border border-border rounded-lg overflow-hidden bg-card">
+                <div key={i} className="bg-white rounded-[var(--radius-lg)] border border-[var(--border-color)] mb-[8px] overflow-hidden">
                   <button
                     onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                    className="w-full flex items-center justify-between p-5 text-left"
+                    className="w-full flex items-center justify-between p-[18px_24px] text-left hover:bg-[var(--bg)] transition-colors"
                   >
-                    <span className={`font-semibold transition-colors ${openIndex === i ? "text-teal" : "text-text-dark"}`}>
+                    <span className={`font-['Inter'] font-[600] text-[15px] transition-colors ${openIndex === i ? "text-[var(--teal)]" : "text-[var(--dark)]"}`}>
                       {faq.question}
                     </span>
                     <ChevronDown
                       size={18}
-                      className={`text-text-light transition-transform duration-200 flex-shrink-0 ml-4 ${openIndex === i ? "rotate-180" : ""}`}
+                      className={`text-[var(--light)] transition-transform duration-250 flex-shrink-0 ml-4 ${openIndex === i ? "rotate-180" : ""}`}
                     />
                   </button>
                   <AnimatePresence>
@@ -60,14 +60,13 @@ const FAQ = () => {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <p className="px-5 pb-5 text-[15px] text-text-mid leading-[1.75]">{faq.answer}</p>
+                        <p className="px-[24px] pb-[18px] pt-0 text-[14px] text-[var(--mid)] leading-[1.75] font-['Inter'] font-[400]">{faq.answer}</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-              </FadeInUp>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
     </main>

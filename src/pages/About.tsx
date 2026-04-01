@@ -3,8 +3,11 @@ import FadeInUp from "@/components/ui/FadeInUp";
 import { team } from "@/data/team";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { FileCheck, Building2, Award, Globe } from "lucide-react";
+import { Building2, Award, Globe, FileCheck } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { StaggerContainer } from "@/components/ui/StaggerContainer";
+import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 
 const timeline = [
   { year: "2020", event: "AGSWS founded in Kolkata with a team of 4 volunteers." },
@@ -38,11 +41,10 @@ const About = () => {
 
       {/* Mission */}
       <section className="bg-card py-24">
-        <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2  gap-5 lg:gap-8">
           <FadeInUp>
-            <div className="flex">
-              <div className="w-1 bg-teal rounded-full mr-6 flex-shrink-0" />
-              <blockquote className="text-[28px] font-light text-teal leading-[1.5] italic">
+            <div className="flex justify-center w-full">
+              <blockquote className="text-[clamp(20px,2.5vw,28px)] font-[300] text-[var(--teal)] leading-[1.5] italic border-l-[4px] border-l-[var(--teal)] pl-[24px] max-w-[700px]">
                 "We believe every human being — regardless of economic status — deserves dignity, care, and opportunity."
               </blockquote>
             </div>
@@ -60,13 +62,9 @@ const About = () => {
         </div>
       </section>
 
-      {/* Timeline */}
       <section className="bg-background py-24">
         <div className="max-w-[800px] mx-auto px-6">
-          <FadeInUp className="text-center mb-16">
-            <span className="label-text text-teal">Our Journey</span>
-            <h2 className="heading-2 text-text-dark mt-3 before:hidden text-center">Milestones of Impact</h2>
-          </FadeInUp>
+          <SectionHeader label="Our Journey" title="Milestones of Impact" />
           <div className="relative">
             <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] border-l-2 border-dashed border-teal/30" />
             {timeline.map((item, i) => {
@@ -79,44 +77,37 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team */}
       <section className="bg-card py-24">
-        <div className="max-w-[1100px] mx-auto px-6">
-          <FadeInUp className="text-center mb-16">
-            <span className="label-text text-teal">Our Team</span>
-            <h2 className="heading-2 text-text-dark mt-3 before:hidden text-center">The People Behind AGSWS</h2>
-          </FadeInUp>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <SectionHeader label="Our Team" title="The People Behind AGSWS" />
+          <StaggerContainer staggerDelay={0.08} className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-[24px]">
             {team.map((member, i) => (
-              <FadeInUp key={member.name} delay={i * 0.1}>
                 <motion.div
-                  className="bg-card border border-border rounded-xl p-6 text-center shadow-brand-sm hover:shadow-brand-md transition-all duration-300"
-                  whileHover={{ y: -6 }}
+                  key={member.name}
+                  className="bg-white rounded-[var(--radius-xl)] border border-[var(--border-color)] shadow-[var(--shadow-card)] text-center p-[32px_24px] group"
+                  whileHover={{ y: -8, scale: 1.02 }}
                 >
-                  <div className={`w-20 h-20 rounded-full ${colorMap[member.color] || "bg-teal"} flex items-center justify-center mx-auto mb-4`}>
-                    <span className="text-primary-foreground font-bold text-lg">{member.initials}</span>
+                  <div className={`w-[100px] h-[100px] rounded-full overflow-hidden mx-auto mb-6 border-4 border-white shadow-md relative`}>
+                    <ImagePlaceholder category="community" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                    <div className={`absolute inset-0 flex items-center justify-center text-white/90 font-bold text-2xl ${colorMap[member.color] || "bg-[var(--teal)]"} opacity-0 group-hover:opacity-10 transition-opacity`}>
+                      {member.initials}
+                    </div>
                   </div>
-                  <h4 className="heading-4 text-text-dark mb-1">{member.name}</h4>
-                  <p className="label-text text-teal mb-3">{member.role}</p>
-                  <p className="body-small text-text-mid">{member.bio}</p>
+                  <h4 className="font-['Inter'] font-[700] text-[18px] text-[var(--dark)] mb-1">{member.name}</h4>
+                  <p className="text-[11px] uppercase tracking-[0.1em] font-bold text-[var(--teal)] mb-4">{member.role}</p>
+                  <p className="text-[14px] text-[var(--mid)] leading-relaxed">{member.bio}</p>
                 </motion.div>
-              </FadeInUp>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
-      {/* Legal */}
       <section className="bg-background py-24">
-        <div className="max-w-[1100px] mx-auto px-6">
-          <FadeInUp className="text-center mb-16">
-            <span className="label-text text-teal">Legal & Compliance</span>
-            <h2 className="heading-2 text-text-dark mt-3 before:hidden text-center">Transparency Documents</h2>
-          </FadeInUp>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <SectionHeader label="Legal & Compliance" title="Transparency Documents" />
+          <StaggerContainer staggerDelay={0.08} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-3 lg:gap-5">
             {docs.map((doc, i) => (
-              <FadeInUp key={doc.title} delay={i * 0.1}>
-                <div className="bg-card border border-border rounded-lg p-6">
+                <div key={doc.title} className="global-card">
                   <doc.icon size={28} className="text-teal mb-4" />
                   <h4 className="font-semibold text-text-dark mb-1">{doc.title}</h4>
                   <p className="text-sm font-medium text-text-dark">{doc.detail}</p>
@@ -125,9 +116,8 @@ const About = () => {
                     View Document
                   </button>
                 </div>
-              </FadeInUp>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
     </main>
@@ -142,16 +132,16 @@ const TimelineItem = ({ item, index, isLeft }: { item: { year: string; event: st
       ref={ref}
       initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
       animate={inView ? { opacity: 1, x: 0 } : {}}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
-      className={`relative flex items-center mb-12 ${isLeft ? "md:flex-row-reverse" : ""}`}
+      transition={{ delay: index * 0.15, duration: 0.6 }}
+      className={`relative flex items-center mb-16 last:mb-0 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}
     >
       <div className="hidden md:block w-1/2" />
-      <div className="absolute left-6 md:left-1/2 -translate-x-1/2 w-12 h-12 bg-teal rounded-full flex items-center justify-center z-10">
-        <span className="text-primary-foreground font-bold text-sm">{item.year}</span>
+      <div className="absolute left-6 md:left-1/2 -translate-x-1/2 w-[56px] h-[56px] bg-[var(--teal)] rounded-full flex items-center justify-center z-10 border-4 border-white shadow-lg">
+        <span className="font-['Inter'] font-[700] text-[13px] text-white">{item.year}</span>
       </div>
-      <div className={`ml-20 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-16 md:text-right" : "md:pl-16"}`}>
-        <div className="bg-card border border-border border-t-[3px] border-t-teal rounded-lg p-5 shadow-brand-md">
-          <p className="body-small text-text-mid">{item.event}</p>
+      <div className={`ml-20 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-20 md:text-right" : "md:pl-20 md:text-left"}`}>
+        <div className="bg-white shadow-[var(--shadow-card)] rounded-[var(--radius-xl)] border border-[var(--border-color)] p-8 border-t-[4px] border-t-[var(--teal)] hover:shadow-brand-lg transition-all duration-300">
+          <p className="text-[15px] leading-relaxed text-[var(--mid)] font-medium">{item.event}</p>
         </div>
       </div>
     </motion.div>

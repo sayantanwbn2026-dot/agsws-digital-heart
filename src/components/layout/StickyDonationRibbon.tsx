@@ -6,13 +6,13 @@ import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 const StickyDonationRibbon = () => {
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [donorCount, setDonorCount] = useState(2847);
-  const [flash, setFlash] = useState(false);
   const { openOverlay } = useDonateOverlay();
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight && !dismissed) {
+      // 30% of scrollable page, or past window.innerHeight
+      const scrollThreshold = Math.min(window.innerHeight, document.body.scrollHeight * 0.3);
+      if (window.scrollY > scrollThreshold && !dismissed) {
         setVisible(true);
       } else {
         setVisible(false);
@@ -22,44 +22,37 @@ const StickyDonationRibbon = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [dismissed]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDonorCount(c => c + 1);
-      setFlash(true);
-      setTimeout(() => setFlash(false), 400);
-    }, 45000 + Math.random() * 45000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <AnimatePresence>
       {visible && !dismissed && (
         <motion.div
-          initial={{ y: 100 }}
+          initial={{ y: 60 }}
           animate={{ y: 0 }}
-          exit={{ y: 100 }}
-          transition={{ type: "spring", stiffness: 100, damping: 20 }}
-          className="fixed bottom-0 md:bottom-0 w-full h-[60px] bg-card border-t-2 border-teal z-50 hidden md:flex items-center justify-between px-6 shadow-brand-md"
+          exit={{ y: 60 }}
+          transition={{ type: "spring", damping: 20, stiffness: 200 }}
+          className="fixed bottom-0 left-0 right-0 z-[998] h-[60px] bg-white border-t-[2px] border-t-[var(--teal)] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center justify-between px-[20px] md:px-[32px]"
         >
-          <p className="text-sm font-medium text-text-dark hidden sm:block">Your support saves lives.</p>
-          <div className="flex items-center gap-4 ml-auto">
-            <motion.span
-              className={`text-[11px] font-medium text-text-mid transition-colors ${flash ? "text-teal" : ""}`}
-              animate={flash ? { scale: [1, 1.15, 1] } : {}}
-              transition={{ duration: 0.3 }}
-            >
-              Join {donorCount.toLocaleString()} donors
-            </motion.span>
+          <div className="flex items-center">
+            <span className="font-['Inter'] font-[600] text-[14px] text-[var(--dark)]">
+              Your support saves lives.
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-[16px]">
             <motion.button
               onClick={openOverlay}
-              className="inline-block bg-yellow text-text-dark font-semibold text-sm px-6 py-2 rounded-full hover:shadow-yellow transition-shadow cursor-pointer"
+              className="bg-[var(--yellow)] text-[var(--dark)] font-[600] font-['Inter'] text-[14px] h-[40px] px-[20px] rounded-full flex items-center justify-center cursor-pointer border-none"
               animate={{ scale: [1, 1.04, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
-              Donate Now
+              Donate
             </motion.button>
-            <button onClick={() => setDismissed(true)} className="text-text-light hover:text-text-dark transition-colors" aria-label="Dismiss">
-              <X size={18} />
+            <button 
+              onClick={() => setDismissed(true)} 
+              className="w-[32px] h-[32px] rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors text-[var(--dark)]" 
+              aria-label="Dismiss Donation Ribbon"
+            >
+              <X size={16} />
             </button>
           </div>
         </motion.div>

@@ -21,16 +21,16 @@ const ImpactStory = () => {
         transition={{ duration: 1.2, ease: "easeInOut" }}
       />
       <div className="bg-gradient-to-r from-teal-dark to-[#0F1F20] relative">
-        {/* Background mosaic */}
-        <div className="absolute left-8 top-1/2 -translate-y-1/2 grid grid-cols-2 gap-2 opacity-[0.12] hidden lg:grid">
+        {/* Background mosaic - Moved to right and lowered opacity to prevent text overlap */}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 grid grid-cols-2 gap-4 opacity-[0.05] hidden xl:grid z-0 pointer-events-none">
           {(["child", "elderly", "medical", "community"] as const).map((cat) => (
-            <ImagePlaceholder key={cat} category={cat} className="w-[100px] h-[100px] rounded-md border-[3px] border-white/20" />
+            <ImagePlaceholder key={cat} category={cat} className="w-[140px] h-[140px] rounded-2xl border border-white/5" />
           ))}
         </div>
-        <div className="max-w-[1100px] mx-auto px-6 py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-[1240px] mx-auto px-6 py-28 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[55%_40%] gap-16 items-center">
             {/* Left */}
-            <motion.div style={{ y: leftY }} className="will-change-transform">
+            <motion.div style={{ y: leftY }} className="will-change-transform z-10 relative">
               <FadeInUp>
                 <span className="label-text text-yellow">Impact Story</span>
                 <h2 className="text-4xl font-bold text-primary-foreground mt-4 mb-6 tracking-tight">

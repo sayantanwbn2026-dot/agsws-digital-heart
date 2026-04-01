@@ -31,12 +31,12 @@ const SearchPage = () => {
         <div className="max-w-[800px] mx-auto w-full px-6 pb-8 relative z-10">
           <div className="relative">
             <SearchIcon size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light" />
-            <input
+            <input placeholder=" "
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search stories, campaigns, events, FAQs..."
               autoFocus
-              className="w-full h-14 bg-card rounded-xl pl-12 pr-4 text-lg text-text-dark border-none outline-none shadow-brand-lg"
+              className="global-card w-full h-14 pl-12 pr-4 text-lg text-text-dark outline-none"
             />
           </div>
         </div>
@@ -77,7 +77,7 @@ const SearchPage = () => {
               <h3 className="label-text text-teal mb-4">Stories ({results.stories.length})</h3>
               <div className="space-y-3">
                 {results.stories.map(s => (
-                  <Link key={s.slug} to={`/blog/${s.slug}`} className="block bg-card border border-border rounded-lg p-4 hover:shadow-brand-sm transition-shadow">
+                  <Link key={s.slug} to={`/blog/${s.slug}`} className="global-card block hover:">
                     <h4 className="font-semibold text-text-dark">{highlightMatch(s.title, query)}</h4>
                     <p className="text-sm text-text-mid mt-1">{highlightMatch(s.excerpt, query)}</p>
                   </Link>
@@ -91,7 +91,7 @@ const SearchPage = () => {
               <h3 className="label-text text-teal mb-4">FAQs ({results.faqs.length})</h3>
               <div className="space-y-3">
                 {results.faqs.map((f, i) => (
-                  <Link key={i} to="/faq" className="block bg-card border border-border rounded-lg p-4 hover:shadow-brand-sm transition-shadow">
+                  <Link key={i} to="/faq" className="global-card block hover:">
                     <h4 className="font-semibold text-text-dark">{highlightMatch(f.question, query)}</h4>
                     <p className="text-sm text-text-mid mt-1 line-clamp-2">{highlightMatch(f.answer, query)}</p>
                   </Link>
@@ -105,7 +105,7 @@ const SearchPage = () => {
               <h3 className="label-text text-teal mb-4">Events ({results.events.length})</h3>
               <div className="space-y-3">
                 {results.events.map(e => (
-                  <Link key={e.id} to="/events" className="block bg-card border border-border rounded-lg p-4 hover:shadow-brand-sm transition-shadow">
+                  <Link key={e.id} to="/events" className="global-card block hover:">
                     <h4 className="font-semibold text-text-dark">{highlightMatch(e.title, query)}</h4>
                     <p className="text-sm text-text-mid mt-1 line-clamp-2">{highlightMatch(e.description, query)}</p>
                   </Link>
@@ -119,7 +119,7 @@ const SearchPage = () => {
               <h3 className="label-text text-teal mb-4">Resources ({results.resources.length})</h3>
               <div className="space-y-3">
                 {results.resources.map((r, i) => (
-                  <Link key={i} to="/resources" className="block bg-card border border-border rounded-lg p-4 hover:shadow-brand-sm transition-shadow">
+                  <Link key={i} to="/resources" className="global-card block hover:">
                     <h4 className="font-semibold text-text-dark">{highlightMatch(r.title, query)}</h4>
                     <p className="text-sm text-text-mid mt-1 line-clamp-2">{highlightMatch(r.description, query)}</p>
                   </Link>
