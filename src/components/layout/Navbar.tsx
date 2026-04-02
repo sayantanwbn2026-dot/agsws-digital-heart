@@ -276,12 +276,12 @@ const Navbar = () => {
             >
               <form onSubmit={handleSearch} className="max-w-[800px] mx-auto relative flex items-center">
                 <Search size={18} className="text-[var(--light)] absolute left-0" />
-                <input placeholder=" "
+                <input
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search articles, generic terms, or initiatives..."
+                  placeholder="Search articles, initiatives..."
                   autoFocus
-                  className="w-full text-[16px] text-[var(--dark)] font-normal border-b-2 border-[var(--border-color)] focus:border-[var(--teal)] transition-colors py-3 pl-8 pr-8 outline-none bg-transparent"
+                  className="w-full text-[16px] text-[var(--dark)] font-normal border-b-2 border-[var(--border-color)] focus:border-[var(--teal)] transition-colors py-3 pl-8 pr-8 outline-none bg-transparent no-float"
                   style={{ fontFamily: 'var(--font)' }}
                 />
                 <button type="button" onClick={() => setSearchOpen(false)} className="absolute right-0 text-[var(--light)] hover:text-[var(--dark)] transition-colors">

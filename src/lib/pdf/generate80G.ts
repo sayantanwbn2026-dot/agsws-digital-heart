@@ -37,7 +37,7 @@ export async function generate80GPDF(
  
   page.drawText('SOCIAL WELFARE SOCIETY', {
     x: 40, y: height - 70,
-    size: 9, font: fontReg, color: rgb(1,1,1,0.8),
+    size: 9, font: fontReg, color: rgb(1, 1, 1),
   })
  
   page.drawText('80G DONATION RECEIPT', {

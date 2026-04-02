@@ -322,14 +322,15 @@ body {
     100% { transform: translateX(0); }
   }
 
-  div:has(> label + input), div:has(> label + textarea), div:has(> label + select),
-  div:has(> input + label), div:has(> textarea + label), div:has(> select + label) {
+  /* Floating label system — only for inputs WITHOUT .no-float */
+  div:has(> label + input:not(.no-float)), div:has(> label + textarea:not(.no-float)), div:has(> label + select:not(.no-float)),
+  div:has(> input:not(.no-float) + label), div:has(> textarea:not(.no-float) + label), div:has(> select:not(.no-float) + label) {
     position: relative;
     margin-top: 14px;
     margin-bottom: 24px;
   }
 
-  div:has(> input) > label, div:has(> textarea) > label, div:has(> select) > label {
+  div:has(> input:not(.no-float)) > label, div:has(> textarea:not(.no-float)) > label, div:has(> select:not(.no-float)) > label {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -343,16 +344,16 @@ body {
     background: transparent;
   }
 
-  div:has(> textarea) > label {
+  div:has(> textarea:not(.no-float)) > label {
     top: 24px;
   }
 
-  div:has(> input:focus) > label, 
-  div:has(> textarea:focus) > label, 
-  div:has(> select:focus) > label,
-  div:has(> input:not(:placeholder-shown)) > label, 
-  div:has(> textarea:not(:placeholder-shown)) > label,
-  div:has(> select:not([value=""])) > label {
+  div:has(> input:not(.no-float):focus) > label, 
+  div:has(> textarea:not(.no-float):focus) > label, 
+  div:has(> select:not(.no-float):focus) > label,
+  div:has(> input:not(.no-float):not(:placeholder-shown)) > label, 
+  div:has(> textarea:not(.no-float):not(:placeholder-shown)) > label,
+  div:has(> select:not(.no-float):not([value=""])) > label {
     top: -10px !important;
     transform: translateY(0) !important;
     left: 10px !important;
