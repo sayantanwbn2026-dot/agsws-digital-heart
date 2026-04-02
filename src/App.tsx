@@ -15,6 +15,7 @@ import BackToTop from "./components/ui/BackToTop";
 import { AnimatePresence, motion } from "framer-motion";
 import CookieConsent from "./components/ui/CookieConsent";
 import DonateChoiceOverlay from "./components/ui/DonateChoiceOverlay";
+import { useEffect } from "react";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Initiatives from "./pages/Initiatives";
@@ -52,6 +53,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const queryClient = new QueryClient();
+
+// Scroll to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [pathname]);
+  return null;
+};
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -132,6 +142,7 @@ const AppInner = () => {
         }}
       />
       <BrowserRouter>
+        <ScrollToTop />
         <DonateChoiceOverlay />
         <LiveTicker />
         <Navbar />

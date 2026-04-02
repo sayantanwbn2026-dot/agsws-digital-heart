@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { Check, Upload, ChevronDown } from "lucide-react";
+import { Check, Upload, ChevronDown, Shield, Heart } from "lucide-react";
+import PageHero from "@/components/layout/PageHero";
+import FadeInUp from "@/components/ui/FadeInUp";
 
 const steps = ["About You", "About Your Parent", "Documents", "Confirm & Pay"];
+
+const FormField = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div>
+    <label className="text-[12px] font-[600] text-[var(--dark)] mb-2 block uppercase tracking-[0.06em]">{label}</label>
+    {children}
+  </div>
+);
 
 const RegisterParent = () => {
   useSEO("Register Parent", "Register your elderly parent in Kolkata for emergency medical support through AGSWS.");
@@ -18,15 +26,15 @@ const RegisterParent = () => {
 
   if (success) {
     return (
-      <main id="main-content" className="min-h-screen flex items-center justify-center bg-card">
+      <main id="main-content" className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }} className="text-center max-w-md mx-auto px-6">
-          <div className="w-20 h-20 bg-teal rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check size={40} className="text-primary-foreground" />
+          <div className="w-20 h-20 bg-[var(--teal)] rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check size={40} className="text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-teal mb-2">Registration Complete!</h2>
-          <p className="text-lg font-bold text-teal mb-4">REG-2025-{Math.floor(1000 + Math.random() * 9000)}</p>
-          <p className="body-text text-text-mid mb-8">A confirmation has been emailed to you. Our coordinator will contact your parent within 24 hours.</p>
-          <button className="bg-yellow text-text-dark font-semibold px-8 py-3 rounded-full shadow-yellow">Download Registration PDF</button>
+          <h2 className="text-3xl font-bold text-[var(--teal)] mb-2">Registration Complete!</h2>
+          <p className="text-lg font-bold text-[var(--teal)] mb-4">REG-2025-{Math.floor(1000 + Math.random() * 9000)}</p>
+          <p className="text-[var(--mid)] mb-8">A confirmation has been emailed to you. Our coordinator will contact your parent within 24 hours.</p>
+          <button className="bg-[var(--yellow)] text-[var(--dark)] font-semibold px-8 py-3 rounded-full shadow-[var(--shadow-yellow)]">Download Registration PDF</button>
         </motion.div>
       </main>
     );
@@ -34,30 +42,43 @@ const RegisterParent = () => {
 
   return (
     <main id="main-content">
-      <section className="h-[300px] bg-gradient-to-r from-beige to-teal flex items-center justify-center relative">
-        <div className="absolute inset-0 bg-[#0D1B1C]/20" />
-        <div className="relative z-10 text-center max-w-2xl px-6">
-          <h1 className="heading-1 text-primary-foreground">Register Your Parent for Emergency Care</h1>
-          <p className="body-text text-primary-foreground/80 mt-3">You're far. We're here. Register your parent today.</p>
-        </div>
-      </section>
+      <PageHero 
+        title="Register Your Parent for Emergency Care" 
+        subtitle="You're far. We're here. Register your parent today."
+        bgVariant="warm" 
+        size="md"
+        breadcrumb={[{ label: "Home", href: "/" }, { label: "Register Parent" }]}
+      />
 
       {/* Stepper */}
-      <div className="global-card">
+      <div className="bg-white border-b border-[var(--border-color)] py-6">
         <div className="max-w-[700px] mx-auto px-6">
           <div className="flex items-center justify-between">
             {steps.map((label, i) => (
               <div key={label} className="flex items-center flex-1">
                 <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                    i < currentStep ? "bg-teal text-primary-foreground" : i === currentStep ? "border-2 border-teal text-teal bg-card" : "bg-border text-text-light"
-                  }`}>
+                  <motion.div
+                    animate={{ 
+                      scale: i === currentStep ? 1.1 : 1,
+                      backgroundColor: i < currentStep ? "var(--teal)" : i === currentStep ? "white" : "var(--bg)",
+                    }}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                      i < currentStep ? "text-white" : i === currentStep ? "border-2 border-[var(--teal)] text-[var(--teal)]" : "text-[var(--light)] border border-[var(--border-color)]"
+                    }`}
+                  >
                     {i < currentStep ? <Check size={16} /> : i + 1}
-                  </div>
-                  <span className="text-[11px] font-medium text-text-mid mt-2 hidden sm:block">{label}</span>
+                  </motion.div>
+                  <span className={`text-[11px] font-[500] mt-2 hidden sm:block ${i <= currentStep ? "text-[var(--teal)]" : "text-[var(--light)]"}`}>{label}</span>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`flex-1 h-[2px] mx-2 transition-colors ${i < currentStep ? "bg-teal" : "bg-border"}`} />
+                  <div className="flex-1 h-[2px] mx-3 rounded-full overflow-hidden bg-[var(--border-color)]">
+                    <motion.div
+                      className="h-full bg-[var(--teal)]"
+                      initial={{ width: "0%" }}
+                      animate={{ width: i < currentStep ? "100%" : "0%" }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
+                  </div>
                 )}
               </div>
             ))}
@@ -65,8 +86,8 @@ const RegisterParent = () => {
         </div>
       </div>
 
-      <section className="bg-background py-16">
-        <div className="max-w-[600px] mx-auto px-6">
+      <section className="bg-[var(--bg)] py-[var(--section-y-sm)]">
+        <div className="max-w-[640px] mx-auto px-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
@@ -75,111 +96,134 @@ const RegisterParent = () => {
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.3 }}
             >
-              {currentStep === 0 && (
-                <div className="space-y-4">
-                  <h3 className="heading-3 text-text-dark mb-6">About You</h3>
-                  <div className="bg-yellow-light border border-yellow/30 rounded-lg p-4 mb-6">
-                    <p className="text-sm text-text-mid">We'll send you a Registration ID and keep you updated about your parent's care.</p>
-                  </div>
-                  {[["Your Name", "yourName"], ["Your City (outside Kolkata)", "yourCity"], ["Your Phone", "yourPhone"], ["Your Email", "yourEmail"]].map(([label, name]) => (
-                    <div key={name}>
-                      <label className="text-sm font-medium text-text-dark mb-1 block">{label}</label>
-                      <input placeholder=" " {...register(name)} className="global-card w-full h-12 outline-none focus: focus:ring-2 focus:ring-teal/15" />
+              <div className="bg-white rounded-[var(--radius-2xl)] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-8">
+                {currentStep === 0 && (
+                  <div className="space-y-5">
+                    <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-2">About You</h3>
+                    <div className="bg-[var(--yellow-light)] border border-[var(--yellow)]/30 rounded-[var(--radius-lg)] p-4 flex items-start gap-3">
+                      <Shield size={18} className="text-[var(--yellow)] mt-0.5 flex-shrink-0" />
+                      <p className="text-[13px] text-[var(--mid)] leading-[1.6]">We'll send you a Registration ID and keep you updated about your parent's care.</p>
                     </div>
-                  ))}
-                  <div>
-                    <label className="text-sm font-medium text-text-dark mb-1 block">Relation to Parent</label>
-                    <select {...register("relation")} className="global-card w-full h-12 outline-none focus: text-text-dark">
-                      <option value="">Select</option>
-                      <option>Son</option><option>Daughter</option><option>Relative</option><option>Other</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 1 && (
-                <div className="space-y-4">
-                  <h3 className="heading-3 text-text-dark mb-6">About Your Parent</h3>
-                  <div className="bg-teal-light border border-teal/20 rounded-lg p-4 mb-6">
-                    <p className="text-sm text-text-mid">This information helps us respond faster in an emergency.</p>
-                  </div>
-                  {[["Parent's Full Name", "parentName"], ["Age", "parentAge"], ["Emergency Contact in Kolkata (Name)", "emergencyName"], ["Emergency Contact Phone", "emergencyPhone"]].map(([label, name]) => (
-                    <div key={name}>
-                      <label className="text-sm font-medium text-text-dark mb-1 block">{label}</label>
-                      <input placeholder=" " {...register(name)} className="global-card w-full h-12 outline-none focus: focus:ring-2 focus:ring-teal/15" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <FormField label="Your Name"><input {...register("yourName")} placeholder="Full name" className="no-float" /></FormField>
+                      <FormField label="Your City"><input {...register("yourCity")} placeholder="City (outside Kolkata)" className="no-float" /></FormField>
                     </div>
-                  ))}
-                  <div>
-                    <label className="text-sm font-medium text-text-dark mb-1 block">Address in Kolkata</label>
-                    <textarea placeholder=" " {...register("parentAddress")} rows={3} className="global-card w-full outline-none focus: focus:ring-2 focus:ring-teal/15" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-text-dark mb-1 block">Primary Medical Condition</label>
-                    <select {...register("medicalCondition")} className="global-card w-full h-12 outline-none focus: text-text-dark">
-                      <option value="">Select</option>
-                      <option>Cardiac</option><option>Diabetes</option><option>Respiratory</option><option>Orthopedic</option><option>Other</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 2 && (
-                <div className="space-y-6">
-                  <h3 className="heading-3 text-text-dark mb-6">Documents</h3>
-                  {[["Aadhar / ID Proof", true], ["Recent Medical Report", false], ["Recent Photo", false]].map(([label, required]) => (
-                    <div key={label as string} className="border-2 border-dashed border-teal/40 rounded-xl p-8 text-center hover:bg-teal-light/30 transition-colors cursor-pointer">
-                      <Upload size={32} className="text-teal mx-auto mb-3" />
-                      <p className="text-sm font-medium text-text-dark">{label as string} {required ? <span className="text-destructive">*</span> : <span className="text-text-light">(optional)</span>}</p>
-                      <p className="text-xs text-text-light mt-1">PDF, JPG, PNG — Max 5MB</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <FormField label="Your Phone"><input {...register("yourPhone")} type="tel" placeholder="+91 98765 43210" className="no-float" /></FormField>
+                      <FormField label="Your Email"><input {...register("yourEmail")} type="email" placeholder="your@email.com" className="no-float" /></FormField>
                     </div>
-                  ))}
-                </div>
-              )}
-
-              {currentStep === 3 && (
-                <div className="space-y-6">
-                  <h3 className="heading-3 text-text-dark mb-6">Confirm & Pay ₹100</h3>
-                  <div className="global-card">
-                    <h4 className="font-semibold text-text-dark mb-4">Registration Summary</h4>
-                    <div className="space-y-3">
-                      {[["Registrant", getValues("yourName") || "—"], ["Parent", getValues("parentName") || "—"], ["City", getValues("yourCity") || "—"], ["Condition", getValues("medicalCondition") || "—"]].map(([l, v]) => (
-                        <div key={l} className="flex justify-between text-sm border-b border-border pb-2">
-                          <span className="text-text-light">{l}</span>
-                          <span className="font-medium text-text-dark">{v}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <FormField label="Relation to Parent">
+                      <select {...register("relation")} className="no-float">
+                        <option value="">Select relationship</option>
+                        <option>Son</option><option>Daughter</option><option>Relative</option><option>Other</option>
+                      </select>
+                    </FormField>
                   </div>
+                )}
 
-                  <details className="global-card">
-                    <summary className="flex items-center justify-between p-4 cursor-pointer text-sm font-medium text-text-dark">
-                      Why ₹100? <ChevronDown size={16} />
-                    </summary>
-                    <p className="px-4 pb-4 text-sm text-text-mid">The ₹100 fee covers admin processing, SMS alert setup, coordinator assignment, and registration card printing.</p>
-                  </details>
+                {currentStep === 1 && (
+                  <div className="space-y-5">
+                    <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-2">About Your Parent</h3>
+                    <div className="bg-[var(--teal-light)] border border-[var(--teal)]/20 rounded-[var(--radius-lg)] p-4 flex items-start gap-3">
+                      <Heart size={18} className="text-[var(--teal)] mt-0.5 flex-shrink-0" />
+                      <p className="text-[13px] text-[var(--mid)] leading-[1.6]">This information helps us respond faster in an emergency.</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <FormField label="Parent's Full Name"><input {...register("parentName")} placeholder="Full name" className="no-float" /></FormField>
+                      <FormField label="Age"><input {...register("parentAge")} type="number" placeholder="Age" className="no-float" /></FormField>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <FormField label="Emergency Contact Name"><input {...register("emergencyName")} placeholder="Name in Kolkata" className="no-float" /></FormField>
+                      <FormField label="Emergency Contact Phone"><input {...register("emergencyPhone")} type="tel" placeholder="Phone number" className="no-float" /></FormField>
+                    </div>
+                    <FormField label="Address in Kolkata">
+                      <textarea {...register("parentAddress")} placeholder="Full address" rows={3} className="no-float" />
+                    </FormField>
+                    <FormField label="Primary Medical Condition">
+                      <select {...register("medicalCondition")} className="no-float">
+                        <option value="">Select condition</option>
+                        <option>Cardiac</option><option>Diabetes</option><option>Respiratory</option><option>Orthopedic</option><option>Other</option>
+                      </select>
+                    </FormField>
+                  </div>
+                )}
 
-                  <button
-                    onClick={() => setSuccess(true)}
-                    className="w-full h-[52px] bg-yellow text-text-dark font-bold text-base rounded-full shadow-yellow hover:scale-[1.01] transition-transform"
-                  >
-                    Pay ₹100 & Register →
-                  </button>
-                  <p className="text-xs text-text-light text-center">One-time platform maintenance fee. Non-refundable.</p>
-                </div>
-              )}
+                {currentStep === 2 && (
+                  <div className="space-y-6">
+                    <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-2">Upload Documents</h3>
+                    <p className="text-[13px] text-[var(--mid)]">Upload identification and medical documents to help us process your registration faster.</p>
+                    {[["Aadhar / ID Proof", true], ["Recent Medical Report", false], ["Recent Photo", false]].map(([label, required]) => (
+                      <motion.div 
+                        key={label as string} 
+                        whileHover={{ scale: 1.01, borderColor: "var(--teal)" }}
+                        className="border-2 border-dashed border-[var(--border-color)] rounded-[var(--radius-xl)] p-8 text-center cursor-pointer transition-colors"
+                      >
+                        <Upload size={28} className="text-[var(--teal)] mx-auto mb-3" />
+                        <p className="text-[14px] font-[600] text-[var(--dark)]">{label as string} {required ? <span className="text-[#DC2626]">*</span> : <span className="text-[var(--light)] font-[400]">(optional)</span>}</p>
+                        <p className="text-[12px] text-[var(--light)] mt-1">PDF, JPG, PNG — Max 5MB</p>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                {currentStep === 3 && (
+                  <div className="space-y-6">
+                    <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-2">Confirm & Pay ₹100</h3>
+                    
+                    <div className="bg-[var(--bg)] rounded-[var(--radius-xl)] p-6">
+                      <h4 className="font-[600] text-[var(--dark)] mb-4 text-[14px] uppercase tracking-[0.06em]">Registration Summary</h4>
+                      <div className="space-y-3">
+                        {[["Registrant", getValues("yourName") || "—"], ["Parent", getValues("parentName") || "—"], ["City", getValues("yourCity") || "—"], ["Condition", getValues("medicalCondition") || "—"]].map(([l, v]) => (
+                          <div key={l} className="flex justify-between text-sm border-b border-[var(--border-color)] pb-3">
+                            <span className="text-[var(--light)]">{l}</span>
+                            <span className="font-[600] text-[var(--dark)]">{v}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <details className="bg-[var(--bg)] rounded-[var(--radius-xl)] overflow-hidden">
+                      <summary className="flex items-center justify-between p-5 cursor-pointer text-[14px] font-[600] text-[var(--dark)]">
+                        Why ₹100? <ChevronDown size={16} className="text-[var(--light)]" />
+                      </summary>
+                      <p className="px-5 pb-5 text-[13px] text-[var(--mid)] leading-[1.6]">The ₹100 fee covers admin processing, SMS alert setup, coordinator assignment, and registration card printing.</p>
+                    </details>
+
+                    <motion.button
+                      onClick={() => setSuccess(true)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full h-[52px] bg-[var(--yellow)] text-[var(--dark)] font-[700] text-[15px] rounded-full shadow-[var(--shadow-yellow)] transition-all"
+                    >
+                      Pay ₹100 & Register →
+                    </motion.button>
+                    <p className="text-[12px] text-[var(--light)] text-center">One-time platform maintenance fee. Non-refundable.</p>
+                  </div>
+                )}
+              </div>
             </motion.div>
           </AnimatePresence>
 
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between mt-6">
             {currentStep > 0 && (
-              <button onClick={prevStep} className="global-card .5 text-sm font-medium text-text-mid hover:">
+              <motion.button 
+                onClick={prevStep} 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-2.5 border border-[var(--border-color)] text-[var(--mid)] rounded-full text-[14px] font-[600] hover:bg-white transition-colors"
+              >
                 ← Back
-              </button>
+              </motion.button>
             )}
             {currentStep < 3 && (
-              <button onClick={nextStep} className="ml-auto px-6 py-2.5 bg-teal text-primary-foreground rounded-full text-sm font-semibold hover:bg-teal-dark transition-colors">
+              <motion.button 
+                onClick={nextStep} 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="ml-auto px-8 py-2.5 bg-[var(--teal)] text-white rounded-full text-[14px] font-[600] hover:bg-[var(--teal-dark)] transition-colors"
+              >
                 Continue →
-              </button>
+              </motion.button>
             )}
           </div>
         </div>
