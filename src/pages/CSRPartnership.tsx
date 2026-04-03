@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
+import PageHero from "@/components/layout/PageHero";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Heart, BookOpen, Users, ShieldCheck, FileText, CheckCircle } from "lucide-react";
+import { Heart, BookOpen, Users, ShieldCheck, FileText, CheckCircle, Building, ArrowRight } from "lucide-react";
 
 const csrSchema = z.object({
   companyName: z.string().min(2, "Required"),
@@ -23,25 +24,33 @@ const csrSchema = z.object({
   consent: z.boolean().refine(v => v, "Required"),
 });
 
+const csrAreas = [
+  { icon: Heart, title: "Healthcare CSR", desc: "Schedule VII (i) — Health, sanitation, and preventive care", color: "var(--teal)" },
+  { icon: BookOpen, title: "Education CSR", desc: "Schedule VII (ii) — Promoting education and livelihood", color: "var(--purple)" },
+  { icon: Users, title: "Elderly Care", desc: "Schedule VII (iii) — Measures for senior citizen welfare", color: "var(--beige)" },
+];
+
 const CSRPartnership = () => {
   useSEO("CSR Partnership", "Partner with AGSWS for meaningful CSR impact.");
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<z.infer<typeof csrSchema>>({ resolver: zodResolver(csrSchema), defaultValues: { focusMedical: false, focusEducation: false, focusElderly: false, focusVolunteering: false, consent: false } });
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<z.infer<typeof csrSchema>>({
+    resolver: zodResolver(csrSchema),
+    defaultValues: { focusMedical: false, focusEducation: false, focusElderly: false, focusVolunteering: false, consent: false },
+  });
   const data = watch();
-
   const onSubmit = () => setSubmitted(true);
 
   if (submitted) {
     return (
-      <main id="main-content" className="min-h-screen flex items-center justify-center bg-background">
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md mx-auto px-6 py-16">
-          <div className="w-20 h-20 bg-teal rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle size={40} className="text-primary-foreground" />
+      <main id="main-content" className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
+        <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }} className="text-center max-w-md mx-auto px-6 py-16">
+          <div className="w-20 h-20 bg-[var(--teal)] rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle size={40} className="text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-teal mb-2">Proposal Sent!</h2>
-          <p className="text-text-mid text-sm mb-6">Our CSR team will follow up within 48 hours at {data.contactEmail}.</p>
-          <a href="/" className="text-teal font-semibold hover:underline">Back to Home</a>
+          <h2 className="text-[28px] font-[700] text-[var(--teal)] mb-3">Proposal Sent!</h2>
+          <p className="text-[var(--mid)] text-[14px] mb-6 leading-[1.7]">Our CSR team will follow up within 48 hours at {data.contactEmail}.</p>
+          <a href="/" className="text-[var(--teal)] font-[600] text-[14px] hover:underline">← Back to Home</a>
         </motion.div>
       </main>
     );
@@ -49,47 +58,51 @@ const CSRPartnership = () => {
 
   return (
     <main id="main-content">
-      <section className="h-[360px] bg-gradient-to-br from-teal-dark via-teal to-teal flex items-center justify-center relative">
-        <div className="absolute inset-0 bg-[#0D1B1C]/30" />
-        <div className="relative z-10 text-center">
-          <h1 className="heading-1 text-primary-foreground">Partner With AGSWS for CSR</h1>
-          <p className="text-sm text-primary-foreground/60 mt-3">Meaningful impact. Full compliance. Instant documentation.</p>
-          <div className="flex gap-3 justify-center mt-6">
-            {["Schedule VII Compliant", "80G + 12A Certified"].map(b => (
-              <span key={b} className="bg-primary-foreground/10 text-primary-foreground text-xs font-semibold px-4 py-1.5 rounded-full flex items-center gap-1.5">
-                <ShieldCheck size={14} /> {b}
-              </span>
+      <PageHero title="Partner With AGSWS" label="CSR Partnership" subtitle="Meaningful impact. Full compliance. Instant documentation." bgVariant="teal-dark" size="md" breadcrumb={[{ label: "Home", href: "/" }, { label: "CSR Partnership" }]}>
+        <div className="flex gap-3 mt-4">
+          {["Schedule VII Compliant", "80G + 12A Certified"].map(b => (
+            <span key={b} className="bg-white/[0.08] text-white/90 text-[11px] font-[600] px-4 py-1.5 rounded-full flex items-center gap-1.5 border border-white/[0.1]">
+              <ShieldCheck size={12} /> {b}
+            </span>
+          ))}
+        </div>
+      </PageHero>
+
+      {/* CSR Areas */}
+      <section className="bg-white py-[64px] lg:py-[80px]">
+        <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {csrAreas.map((c, i) => (
+              <FadeInUp key={c.title} delay={i * 0.08}>
+                <div className="bg-white rounded-[var(--radius-xl)] border border-[var(--border-color)] p-6 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] transition-shadow">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: `color-mix(in srgb, ${c.color} 10%, white)` }}>
+                    <c.icon size={22} style={{ color: c.color }} />
+                  </div>
+                  <h4 className="font-[600] text-[var(--dark)] mb-2 text-[16px]">{c.title}</h4>
+                  <p className="text-[13px] text-[var(--mid)] leading-[1.7]">{c.desc}</p>
+                </div>
+              </FadeInUp>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-background py-12">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <FadeInUp>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-              {[
-                { icon: Heart, title: "Healthcare CSR", desc: "Schedule VII item (i) — health, sanitation, safe drinking water" },
-                { icon: BookOpen, title: "Education CSR", desc: "Schedule VII item (ii) — promoting education and livelihood" },
-                { icon: Users, title: "Elderly Care CSR", desc: "Schedule VII item (iii) — measures for elderly welfare" },
-              ].map(c => (
-                <div key={c.title} className="global-card">
-                  <c.icon size={28} className="text-teal mb-3" />
-                  <h4 className="font-semibold text-text-dark mb-2">{c.title}</h4>
-                  <p className="text-sm text-text-mid">{c.desc}</p>
-                </div>
-              ))}
-            </div>
-          </FadeInUp>
-
+      {/* Form */}
+      <section className="bg-[var(--bg)] py-[64px] lg:py-[96px]">
+        <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)]">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-12">
             <div>
               {/* Stepper */}
-              <div className="flex items-center gap-2 mb-8">
+              <div className="flex items-center gap-3 mb-8">
                 {[1, 2, 3].map(s => (
-                  <div key={s} className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= s ? "bg-teal text-primary-foreground" : "bg-border text-text-light"}`}>{s}</div>
-                    {s < 3 && <div className={`w-8 h-0.5 ${step > s ? "bg-teal" : "bg-border"}`} />}
+                  <div key={s} className="flex items-center gap-3">
+                    <motion.div
+                      animate={{ scale: step === s ? 1.1 : 1 }}
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-[700] transition-colors ${step >= s ? "bg-[var(--teal)] text-white" : "bg-[var(--border-color)] text-[var(--light)]"}`}
+                    >
+                      {step > s ? <CheckCircle size={14} /> : s}
+                    </motion.div>
+                    {s < 3 && <div className={`w-10 h-[2px] rounded-full transition-colors ${step > s ? "bg-[var(--teal)]" : "bg-[var(--border-color)]"}`} />}
                   </div>
                 ))}
               </div>
@@ -97,71 +110,82 @@ const CSRPartnership = () => {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <AnimatePresence mode="wait">
                   {step === 1 && (
-                    <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                      <h3 className="heading-3 mb-4">Your Organisation</h3>
-                      {[
-                        { name: "companyName" as const, label: "Company Name", type: "text" },
-                        { name: "contactName" as const, label: "Contact Person", type: "text" },
-                        { name: "contactEmail" as const, label: "Email", type: "email" },
-                        { name: "contactPhone" as const, label: "Phone", type: "tel" },
-                        { name: "website" as const, label: "Website (optional)", type: "url" },
-                      ].map(f => (
-                        <div key={f.name}>
-                          <label className="text-sm font-medium text-text-dark mb-1 block">{f.label}</label>
-                          <input placeholder=" " {...register(f.name)} type={f.type} className={`w-full h-12 px-4 border rounded-lg bg-card outline-none transition-all focus:border-teal focus:ring-2 focus:ring-teal/15 ${errors[f.name] ? "border-destructive" : "border-border"}`} />
-                        </div>
-                      ))}
-                      <div>
-                        <label className="text-sm font-medium text-text-dark mb-1 block">Industry</label>
-                        <select {...register("industry")} className="global-card w-full h-12 outline-none focus:">
-                          <option value="">Select</option>
-                          {["Technology", "Finance", "Manufacturing", "Healthcare", "FMCG", "Real Estate", "Other"].map(o => <option key={o} value={o}>{o}</option>)}
-                        </select>
-                      </div>
-                      <button type="button" onClick={() => setStep(2)} className="bg-teal text-primary-foreground font-semibold px-8 py-3 rounded-full mt-4">Next →</button>
-                    </motion.div>
-                  )}
-                  {step === 2 && (
-                    <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                      <h3 className="heading-3 mb-4">CSR Budget & Focus</h3>
-                      <div>
-                        <label className="text-sm font-medium text-text-dark mb-1 block">Annual CSR Budget</label>
-                        <select {...register("budgetRange")} className="global-card w-full h-12 outline-none focus:">
-                          <option value="">Select range</option>
-                          {["Below ₹5 Lakh", "₹5L–₹25L", "₹25L–₹1 Cr", "Above ₹1 Cr"].map(o => <option key={o} value={o}>{o}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-text-dark mb-2">Focus Areas</p>
+                    <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="bg-white rounded-[var(--radius-2xl)] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-8">
+                      <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-6">Your Organisation</h3>
+                      <div className="space-y-5">
                         {[
-                          { name: "focusMedical" as const, label: "Medical Aid & Hospital Support" },
-                          { name: "focusEducation" as const, label: "Education for Underprivileged Children" },
-                          { name: "focusElderly" as const, label: "Elderly Care Support" },
-                          { name: "focusVolunteering" as const, label: "Employee Volunteering" },
-                        ].map(c => (
-                          <label key={c.name} className="flex items-center gap-3 py-2 cursor-pointer">
-                            <input placeholder=" " {...register(c.name)} type="checkbox" className="w-4 h-4 accent-teal" />
-                            <span className="text-sm text-text-mid">{c.label}</span>
-                          </label>
+                          { name: "companyName" as const, label: "Company Name", type: "text" },
+                          { name: "contactName" as const, label: "Contact Person", type: "text" },
+                          { name: "contactEmail" as const, label: "Email", type: "email" },
+                          { name: "contactPhone" as const, label: "Phone", type: "tel" },
+                          { name: "website" as const, label: "Website (optional)", type: "url" },
+                        ].map(f => (
+                          <div key={f.name}>
+                            <label className="text-[12px] font-[600] text-[var(--dark)] mb-2 block uppercase tracking-[0.06em]">{f.label}</label>
+                            <input {...register(f.name)} type={f.type} placeholder={f.label} className={`no-float ${errors[f.name] ? "!border-[#DC2626]" : ""}`} />
+                            {errors[f.name] && <p className="text-[12px] text-[#DC2626] mt-1">{String(errors[f.name]?.message)}</p>}
+                          </div>
                         ))}
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-text-dark mb-1 block">Timeline</label>
-                        <select {...register("timeline")} className="global-card w-full h-12 outline-none focus:">
-                          <option value="">Select</option>
-                          {["This Quarter", "This Financial Year", "Next Year", "Flexible"].map(o => <option key={o} value={o}>{o}</option>)}
-                        </select>
-                      </div>
-                      <div className="flex gap-3 mt-4">
-                        <button type="button" onClick={() => setStep(1)} className="border border-border text-text-mid font-semibold px-8 py-3 rounded-full">← Back</button>
-                        <button type="button" onClick={() => setStep(3)} className="bg-teal text-primary-foreground font-semibold px-8 py-3 rounded-full">Next →</button>
+                        <div>
+                          <label className="text-[12px] font-[600] text-[var(--dark)] mb-2 block uppercase tracking-[0.06em]">Industry</label>
+                          <select {...register("industry")} className="no-float">
+                            <option value="">Select</option>
+                            {["Technology", "Finance", "Manufacturing", "Healthcare", "FMCG", "Real Estate", "Other"].map(o => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        </div>
+                        <motion.button type="button" onClick={() => setStep(2)} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="bg-[var(--teal)] text-white font-[600] px-8 py-3 rounded-full text-[14px] mt-2">
+                          Next →
+                        </motion.button>
                       </div>
                     </motion.div>
                   )}
+
+                  {step === 2 && (
+                    <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="bg-white rounded-[var(--radius-2xl)] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-8">
+                      <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-6">CSR Budget & Focus</h3>
+                      <div className="space-y-5">
+                        <div>
+                          <label className="text-[12px] font-[600] text-[var(--dark)] mb-2 block uppercase tracking-[0.06em]">Annual CSR Budget</label>
+                          <select {...register("budgetRange")} className="no-float">
+                            <option value="">Select range</option>
+                            {["Below ₹5 Lakh", "₹5L–₹25L", "₹25L–₹1 Cr", "Above ₹1 Cr"].map(o => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <p className="text-[12px] font-[600] text-[var(--dark)] mb-3 uppercase tracking-[0.06em]">Focus Areas</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {[
+                              { name: "focusMedical" as const, label: "Medical Aid & Hospital Support", icon: Heart },
+                              { name: "focusEducation" as const, label: "Education for Children", icon: BookOpen },
+                              { name: "focusElderly" as const, label: "Elderly Care Support", icon: Users },
+                              { name: "focusVolunteering" as const, label: "Employee Volunteering", icon: Building },
+                            ].map(c => (
+                              <label key={c.name} className="flex items-center gap-3 p-3 rounded-[var(--radius-md)] border border-[var(--border-color)] cursor-pointer hover:bg-[var(--bg)] transition-colors">
+                                <input {...register(c.name)} type="checkbox" className="w-4 h-4 accent-[var(--teal)]" />
+                                <span className="text-[13px] text-[var(--mid)] font-[500]">{c.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[12px] font-[600] text-[var(--dark)] mb-2 block uppercase tracking-[0.06em]">Timeline</label>
+                          <select {...register("timeline")} className="no-float">
+                            <option value="">Select</option>
+                            {["This Quarter", "This Financial Year", "Next Year", "Flexible"].map(o => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        </div>
+                        <div className="flex gap-3 mt-2">
+                          <button type="button" onClick={() => setStep(1)} className="border border-[var(--border-color)] text-[var(--mid)] font-[600] px-6 py-3 rounded-full text-[14px] hover:bg-[var(--bg)] transition-colors">← Back</button>
+                          <motion.button type="button" onClick={() => setStep(3)} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="bg-[var(--teal)] text-white font-[600] px-8 py-3 rounded-full text-[14px]">Next →</motion.button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
                   {step === 3 && (
-                    <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                      <h3 className="heading-3 mb-4">Confirm & Submit</h3>
-                      <div className="global-card space-y-3 text-sm">
+                    <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="bg-white rounded-[var(--radius-2xl)] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-8">
+                      <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-6">Review & Submit</h3>
+                      <div className="bg-[var(--bg)] rounded-[var(--radius-xl)] p-6 mb-6">
                         {[
                           ["Company", data.companyName],
                           ["Contact", data.contactName],
@@ -169,21 +193,21 @@ const CSRPartnership = () => {
                           ["Budget", data.budgetRange],
                           ["Timeline", data.timeline],
                         ].map(([l, v]) => (
-                          <div key={l} className="flex justify-between">
-                            <span className="text-text-light">{l}</span>
-                            <span className="font-medium text-text-dark">{v || "—"}</span>
+                          <div key={l} className="flex justify-between py-2.5 border-b border-[var(--border-color)] last:border-0">
+                            <span className="text-[13px] text-[var(--light)]">{l}</span>
+                            <span className="text-[13px] font-[600] text-[var(--dark)]">{v || "—"}</span>
                           </div>
                         ))}
                       </div>
-                      <label className="flex items-start gap-3 py-2 cursor-pointer">
-                        <input placeholder=" " {...register("consent")} type="checkbox" className="w-4 h-4 accent-teal mt-0.5" />
-                        <span className="text-sm text-text-mid">I agree to be contacted by AGSWS regarding this enquiry</span>
+                      <label className="flex items-start gap-3 py-2 cursor-pointer mb-4">
+                        <input {...register("consent")} type="checkbox" className="w-4 h-4 accent-[var(--teal)] mt-0.5" />
+                        <span className="text-[13px] text-[var(--mid)]">I agree to be contacted by AGSWS regarding this enquiry</span>
                       </label>
-                      <div className="flex gap-3 mt-4">
-                        <button type="button" onClick={() => setStep(2)} className="border border-border text-text-mid font-semibold px-8 py-3 rounded-full">← Back</button>
-                        <button type="submit" className="bg-yellow text-text-dark font-bold px-8 py-3 rounded-full shadow-yellow flex items-center gap-2">
-                          <FileText size={16} /> Generate My Proposal →
-                        </button>
+                      <div className="flex gap-3">
+                        <button type="button" onClick={() => setStep(2)} className="border border-[var(--border-color)] text-[var(--mid)] font-[600] px-6 py-3 rounded-full text-[14px] hover:bg-[var(--bg)] transition-colors">← Back</button>
+                        <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="bg-[var(--yellow)] text-[var(--dark)] font-[700] px-8 py-3 rounded-full shadow-[var(--shadow-yellow)] flex items-center gap-2 text-[14px]">
+                          <FileText size={16} /> Submit Proposal
+                        </motion.button>
                       </div>
                     </motion.div>
                   )}
@@ -191,29 +215,34 @@ const CSRPartnership = () => {
               </form>
             </div>
 
-            {/* Live proposal preview */}
+            {/* Live preview sidebar */}
             <div className="hidden lg:block">
-              <div className="global-card sticky top-24" style={{ aspectRatio: "3/4" }}>
-                <div className="bg-teal p-5">
-                  <p className="text-xs font-bold text-primary-foreground/60 uppercase tracking-widest">AGSWS CSR Proposal</p>
-                  <p className="text-primary-foreground font-bold mt-1">{data.companyName || "Your Company"}</p>
+              <div className="bg-white rounded-[var(--radius-2xl)] border border-[var(--border-color)] shadow-[var(--shadow-card)] sticky top-24 overflow-hidden">
+                <div className="bg-gradient-to-r from-[var(--teal-dark)] to-[var(--teal)] p-6">
+                  <p className="text-[10px] font-[600] text-white/50 uppercase tracking-[0.1em]">AGSWS CSR Proposal</p>
+                  <p className="text-white font-[700] text-[18px] mt-1">{data.companyName || "Your Company"}</p>
                 </div>
-                <div className="p-5 space-y-4">
+                <div className="p-6 space-y-4">
                   <div className="flex flex-wrap gap-2">
-                    {data.focusMedical && <span className="text-[10px] bg-teal-light text-teal px-2 py-0.5 rounded-full font-semibold">Medical</span>}
-                    {data.focusEducation && <span className="text-[10px] bg-purple-light text-purple px-2 py-0.5 rounded-full font-semibold">Education</span>}
-                    {data.focusElderly && <span className="text-[10px] bg-yellow-light text-text-dark px-2 py-0.5 rounded-full font-semibold">Elderly</span>}
-                    {data.focusVolunteering && <span className="text-[10px] bg-background text-text-mid px-2 py-0.5 rounded-full font-semibold">Volunteering</span>}
+                    {data.focusMedical && <span className="text-[10px] bg-[var(--teal)]/10 text-[var(--teal)] px-3 py-1 rounded-full font-[600]">Medical</span>}
+                    {data.focusEducation && <span className="text-[10px] bg-[var(--purple)]/10 text-[var(--purple)] px-3 py-1 rounded-full font-[600]">Education</span>}
+                    {data.focusElderly && <span className="text-[10px] bg-[var(--yellow)]/10 text-[var(--dark)] px-3 py-1 rounded-full font-[600]">Elderly</span>}
+                    {data.focusVolunteering && <span className="text-[10px] bg-[var(--bg)] text-[var(--mid)] px-3 py-1 rounded-full font-[600]">Volunteering</span>}
                   </div>
                   {data.budgetRange && (
                     <div>
-                      <p className="text-[10px] text-text-light uppercase">Budget</p>
-                      <div className="h-2 bg-border rounded-full mt-1">
-                        <div className="h-full bg-teal rounded-full" style={{ width: data.budgetRange.includes("1 Cr") ? "100%" : data.budgetRange.includes("25L") ? "70%" : data.budgetRange.includes("5L") ? "40%" : "15%" }} />
+                      <p className="text-[10px] text-[var(--light)] uppercase tracking-[0.06em] mb-2">Budget Range</p>
+                      <div className="h-2 bg-[var(--border-color)] rounded-full">
+                        <motion.div 
+                          className="h-full bg-[var(--teal)] rounded-full" 
+                          animate={{ width: data.budgetRange.includes("1 Cr") ? "100%" : data.budgetRange.includes("25L") ? "70%" : data.budgetRange.includes("5L") ? "40%" : "15%" }}
+                          transition={{ duration: 0.5 }}
+                        />
                       </div>
+                      <p className="text-[12px] font-[600] text-[var(--dark)] mt-1">{data.budgetRange}</p>
                     </div>
                   )}
-                  <p className="text-[10px] text-text-light mt-auto">Your copy will be emailed to {data.contactEmail || "..."}</p>
+                  <p className="text-[11px] text-[var(--light)]">Proposal will be emailed to {data.contactEmail || "..."}</p>
                 </div>
               </div>
             </div>
