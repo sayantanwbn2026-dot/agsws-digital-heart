@@ -2,22 +2,31 @@ import { useSEO } from "@/hooks/useSEO";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import FadeInUp from "@/components/ui/FadeInUp";
+import PageHero from "@/components/layout/PageHero";
 import { supabase } from "@/lib/supabase/client";
+import { Heart, BookOpen, Users, TrendingUp } from "lucide-react";
 
 function getTier(amount: number) {
-  if (amount >= 10000) return { label: "Champion", cls: "bg-purple-light text-purple" };
-  if (amount >= 5000) return { label: "Gold", cls: "bg-yellow-light text-yellow" };
-  if (amount >= 1000) return { label: "Silver", cls: "bg-background text-text-mid" };
-  return { label: "Supporter", cls: "bg-teal-light text-teal" };
+  if (amount >= 10000) return { label: "Champion", cls: "bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20" };
+  if (amount >= 5000) return { label: "Gold", cls: "bg-[var(--teal)]/10 text-[var(--teal)] border border-[var(--teal)]/20" };
+  if (amount >= 1000) return { label: "Silver", cls: "bg-[var(--purple)]/10 text-[var(--purple)] border border-[var(--purple)]/20" };
+  return { label: "Supporter", cls: "bg-[var(--bg)] text-[var(--light)] border border-[var(--border-color)]" };
 }
 
-function getColor(gateway: string) {
-  if (gateway === "Education" || gateway === "education") return "bg-purple";
-  if (gateway === "Registration" || gateway === "registration") return "bg-beige";
-  return "bg-teal";
+function getGatewayInfo(gateway: string) {
+  const g = (gateway ?? "").toLowerCase();
+  if (g.includes("education")) return { icon: BookOpen, color: "var(--purple)", bg: "bg-[var(--purple)]" };
+  if (g.includes("registration")) return { icon: Users, color: "var(--beige)", bg: "bg-[var(--beige)]" };
+  return { icon: Heart, color: "var(--teal)", bg: "bg-[var(--teal)]" };
 }
 
 const filters = ["All", "Medical Aid", "Education", "Registration"];
+
+const summaryStats = [
+  { icon: Users, label: "Total Donors", value: "2,847", color: "var(--teal)" },
+  { icon: TrendingUp, label: "This Month", value: "124", color: "var(--yellow)" },
+  { icon: Heart, label: "Cities", value: "42", color: "var(--purple)" },
+];
 
 const DonorWall = () => {
   useSEO("Donor Wall", "Our wall of donors — every name represents a real act of kindness.");
@@ -31,13 +40,12 @@ const DonorWall = () => {
     try {
       const data = await fetch(url).then(r => r.json());
       if (Array.isArray(data)) setEntries(data);
-    } catch { /* keep existing entries */ }
+    } catch { /* keep existing */ }
     setLoading(false);
   };
 
   useEffect(() => { loadWall(); }, []);
 
-  // Realtime: new medical donors appear instantly
   useEffect(() => {
     const channel = supabase
       .channel("donor-wall-live")
@@ -50,12 +58,11 @@ const DonorWall = () => {
         if (payload.new.status !== "captured") return;
         setEntries(prev => [{
           donor_first_name: (payload.new.donor_name ?? "").split(" ")[0],
+          name: (payload.new.donor_name ?? "").split(" ")[0],
           city: "India",
           gateway: "medical",
           amount: payload.new.amount,
-          amount_tier: payload.new.amount >= 10000 ? "champion"
-            : payload.new.amount >= 5000 ? "gold"
-            : payload.new.amount >= 1000 ? "silver" : "supporter",
+          time: "Just now",
           created_at: payload.new.created_at,
         }, ...prev]);
       })
@@ -69,66 +76,77 @@ const DonorWall = () => {
 
   return (
     <main id="main-content">
-      <section className="h-[250px] bg-gradient-to-br from-teal-dark via-teal to-teal flex items-center justify-center relative">
-        <div className="absolute inset-0 bg-[#0D1B1C]/30" />
-        <div className="relative z-10 text-center">
-          <h1 className="heading-1 text-primary-foreground">Our Donor Wall</h1>
-          <p className="text-sm text-primary-foreground/60 mt-3">Every name here represents a real act of kindness</p>
-        </div>
-      </section>
+      <PageHero title="Our Donor Wall" label="Community" subtitle="Every name here represents a real act of kindness." size="md" bgVariant="teal-dark" breadcrumb={[{ label: "Home", href: "/" }, { label: "Donor Wall" }]} />
 
-      <section className="bg-background py-12">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex items-center gap-6 mb-8 flex-wrap">
-            <div className="flex gap-3 flex-wrap">
-              {[
-                { label: "Total Donors", value: "2,847" },
-                { label: "This Month", value: "124" },
-                { label: "Cities", value: "42" },
-              ].map(s => (
-                <div key={s.label} className="global-card">
-                  <p className="text-xl font-bold text-teal">{s.value}</p>
-                  <p className="text-xs text-text-light">{s.label}</p>
+      <section className="bg-[var(--bg)] py-[64px] lg:py-[96px]">
+        <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)]">
+          
+          {/* Summary stats */}
+          <div className="grid grid-cols-3 gap-4 mb-10">
+            {summaryStats.map((s, i) => (
+              <FadeInUp key={s.label} delay={i * 0.08}>
+                <div className="bg-white rounded-[var(--radius-xl)] border border-[var(--border-color)] p-5 text-center shadow-[var(--shadow-card)]">
+                  <div className="w-10 h-10 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: `color-mix(in srgb, ${s.color} 10%, white)` }}>
+                    <s.icon size={18} style={{ color: s.color }} />
+                  </div>
+                  <p className="text-[clamp(22px,3vw,28px)] font-[800] text-[var(--dark)] leading-none">{s.value}</p>
+                  <p className="text-[11px] font-[500] text-[var(--light)] uppercase tracking-[0.06em] mt-1">{s.label}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex gap-2 mb-8 flex-wrap">
-            {filters.map(f => (
-              <button key={f} onClick={() => { const gw = f === "All" ? null : f; setGateway(gw); loadWall(gw); }} className={`px-5 py-2 rounded-full text-sm font-medium border transition-all ${(gateway === null && f === "All") || gateway === f ? "bg-teal text-primary-foreground border-teal" : "bg-card text-text-mid border-border hover:border-teal"}`}>
-                {f}
-              </button>
+              </FadeInUp>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-3 md:gap-4 lg:gap-6">
+          {/* Filters */}
+          <div className="flex gap-2 mb-8 flex-wrap">
+            {filters.map(f => {
+              const isActive = (gateway === null && f === "All") || gateway === f;
+              return (
+                <button
+                  key={f}
+                  onClick={() => { const gw = f === "All" ? null : f; setGateway(gw); loadWall(gw); }}
+                  className={`px-5 py-2 rounded-full text-[13px] font-[600] border transition-all duration-200 ${isActive ? "bg-[var(--teal)] text-white border-[var(--teal)]" : "bg-white text-[var(--mid)] border-[var(--border-color)] hover:border-[var(--teal)] hover:text-[var(--teal)]"}`}
+                >
+                  {f}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Donor grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((d, i) => {
               const tier = getTier(d.amount);
-              const avatarColor = getColor(d.gateway);
+              const gw = getGatewayInfo(d.gateway);
+              const displayName = d.name || d.donor_first_name || "Anonymous";
               return (
-                <motion.div key={`${d.name}-${d.city}-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="global-card relative hover:">
-                  <span className={`absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full ${tier.cls}`}>{tier.label}</span>
+                <motion.div
+                  key={`${displayName}-${d.city}-${i}`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03, duration: 0.3 }}
+                  className="bg-white rounded-[var(--radius-xl)] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] transition-shadow relative group"
+                >
+                  <span className={`absolute top-4 right-4 text-[10px] font-[600] px-2.5 py-0.5 rounded-full ${tier.cls}`}>{tier.label}</span>
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-primary-foreground font-bold text-sm`}>
-                      {d.name[0]}
+                    <div className={`w-10 h-10 rounded-full ${gw.bg} flex items-center justify-center text-white font-[700] text-[13px] flex-shrink-0`}>
+                      {displayName[0]?.toUpperCase()}
                     </div>
-                    <div>
-                      <p className="font-semibold text-sm text-text-dark">{d.name} from {d.city}</p>
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${getColor(d.gateway)}`} />
-                        <span className="text-xs text-text-light">{d.gateway}</span>
+                    <div className="min-w-0">
+                      <p className="font-[600] text-[14px] text-[var(--dark)] truncate">{displayName} from {d.city}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="w-[6px] h-[6px] rounded-full flex-shrink-0" style={{ backgroundColor: gw.color }} />
+                        <span className="text-[12px] text-[var(--light)]">{d.gateway}</span>
                       </div>
                     </div>
                   </div>
-                  <p className="text-[11px] text-text-light mt-2">{d.time}</p>
+                  <p className="text-[11px] text-[var(--light)] mt-3">{d.time}</p>
                 </motion.div>
               );
             })}
           </div>
 
-          <FadeInUp className="text-center mt-12">
-            <p className="text-sm text-text-mid">Join <strong className="text-teal">2,847</strong> donors on this wall</p>
+          <FadeInUp className="text-center mt-14">
+            <p className="text-[14px] text-[var(--mid)]">Join <strong className="text-[var(--teal)] font-[700]">2,847</strong> donors on this wall</p>
           </FadeInUp>
         </div>
       </section>
