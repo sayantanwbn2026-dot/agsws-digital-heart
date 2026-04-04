@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import { events, eventTypeLabels, eventTypeColors, type AGSWSEvent } from "@/data/events";
-import { StaggerContainer } from "@/components/ui/StaggerContainer";
+
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import PageHero from "@/components/layout/PageHero";
 import { motion, AnimatePresence } from "framer-motion";

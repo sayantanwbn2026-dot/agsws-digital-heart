@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Shield, ChevronDown, Heart, BookOpen, Users, ArrowRight } from "lucide-react";
+import { Shield, ChevronDown, Heart, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";

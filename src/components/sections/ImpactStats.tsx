@@ -8,7 +8,6 @@ import { useCMSList } from "@/hooks/useCMSList";
 const ImpactStats = () => {
   const { ref: inViewRef, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
   const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const { data: cmsStats } = useCMSList<any>('impact_stats', [], {
     filter: { column: 'is_active', value: true },
     orderBy: { column: 'display_order' }

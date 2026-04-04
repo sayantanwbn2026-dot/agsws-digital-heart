@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import { motion } from "framer-motion";
+
 import "swiper/swiper-bundle.css";
 import { testimonials as staticTestimonials } from "@/data/testimonials";
 import FadeInUp from "../ui/FadeInUp";
