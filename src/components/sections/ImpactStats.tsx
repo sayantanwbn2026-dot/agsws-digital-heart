@@ -1,6 +1,6 @@
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { stats as staticStats } from "@/data/stats";
 import { useRef, useState, useEffect } from "react";
 import { useCMSList } from "@/hooks/useCMSList";
