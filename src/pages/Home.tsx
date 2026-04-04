@@ -10,7 +10,6 @@ import Testimonials from "@/components/sections/Testimonials";
 import LatestStories from "@/components/sections/LatestStories";
 import TrustBand from "@/components/sections/TrustBand";
 import PartnerStrip from "@/components/sections/PartnerStrip";
-import { WaveDivider } from "@/components/layout/WaveDivider";
 
 const Home = () => {
   useSEO("Home", "AGSWS — Medical aid, education, and emergency care for families in Kolkata.");
@@ -26,9 +25,7 @@ const Home = () => {
       <ImpactStory />
       <Testimonials />
       <LatestStories />
-      <WaveDivider top="#FFFFFF" bottom="#1F9AA8" />
       <TrustBand />
-      <WaveDivider top="#1F9AA8" bottom="#FFFFFF" />
       <PartnerStrip />
     </main>
   );

@@ -1,6 +1,6 @@
 import { ShieldCheck, FileText, Lock, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
-import FadeInUp from "../ui/FadeInUp";
+import { motion } from "framer-motion";
 
 const items = [
   { icon: ShieldCheck, title: "80G Tax Benefit", desc: "Donations eligible for 50% tax deduction under Section 80G" },
@@ -10,38 +10,37 @@ const items = [
 ];
 
 const TrustBand = () => (
-  <section className="relative bg-[var(--teal)] mt-12 mb-12 py-[12px]">
-    {/* SVG Wave top */}
-    <div className="absolute left-0 right-0 top-0 -translate-y-full text-[var(--teal)] w-full overflow-hidden leading-none">
-      <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="block w-full h-[60px] fill-current">
-        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C63.26,35.26,163.5,60.85,321.39,56.44Z"></path>
-      </svg>
-    </div>
+  <section className="relative bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] py-16 lg:py-20">
+    {/* Subtle pattern overlay */}
+    <div className="absolute inset-0 opacity-[0.04]" style={{
+      backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+      backgroundSize: '32px 32px'
+    }} />
 
     <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] relative z-10">
-      <div className="grid grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {items.map((item, i) => (
-          <FadeInUp key={item.title} delay={i * 0.1} className="text-center p-[40px_24px] flex flex-col items-center">
-            <item.icon size={32} className="text-[var(--yellow)] mb-[12px]" />
-            <h4 className="font-semibold text-[15px] text-white mb-[8px] tracking-wide">{item.title}</h4>
-            <p className="text-[13px] font-normal text-white/80 leading-[1.6] max-w-[200px] mx-auto">
-              {item.desc}
-            </p>
+          <motion.div
+            key={item.title}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.08, duration: 0.5 }}
+            className="text-center flex flex-col items-center px-4"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-white/[0.1] flex items-center justify-center mb-4">
+              <item.icon size={24} className="text-[var(--yellow)]" />
+            </div>
+            <h4 className="font-[700] text-[14px] text-white mb-2">{item.title}</h4>
+            <p className="text-[12px] text-white/70 leading-relaxed max-w-[200px]">{item.desc}</p>
             {item.link && (
-              <Link to="/transparency" className="text-[var(--yellow)] text-[12px] font-medium hover:underline mt-[12px] inline-block tracking-wide">
+              <Link to="/transparency" className="text-[var(--yellow)] text-[11px] font-[600] hover:underline mt-3 inline-block">
                 View Report →
               </Link>
             )}
-          </FadeInUp>
+          </motion.div>
         ))}
       </div>
-    </div>
-
-    {/* SVG Wave bottom */}
-    <div className="absolute left-0 right-0 bottom-0 translate-y-full text-[var(--teal)] w-full overflow-hidden leading-none rotate-180">
-      <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="block w-full h-[60px] fill-current">
-        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C63.26,35.26,163.5,60.85,321.39,56.44Z"></path>
-      </svg>
     </div>
   </section>
 );

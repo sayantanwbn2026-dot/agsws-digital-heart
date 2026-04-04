@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import { motion } from "framer-motion";
+
 import "swiper/swiper-bundle.css";
 import { testimonials as staticTestimonials } from "@/data/testimonials";
 import FadeInUp from "../ui/FadeInUp";
 import { useCMSList } from "@/hooks/useCMSList";
+import { Quote } from "lucide-react";
 
 const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -23,40 +24,41 @@ const Testimonials = () => {
     : staticTestimonials;
 
   return (
-    <section className="bg-[var(--bg)] py-[64px]">
+    <section className="bg-white py-20 lg:py-24">
       <div className="container">
-        <FadeInUp className="text-center mb-12">
+        <FadeInUp className="text-center mb-14">
           <span className="label">Testimonials</span>
           <h2 className="text-[var(--dark)] mt-3 text-center">What People Say</h2>
         </FadeInUp>
 
-        <div className="relative max-w-[800px] mx-auto pb-16">
+        <div className="relative max-w-[760px] mx-auto pb-12">
           <Swiper
             modules={[Autoplay]}
-            autoplay={{ delay: 4000, disableOnInteraction: false }}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
             loop
             spaceBetween={40}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="w-full relative px-4"
+            className="w-full relative"
           >
             {testimonials.map((t, i) => (
               <SwiperSlide key={i}>
-                <div className="text-center max-w-[680px] mx-auto px-10 relative z-10">
-                  <span className="absolute top-[-30px] left-[0px] text-[120px] text-[var(--teal)] opacity-[0.1] z-0 pointer-events-none font-serif leading-none select-none">
-                    "
-                  </span>
-                  <div className="relative z-10">
-                    <p className="text-[clamp(17px,2.2vw,22px)] font-medium text-[var(--dark)] italic leading-[1.8] mb-12">
-                      “{t.quote}”
-                    </p>
-                    <div className="flex items-center justify-center gap-5">
-                      <div className="w-[56px] h-[56px] rounded-full bg-[var(--teal)] shadow-md flex items-center justify-center text-white font-bold text-[16px] border-2 border-white">
-                        {t.initials}
-                      </div>
-                      <div className="text-left">
-                        <p className="font-bold text-[16px] text-[var(--dark)] tracking-tight">{t.author}</p>
-                        <p className="text-[13px] font-medium text-[var(--teal)] opacity-80">{t.role}</p>
-                      </div>
+                <div className="text-center max-w-[640px] mx-auto px-6 relative">
+                  {/* Quote icon */}
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--teal-light)] flex items-center justify-center mx-auto mb-8">
+                    <Quote size={20} className="text-[var(--teal)]" />
+                  </div>
+
+                  <p className="text-[clamp(17px,2vw,21px)] font-[500] text-[var(--dark)] italic leading-[1.85] mb-10">
+                    "{t.quote}"
+                  </p>
+
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] flex items-center justify-center text-white font-[700] text-[14px] shadow-[0_4px_12px_rgba(31,154,168,0.25)]">
+                      {t.initials}
+                    </div>
+                    <div className="text-left">
+                      <p className="font-[700] text-[15px] text-[var(--dark)]">{t.author}</p>
+                      <p className="text-[12px] font-[500] text-[var(--teal)]">{t.role}</p>
                     </div>
                   </div>
                 </div>
@@ -64,16 +66,16 @@ const Testimonials = () => {
             ))}
           </Swiper>
 
-          {/* Custom Navigation Dots & Arrows Indicator */}
-          <div className="mt-12 flex justify-center items-center gap-[12px] relative z-20">
+          {/* Dots */}
+          <div className="mt-10 flex justify-center items-center gap-2 relative z-20">
             {testimonials.map((_, i) => (
-              <button 
-                key={i} 
+              <button
+                key={i}
                 onClick={() => setActiveIndex(i)}
                 className={`transition-all duration-300 rounded-full ${
-                  activeIndex === i 
-                    ? "w-8 h-2 bg-[var(--teal)] shadow-sm" 
-                    : "w-2 h-2 bg-[var(--teal)] opacity-20 hover:opacity-40"
+                  activeIndex === i
+                    ? "w-8 h-2 bg-[var(--teal)]"
+                    : "w-2 h-2 bg-[var(--teal)]/20 hover:bg-[var(--teal)]/40"
                 }`}
                 aria-label={`Go to slide ${i + 1}`}
               />

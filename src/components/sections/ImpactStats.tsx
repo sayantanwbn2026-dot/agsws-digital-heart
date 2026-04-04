@@ -1,17 +1,13 @@
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { stats as staticStats } from "@/data/stats";
 import { useRef, useState, useEffect } from "react";
-import { StaggerContainer } from "../ui/StaggerContainer";
 import { useCMSList } from "@/hooks/useCMSList";
-
-const parallaxDistances = [-20, -28, -22, -32, -18];
 
 const ImpactStats = () => {
   const { ref: inViewRef, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
   const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const { data: cmsStats } = useCMSList<any>('impact_stats', [], {
     filter: { column: 'is_active', value: true },
     orderBy: { column: 'display_order' }
@@ -37,48 +33,41 @@ const ImpactStats = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="global-card py-[64px] rounded-none border-x-0 !shadow-none">
+    <section ref={sectionRef} className="relative bg-white py-16 border-y border-[var(--border-color)]">
       <div ref={inViewRef} className="max-w-[var(--container)] mx-auto px-[var(--container-px)]">
-        <StaggerContainer staggerDelay={0.10} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-8">
-          {stats.map((stat, i) => {
-            const y = useTransform(scrollYProgress, [0, 1], [0, parallaxDistances[i]]);
-            
-            let borderClasses = "border-transparent";
-            if (i === 0 || i === 1) borderClasses = "md:border-r md:border-[var(--border-color)]";
-            else if (i === 2) borderClasses = "lg:border-r lg:border-[var(--border-color)]";
-            else if (i === 3) borderClasses = "md:border-r md:border-[var(--border-color)]";
-
-            return (
-              <motion.div
-                key={stat.label}
-                style={{ y }}
-                className={`text-center p-[24px_16px] will-change-transform border-r ${borderClasses}`}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 divide-x divide-[var(--border-color)]">
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: i * 0.08, duration: 0.5 }}
+              className="text-center py-6 px-4"
+            >
+              <div
+                className={`text-[clamp(32px,4vw,48px)] font-[800] text-[var(--teal)] tracking-[-0.03em] leading-none transition-all duration-300 ${flashIndex === i ? "scale-110" : ""}`}
+                style={{ fontVariantNumeric: "tabular-nums" }}
               >
-                <div 
-                  className={`text-[clamp(36px,4vw,56px)] font-[800] text-[var(--teal)] tracking-[-0.03em] leading-none transition-colors duration-300 ${flashIndex === i ? "text-[var(--teal-dark)] scale-105 transform inline-block" : "inline-block"}`}
-                  style={{ fontVariantNumeric: "tabular-nums" }}
-                >
-                  {stat.prefix || ""}
-                  {inView ? (
-                    <CountUp end={stat.targetValue + increments[i]} duration={2.5} delay={i * 0.15} />
-                  ) : (
-                    "0"
-                  )}
-                  {stat.suffix}
-                </div>
-                <p className="text-[12px] font-[500] text-[var(--light)] uppercase tracking-[0.06em] mt-[8px]">
-                  {stat.label}
-                </p>
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={inView ? { width: 24 } : {}}
-                  transition={{ delay: 0.5 + i * 0.1, duration: 0.4 }}
-                  className="h-[2px] bg-[var(--teal)] mx-auto mt-[8px]"
-                />
-              </motion.div>
-            );
-          })}
-        </StaggerContainer>
+                {stat.prefix || ""}
+                {inView ? (
+                  <CountUp end={stat.targetValue + increments[i]} duration={2.5} delay={i * 0.15} />
+                ) : (
+                  "0"
+                )}
+                {stat.suffix}
+              </div>
+              <p className="text-[11px] font-[600] text-[var(--light)] uppercase tracking-[0.08em] mt-2">
+                {stat.label}
+              </p>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={inView ? { width: 20 } : {}}
+                transition={{ delay: 0.5 + i * 0.1, duration: 0.4 }}
+                className="h-[2px] bg-[var(--teal)] mx-auto mt-3 rounded-full"
+              />
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
