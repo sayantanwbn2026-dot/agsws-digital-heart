@@ -1,104 +1,183 @@
 import { Link } from "react-router-dom";
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Facebook, Twitter, Instagram, Linkedin, Heart, ArrowUpRight, Mail, Phone, MapPin } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+
+const footerLinks = {
+  explore: [
+    ["Home", "/"], ["About Us", "/about"], ["Initiatives", "/initiatives"],
+    ["Events", "/events"], ["Gallery", "/gallery"], ["Blog", "/blog"],
+    ["Resources", "/resources"], ["Impact Report", "/impact"],
+  ],
+  involved: [
+    ["Donate Medical Aid", "/donate/medical"], ["Donate Education", "/donate/education"],
+    ["Register Parent", "/register-parent"], ["Volunteer Portal", "/volunteer-portal"],
+    ["CSR Partnership", "/csr"], ["Donor Wall", "/donor-wall"],
+    ["Apply for Support", "/apply"], ["Transparency", "/transparency"],
+  ],
+};
+
+const SocialIcon = ({ icon: Icon, href, label }: { icon: typeof Facebook; href: string; label: string }) => (
+  <motion.a
+    href={href}
+    whileHover={{ scale: 1.15, y: -2 }}
+    whileTap={{ scale: 0.95 }}
+    className="w-10 h-10 rounded-xl bg-white/[0.07] flex items-center justify-center hover:bg-[hsl(var(--primary))]/20 transition-colors duration-300 border border-white/[0.06]"
+    aria-label={label}
+  >
+    <Icon size={16} className="text-white/80" />
+  </motion.a>
+);
+
+const FooterLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
+  <Link
+    to={to}
+    className="group flex items-center gap-1.5 text-[13px] font-medium text-white/60 hover:text-white transition-colors duration-200"
+  >
+    <span className="group-hover:translate-x-1 transition-transform duration-200">{children}</span>
+    <ArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+  </Link>
+);
 
 const Footer = () => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
+
   return (
-    <footer className="bg-[var(--teal-dark)] text-white">
-      <div className="max-w-[1240px] mx-auto px-6 pt-[80px] pb-[40px]">
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[30%_23%_23%_latest] gap-[32px] lg:gap-[48px]" style={{ gridTemplateColumns: '30% 23% 23% 24%' }}>
-          
-          {/* Column 1 (Brand) */}
-          <div>
-            <div className="flex flex-col gap-[1px]">
-              <span className="font-['Inter'] font-[700] text-[20px] text-white">AGSWS</span>
-              <span className="text-[9px] uppercase tracking-widest text-white/65">Social Welfare Society</span>
-            </div>
-            
-            <p className="text-[14px] font-[400] font-['Inter'] text-white/75 mt-[16px] max-w-[240px] leading-[1.7]">
-              Serving families across Kolkata with medical aid, education, and emergency care since 2020.
-            </p>
-            
-            <div className="mt-[24px] flex flex-row gap-[12px]">
-              {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
-                <a 
-                  key={i} 
-                  href="#" 
-                  className="w-[36px] h-[36px] rounded-full bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors duration-200" 
-                  aria-label="Social media link"
-                >
-                  <Icon size={16} className="text-white" />
-                </a>
-              ))}
-            </div>
-          </div>
+    <footer ref={ref} className="relative bg-[hsl(187,68%,5%)] text-white overflow-hidden">
+      {/* Decorative gradient orbs */}
+      <div className="absolute top-0 left-[20%] w-[500px] h-[500px] bg-[hsl(var(--primary))]/[0.04] rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-0 right-[10%] w-[400px] h-[400px] bg-[hsl(var(--accent))]/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
-          {/* Column 2 (Quick Links) */}
+      {/* Newsletter strip */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6 }}
+        className="relative z-10 border-b border-white/[0.06]"
+      >
+        <div className="max-w-[1200px] mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h4 className="font-['Inter'] font-[600] text-[10px] uppercase tracking-[0.12em] text-[var(--yellow)] mb-[24px]">Quick Links</h4>
-            <div className="flex flex-col gap-[12px]">
-              {[
-                ["Home", "/"], ["About", "/about"], ["Initiatives", "/initiatives"],
-                ["Events", "/events"], ["Gallery", "/gallery"], ["Resources", "/resources"],
-                ["Blog", "/blog"], ["Contact", "/contact"], ["Impact Report", "/impact"],
-                ["Transparency", "/transparency"],
-              ].map(([label, path]) => (
-                <Link 
-                  key={path} 
-                  to={path} 
-                  className="font-['Inter'] font-[500] text-[13.5px] text-white/90 hover:text-[var(--yellow)] hover:translate-x-[4px] transition-all duration-200"
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
+            <h3 className="text-lg font-bold text-white">Stay Connected</h3>
+            <p className="text-sm text-white/50 mt-1">Get quarterly impact reports and field stories.</p>
           </div>
-
-          {/* Column 3 (Get Involved) */}
-          <div>
-            <h4 className="font-['Inter'] font-[600] text-[10px] uppercase tracking-[0.12em] text-[var(--yellow)] mb-[24px]">Get Involved</h4>
-            <div className="flex flex-col gap-[12px]">
-              {[
-                ["Donate Medical Aid", "/donate/medical"], ["Donate Education", "/donate/education"],
-                ["Register Parent", "/register-parent"], ["Track Registration", "/track"],
-                ["Track Donation", "/track-donation"], ["Donor Wall", "/donor-wall"],
-                ["CSR Partnership", "/csr"], ["Volunteer Portal", "/volunteer-portal"],
-                ["Apply for Support", "/apply"], ["Subscribe to Updates", "/updates"],
-              ].map(([label, path]) => (
-                <Link 
-                  key={label} 
-                  to={path} 
-                  className="font-['Inter'] font-[500] text-[13.5px] text-white/90 hover:text-[var(--yellow)] hover:translate-x-[4px] transition-all duration-200"
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Column 4 (Contact) */}
-          <div>
-            <h4 className="font-['Inter'] font-[600] text-[10px] uppercase tracking-[0.12em] text-[var(--yellow)] mb-[24px]">Contact</h4>
-            <div className="flex flex-col gap-[12px] font-['Inter'] font-[500] text-[14px] text-white/95">
-              <p className="leading-relaxed">123 Park Street,<br />Kolkata, WB 700016</p>
-              <p>+91 98765 43210</p>
-              <p>contact@agsws.org</p>
-            </div>
+          <div className="flex w-full md:w-auto">
+            <input
+              type="email"
+              placeholder="Your email address"
+              className="flex-1 md:w-[280px] bg-white/[0.06] border border-white/[0.1] rounded-l-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(var(--primary))]/40 transition-colors"
+            />
+            <button className="bg-[hsl(var(--primary))] hover:bg-[hsl(187,70%,34%)] text-white px-6 py-3 rounded-r-xl text-sm font-semibold transition-colors whitespace-nowrap">
+              Subscribe
+            </button>
           </div>
         </div>
+      </motion.div>
 
-        {/* Bottom Bar */}
-        <div className="mt-[64px] pt-[24px] border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="font-['Inter'] font-[400] text-[12px] text-white/75">
-            © {new Date().getFullYear()} AGSWS. All rights reserved.
+      {/* Main footer grid */}
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 pt-16 pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
+          
+          {/* Brand column */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="lg:col-span-4"
+          >
+            <div className="flex flex-col gap-0.5 mb-5">
+              <span className="text-xl font-extrabold tracking-tight text-white">AGSWS</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-medium">Social Welfare Society</span>
+            </div>
+            <p className="text-sm text-white/50 leading-relaxed max-w-[260px] mb-6">
+              Serving families across Kolkata with medical aid, education, and emergency care since 2020.
+            </p>
+            <div className="flex gap-3 mb-8">
+              <SocialIcon icon={Facebook} href="#" label="Facebook" />
+              <SocialIcon icon={Twitter} href="#" label="Twitter" />
+              <SocialIcon icon={Instagram} href="#" label="Instagram" />
+              <SocialIcon icon={Linkedin} href="#" label="LinkedIn" />
+            </div>
+
+            {/* Contact info */}
+            <div className="space-y-3">
+              {[
+                { icon: MapPin, text: "123 Park Street, Kolkata 700016" },
+                { icon: Phone, text: "+91 98765 43210" },
+                { icon: Mail, text: "contact@agsws.org" },
+              ].map(item => (
+                <div key={item.text} className="flex items-center gap-3 text-[13px] text-white/50">
+                  <item.icon size={14} className="text-white/30 flex-shrink-0" />
+                  <span>{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Explore links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="lg:col-span-3"
+          >
+            <h4 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[hsl(var(--accent))] mb-6">Explore</h4>
+            <div className="flex flex-col gap-3">
+              {footerLinks.explore.map(([label, path]) => (
+                <FooterLink key={path} to={path}>{label}</FooterLink>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Get Involved links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="lg:col-span-3"
+          >
+            <h4 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[hsl(var(--accent))] mb-6">Get Involved</h4>
+            <div className="flex flex-col gap-3">
+              {footerLinks.involved.map(([label, path]) => (
+                <FooterLink key={label} to={path}>{label}</FooterLink>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Impact snapshot */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="lg:col-span-2"
+          >
+            <h4 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[hsl(var(--accent))] mb-6">Impact</h4>
+            <div className="space-y-5">
+              {[
+                { value: "2,400+", label: "Patients Aided" },
+                { value: "850+", label: "Students Sponsored" },
+                { value: "120+", label: "Families Registered" },
+                { value: "₹48L+", label: "Funds Deployed" },
+              ].map(stat => (
+                <div key={stat.label}>
+                  <p className="text-lg font-bold text-white">{stat.value}</p>
+                  <p className="text-[10px] text-white/40 uppercase tracking-wider">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="relative z-10 border-t border-white/[0.06]">
+        <div className="max-w-[1200px] mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-[11px] text-white/40 flex items-center gap-1.5">
+            © {new Date().getFullYear()} AGSWS. Built with <Heart size={10} className="text-red-400" /> in Kolkata.
           </p>
-          <div className="flex flex-row gap-[24px]">
-            {["Privacy Policy", "Terms of Use", "Refund Policy"].map((text) => (
-              <a 
-                key={text} 
-                href="#" 
-                className="font-['Inter'] font-[400] text-[12px] text-white/75 hover:text-white transition-colors"
-              >
+          <div className="flex gap-6">
+            {["Privacy Policy", "Terms of Use", "Refund Policy"].map(text => (
+              <a key={text} href="#" className="text-[11px] text-white/40 hover:text-white/70 transition-colors">
                 {text}
               </a>
             ))}

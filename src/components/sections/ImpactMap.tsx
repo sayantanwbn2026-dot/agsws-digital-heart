@@ -1,7 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { MapPin, Activity, Users, BookOpen } from "lucide-react";
-import { SectionHeader } from "../ui/SectionHeader";
 import FadeInUp from "../ui/FadeInUp";
 
 const regions = [
@@ -12,48 +11,47 @@ const regions = [
   { id: 5, name: "Ballygunge", type: "education", x: 65, y: 65, desc: "Community Library", icon: BookOpen, metric: "New Facility" },
 ];
 
+const colorMap: Record<string, string> = {
+  medical: "hsl(var(--primary))",
+  education: "hsl(242, 29%, 50%)",
+  community: "hsl(var(--accent))",
+};
+
 const ImpactMap = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredRegion, setHoveredRegion] = useState<number | null>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
-
-  const mapScale = useTransform(scrollYProgress, [0, 0.5], [0.9, 1]);
-  const mapOpacity = useTransform(scrollYProgress, [0, 0.3], [0.3, 1]);
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
+  const mapScale = useTransform(scrollYProgress, [0, 0.5], [0.92, 1]);
+  const bgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
 
   return (
-    <section className="section bg-[var(--dark)] relative overflow-hidden" ref={containerRef}>
-      {/* Background Decor */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[var(--teal)] rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[var(--yellow)] rounded-full blur-[120px]" />
-      </div>
+    <section className="py-16 lg:py-24 bg-[hsl(187,68%,5%)] relative overflow-hidden" ref={containerRef}>
+      {/* Parallax BG orbs */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[hsl(var(--primary))]/[0.06] rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[hsl(var(--accent))]/[0.04] rounded-full blur-[120px]" />
+      </motion.div>
 
       <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] relative z-10">
         <FadeInUp>
-          <div className="text-center mb-[48px] lg:mb-[64px]">
-            <span className="label text-[var(--teal-light)]">Live Operations</span>
-            <h2 className="text-white mt-3">Active Impact Zones in Kolkata</h2>
-            <p className="text-white/70 max-w-[600px] mx-auto mt-4 text-[16px]">
-              Our network spans across key districts, ensuring rapid response for medical emergencies and accessible education hubs for communities in need.
+          <div className="text-center mb-12 lg:mb-16">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--primary))]">Live Operations</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mt-3 mb-4">Active Impact Zones</h2>
+            <p className="text-white/40 max-w-[500px] mx-auto text-sm">
+              Our network spans across key districts — rapid medical response and accessible education hubs.
             </p>
           </div>
         </FadeInUp>
 
-        {/* Abstract Map UI */}
-        <motion.div 
-          className="relative w-full max-w-[900px] mx-auto aspect-square md:aspect-[16/9] border border-white/10 rounded-[var(--radius-3xl)] bg-black/20 backdrop-blur-md overflow-hidden shadow-[var(--shadow-lg)]"
-          style={{ scale: mapScale, opacity: mapOpacity }}
+        <motion.div
+          className="relative w-full max-w-[900px] mx-auto aspect-square md:aspect-[16/9] rounded-2xl bg-white/[0.03] backdrop-blur-sm overflow-hidden border border-white/[0.06]"
+          style={{ scale: mapScale }}
         >
-          {/* Grid lines */}
-          <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+          <div className="absolute inset-0 pointer-events-none opacity-[0.06]" style={{ backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
 
           {regions.map((region, i) => {
             const isHovered = hoveredRegion === region.id;
-            const color = region.type === 'medical' ? 'var(--teal)' : region.type === 'education' ? 'var(--purple)' : 'var(--yellow)';
+            const color = colorMap[region.type];
 
             return (
               <motion.div
@@ -67,35 +65,30 @@ const ImpactMap = () => {
                 onMouseEnter={() => setHoveredRegion(region.id)}
                 onMouseLeave={() => setHoveredRegion(null)}
               >
-                {/* Ping animation effect */}
-                <span className="absolute inline-flex h-full w-full rounded-full opacity-30 animate-ping" style={{ backgroundColor: color, animationDuration: '3s' }} />
-
-                {/* Node */}
-                <div 
-                  className="relative flex items-center justify-center w-[40px] h-[40px] rounded-full shadow-lg border-[2px] cursor-pointer transition-transform duration-300 hover:scale-110"
-                  style={{ backgroundColor: 'var(--dark)', borderColor: color }}
+                <span className="absolute inline-flex h-full w-full rounded-full opacity-20 animate-ping" style={{ backgroundColor: color, animationDuration: '3s' }} />
+                <motion.div
+                  whileHover={{ scale: 1.2 }}
+                  className="relative flex items-center justify-center w-10 h-10 rounded-full shadow-lg border-2 cursor-pointer bg-[hsl(187,68%,5%)]"
+                  style={{ borderColor: color }}
                 >
-                  <MapPin size={18} style={{ color }} />
-                </div>
+                  <MapPin size={16} style={{ color }} />
+                </motion.div>
 
-                {/* Info Card Popover */}
                 {isHovered && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    className="absolute bottom-[52px] left-1/2 -translateX-1/2 w-[220px] bg-white rounded-[var(--radius-lg)] p-4 shadow-[var(--shadow-lg)] z-50 text-left border border-[var(--border-color)]"
-                    style={{ marginLeft: "-110px" }}
+                    className="absolute bottom-14 left-1/2 w-[200px] bg-white rounded-xl p-4 shadow-lg z-50 text-left border border-[hsl(var(--border))]"
+                    style={{ marginLeft: "-100px" }}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <region.icon size={16} style={{ color }} />
-                      <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--dark)]">{region.name}</span>
+                      <region.icon size={14} style={{ color }} />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[hsl(var(--foreground))]">{region.name}</span>
                     </div>
-                    <p className="text-[13px] text-[var(--mid)] mb-3 leading-snug">{region.desc}</p>
-                    <div className="bg-[var(--bg)] rounded-[var(--radius-sm)] py-2 px-3 text-center">
-                      <span className="text-[12px] font-semibold" style={{ color }}>{region.metric}</span>
+                    <p className="text-[12px] text-[hsl(var(--muted-foreground))] mb-2">{region.desc}</p>
+                    <div className="bg-[hsl(var(--background))] rounded-lg py-1.5 px-2.5 text-center">
+                      <span className="text-[11px] font-semibold" style={{ color }}>{region.metric}</span>
                     </div>
-                    {/* Arrow down */}
-                    <div className="absolute -bottom-[6px] left-1/2 -translateX-1/2 w-3 h-3 bg-white rotate-45 border-r border-b border-[var(--border-color)]" style={{ marginLeft: "-6px" }} />
                   </motion.div>
                 )}
               </motion.div>

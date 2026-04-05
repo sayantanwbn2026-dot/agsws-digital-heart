@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { MousePointer2, CreditCard, BarChart2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import FadeInUp from "../ui/FadeInUp";
 
 const steps = [
@@ -11,56 +11,60 @@ const steps = [
 
 const HowItWorks = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
   return (
-    <section className="bg-[var(--bg)] py-[64px] lg:py-[96px]">
-      <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)]">
+    <section ref={ref} className="bg-[hsl(var(--background))] py-16 lg:py-24 relative overflow-hidden">
+      <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[hsl(var(--primary))]/[0.02] rounded-full blur-[120px]" />
+      </motion.div>
+
+      <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] relative z-10">
         <FadeInUp className="max-w-[540px] mb-12">
-          <span className="label">The Process</span>
-          <h2 className="text-[var(--dark)] mt-3">Simple Steps to Make a Difference</h2>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--primary))]">The Process</span>
+          <h2 className="text-3xl font-bold text-[hsl(var(--foreground))] mt-3">Simple Steps to Make a Difference</h2>
         </FadeInUp>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-          {/* Tabs */}
-          <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-[12px] pb-4 lg:pb-0 hide-scrollbar w-full lg:w-[320px] flex-shrink-0">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-3 pb-4 lg:pb-0 w-full lg:w-[300px] flex-shrink-0">
             {steps.map((step, i) => {
               const isActive = i === activeTab;
               return (
-                <button
+                <motion.button
                   key={step.id}
                   onClick={() => setActiveTab(i)}
-                  className={`flex items-center gap-3 text-left px-[24px] py-[10px] rounded-[var(--radius-full)] font-semibold text-[13px] whitespace-nowrap transition-colors duration-200 border ${
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex items-center gap-3 text-left px-5 py-3 rounded-xl text-[13px] font-semibold whitespace-nowrap transition-all duration-200 border ${
                     isActive
-                      ? "bg-[var(--teal)] text-white border-[var(--teal)]"
-                      : "bg-white border-[var(--border-color)] text-[var(--mid)] hover:bg-[var(--teal-light)] hover:text-[var(--teal)]"
+                      ? "bg-[hsl(var(--primary))] text-white border-[hsl(var(--primary))] shadow-md"
+                      : "bg-[hsl(var(--card))] border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] hover:border-[hsl(var(--primary))]/30"
                   }`}
                 >
-                  <step.icon size={18} />
+                  <step.icon size={16} />
                   {step.title}
-                </button>
+                </motion.button>
               );
             })}
           </div>
 
-          {/* Content Panel */}
-          <div className="global-card relative w-full lg:min-h-[280px] rounded-[var(--radius-2xl)] shadow-[var(--shadow-card)] lg:flex lg:items-center">
+          <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-2xl p-8 lg:p-10 w-full lg:min-h-[260px] flex items-center shadow-sm">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className="w-full flex justify-center flex-col"
+                transition={{ duration: 0.25 }}
+                className="w-full"
               >
-                <div className="w-16 h-16 bg-[var(--teal-light)] text-[var(--teal)] rounded-[var(--radius-lg)] flex items-center justify-center mb-6">
-                  {(() => {
-                    const Icon = steps[activeTab].icon;
-                    return <Icon size={32} />;
-                  })()}
+                <div className="w-14 h-14 bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] rounded-xl flex items-center justify-center mb-6">
+                  {(() => { const Icon = steps[activeTab].icon; return <Icon size={28} />; })()}
                 </div>
-                <h3 className="text-[22px] font-bold text-[var(--dark)] mb-4">{steps[activeTab].title}</h3>
-                <p className="text-[16px] text-[var(--mid)] leading-[1.75] max-w-[500px]">
+                <h3 className="text-xl font-bold text-[hsl(var(--foreground))] mb-3">{steps[activeTab].title}</h3>
+                <p className="text-[15px] text-[hsl(var(--muted-foreground))] leading-relaxed max-w-[480px]">
                   {steps[activeTab].desc}
                 </p>
               </motion.div>
