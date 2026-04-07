@@ -5,7 +5,7 @@ import { Check, Stethoscope, GraduationCap, Printer, Share2, ArrowRight, Trendin
 import { useEffect, useRef } from "react";
 import FadeInUp from "@/components/ui/FadeInUp";
 
-const gatewayConfig: Record<string, { icon: typeof Heart; color: string; gradient: string; label: string }> = {
+const gatewayConfig: Record<string, { icon: typeof Stethoscope; color: string; gradient: string; label: string }> = {
   medical: { icon: Stethoscope, color: "var(--teal)", gradient: "from-[var(--teal)] to-[var(--teal-dark)]", label: "Medical Aid" },
   education: { icon: GraduationCap, color: "var(--purple)", gradient: "from-[var(--purple)] to-[#4A48A0]", label: "Education Support" },
 };
