@@ -99,7 +99,7 @@ export const PremiumCard = ({ children, className, ...props }: React.HTMLAttribu
 export const PremiumButton = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "ghost"; loading?: boolean; icon?: React.ReactNode }
->(({ variant = "primary", loading, icon, children, className, ...props }, ref) => {
+>(({ variant = "primary", loading, icon, children, className, onClick, type, disabled, ...props }, ref) => {
   const base = "relative font-[600] text-[14px] rounded-full transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden";
   const variants = {
     primary: "h-[52px] px-10 bg-[var(--teal)] text-white hover:bg-[var(--teal-dark)] hover:shadow-[var(--shadow-md)] active:scale-[0.98]",
@@ -107,13 +107,13 @@ export const PremiumButton = React.forwardRef<
     ghost: "h-[44px] px-6 text-[var(--teal)] hover:bg-[var(--teal-light)]",
   };
   return (
-    <motion.button ref={ref} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className={cn(base, variants[variant], className)} {...props}>
+    <button ref={ref} onClick={onClick} type={type} disabled={disabled} className={cn(base, variants[variant], className)} {...props}>
       {loading ? (
         <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
       ) : (
         <>{icon}{children}</>
       )}
-    </motion.button>
+    </button>
   );
 });
 PremiumButton.displayName = "PremiumButton";

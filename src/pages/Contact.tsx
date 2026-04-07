@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { useForm } from "react-hook-form";
-import { MapPin, Phone, Mail, Clock, Heart, BookOpen, Users, Wrench, Loader2, Send, ArrowRight, MessageSquare, Sparkles } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Heart, BookOpen, Users, Wrench, Send, ArrowRight, MessageSquare, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumSelect, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";

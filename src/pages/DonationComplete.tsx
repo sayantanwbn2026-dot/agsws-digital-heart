@@ -1,7 +1,7 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Check, Heart, Stethoscope, GraduationCap, Printer, Share2, MessageCircle, ArrowRight, TrendingUp, Users, ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
+import { Check, Stethoscope, GraduationCap, Printer, Share2, ArrowRight, TrendingUp, Users, ShieldCheck } from "lucide-react";
 import { useEffect, useRef } from "react";
 import FadeInUp from "@/components/ui/FadeInUp";
 

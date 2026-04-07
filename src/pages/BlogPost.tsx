@@ -62,7 +62,7 @@ const BlogPost = () => {
         <div className="max-w-[680px] mx-auto px-6">
           <FadeInUp>
             <div className="prose-custom">
-              <p className="text-[18px] leading-[1.9] text-[var(--dark)] mb-8 first-letter:text-[52px] first-letter:font-[800] first-letter:float-left first-letter:mr-3 first-letter:mt-1" style={{ firstLetterColor: accent }}>
+              <p className="text-[18px] leading-[1.9] text-[var(--dark)] mb-8 first-letter:text-[52px] first-letter:font-[800] first-letter:float-left first-letter:mr-3 first-letter:mt-1">
                 {story.body}
               </p>
               <p className="text-[16px] leading-[1.85] text-[var(--mid)] mb-8">
