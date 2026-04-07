@@ -35,6 +35,8 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import ThankYou from "./pages/ThankYou";
+import DonationComplete from "./pages/DonationComplete";
+import EventRegistration from "./pages/EventRegistration";
 import FAQ from "./pages/FAQ";
 import Events from "./pages/Events";
 import Gallery from "./pages/Gallery";
