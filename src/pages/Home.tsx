@@ -10,6 +10,8 @@ import Testimonials from "@/components/sections/Testimonials";
 import LatestStories from "@/components/sections/LatestStories";
 import TrustBand from "@/components/sections/TrustBand";
 import PartnerStrip from "@/components/sections/PartnerStrip";
+import AnalyticsInfographic from "@/components/sections/AnalyticsInfographic";
+import CTABanner from "@/components/sections/CTABanner";
 
 const Home = () => {
   useSEO("Home", "AGSWS — Medical aid, education, and emergency care for families in Kolkata.");
@@ -23,8 +25,10 @@ const Home = () => {
       <HowItWorks />
       <ScrollingStoriesStrip />
       <ImpactStory />
+      <AnalyticsInfographic />
       <Testimonials />
       <LatestStories />
+      <CTABanner />
       <TrustBand />
       <PartnerStrip />
     </main>

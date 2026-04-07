@@ -5,13 +5,7 @@ import { Heart, Users, Stethoscope, Pill, ArrowRight, CheckCircle, Phone } from 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
-
-const FormInput = ({ label, required, ...props }: { label: string; required?: boolean } & React.InputHTMLAttributes<HTMLInputElement>) => (
-  <div>
-    <label className="text-[11px] font-[600] text-[var(--dark)] mb-1.5 block uppercase tracking-[0.08em]">{label} {required && <span className="text-[#DC2626]">*</span>}</label>
-    <input {...props} className="w-full h-[48px] px-4 text-[14px] text-[var(--dark)] bg-[var(--bg)] border border-[var(--border-color)] rounded-[12px] outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/10 transition-all placeholder:text-[var(--light)]" />
-  </div>
-);
+import { PremiumInput, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
 
 const MedicalAid = () => {
   useSEO("Medical Aid", "AGSWS Medical Aid — emergency care, hospital support, and treatment funding in Kolkata.");
@@ -37,8 +31,8 @@ const MedicalAid = () => {
               { icon: Heart, title: "Surgery Support", desc: "Partial to full surgery funding for critical cases." },
             ].map((item, i) => (
               <FadeInUp key={item.title} delay={i * 0.08}>
-                <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-md)" }} className="bg-white rounded-[16px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-shadow">
-                  <div className="w-12 h-12 rounded-xl bg-[var(--teal-light)] flex items-center justify-center mb-4">
+                <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--teal-light)] flex items-center justify-center mb-4">
                     <item.icon size={22} className="text-[var(--teal)]" />
                   </div>
                   <h4 className="text-[16px] font-[700] text-[var(--dark)] mb-2">{item.title}</h4>
@@ -65,45 +59,47 @@ const MedicalAid = () => {
               If you or a family member in Kolkata needs emergency medical support and cannot afford treatment, AGSWS is here. Reach out to us directly — our team will assess and respond within 24 hours.
             </p>
             <div className="flex flex-wrap gap-3">
-              <button onClick={() => setShowApply(true)} className="bg-[var(--teal)] text-white font-[600] px-6 py-3 rounded-full text-[13px] hover:bg-[var(--teal-dark)] transition-colors">Apply for Medical Support →</button>
-              <a href="tel:+919876543210" className="border border-[var(--teal)] text-[var(--teal)] font-[600] px-6 py-3 rounded-full text-[13px] flex items-center gap-2 hover:bg-[var(--teal)] hover:text-white transition-colors">
+              <PremiumButton onClick={() => setShowApply(true)}>Apply for Medical Support →</PremiumButton>
+              <a href="tel:+919876543210" className="h-[52px] px-8 border-[1.5px] border-[var(--teal)] text-[var(--teal)] font-[600] rounded-full text-[14px] flex items-center gap-2 hover:bg-[var(--teal)] hover:text-white transition-all">
                 <Phone size={14} /> Call Our Helpline
               </a>
             </div>
           </div>
-          <div className="bg-white rounded-[16px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6">
+          <PremiumCard className="!p-6">
             <h4 className="font-[600] text-[var(--dark)] mb-4 text-[14px]">What we cover:</h4>
             {["Emergency hospitalisation", "Critical medicines", "Specialist consultations", "Surgery support (partial/full)", "Post-discharge care"].map((item) => (
-              <div key={item} className="flex items-center gap-2 mb-2.5">
+              <div key={item} className="flex items-center gap-2.5 mb-3">
                 <CheckCircle size={16} className="text-[var(--teal)] flex-shrink-0" />
                 <span className="text-[13px] text-[var(--mid)]">{item}</span>
               </div>
             ))}
-          </div>
+          </PremiumCard>
         </div>
       </section>
 
       {/* Apply Modal */}
       <AnimatePresence>
         {showApply && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm p-4" onClick={() => setShowApply(false)}>
-            <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-[520px] rounded-[20px] p-8 shadow-[var(--shadow-lg)] max-h-[90vh] overflow-y-auto">
-              <h3 className="text-[18px] font-[700] text-[var(--dark)] mb-6">Apply for Medical Support</h3>
-              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setShowApply(false); }}>
-                <FormInput label="Patient Full Name" required placeholder="Full name" />
-                <FormInput label="Patient Age" required type="number" placeholder="Age" />
-                <div>
-                  <label className="text-[11px] font-[600] text-[var(--dark)] mb-1.5 block uppercase tracking-[0.08em]">Medical Condition <span className="text-[#DC2626]">*</span></label>
-                  <textarea required rows={3} placeholder="Describe the condition or diagnosis" className="w-full px-4 py-3 text-[14px] text-[var(--dark)] bg-[var(--bg)] border border-[var(--border-color)] rounded-[12px] outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/10 transition-all resize-none placeholder:text-[var(--light)]" />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center backdrop-blur-md p-4" onClick={() => setShowApply(false)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full max-w-[520px] rounded-[24px] p-8 shadow-[var(--shadow-lg)] max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] flex items-center justify-center">
+                  <Stethoscope size={18} className="text-white" />
                 </div>
-                <FormInput label="Hospital Name" placeholder="If admitted" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FormInput label="Phone" required type="tel" placeholder="Phone number" />
-                  <FormInput label="Email" required type="email" placeholder="Email address" />
+                <h3 className="text-[20px] font-[700] text-[var(--dark)]">Apply for Medical Support</h3>
+              </div>
+              <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); setShowApply(false); }}>
+                <PremiumInput label="Patient Full Name" required placeholder="Full name" />
+                <PremiumInput label="Patient Age" required type="number" placeholder="Age" />
+                <PremiumTextarea label="Medical Condition" required rows={3} placeholder="Describe the condition or diagnosis" />
+                <PremiumInput label="Hospital Name" placeholder="If admitted" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <PremiumInput label="Phone" required type="tel" placeholder="Phone number" />
+                  <PremiumInput label="Email" required type="email" placeholder="Email address" />
                 </div>
                 <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={() => setShowApply(false)} className="flex-1 border border-[var(--border-color)] text-[var(--mid)] py-3 rounded-full text-[13px] font-[600] hover:bg-[var(--bg)] transition-colors">Cancel</button>
-                  <button type="submit" className="flex-1 bg-[var(--teal)] text-white py-3 rounded-full text-[13px] font-[600] hover:bg-[var(--teal-dark)] transition-colors">Submit Application</button>
+                  <PremiumButton variant="secondary" type="button" onClick={() => setShowApply(false)} className="flex-1">Cancel</PremiumButton>
+                  <PremiumButton type="submit" className="flex-1">Submit Application</PremiumButton>
                 </div>
               </form>
             </motion.div>

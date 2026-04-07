@@ -35,6 +35,8 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import ThankYou from "./pages/ThankYou";
+import DonationComplete from "./pages/DonationComplete";
+import EventRegistration from "./pages/EventRegistration";
 import FAQ from "./pages/FAQ";
 import Events from "./pages/Events";
 import Gallery from "./pages/Gallery";
@@ -96,6 +98,8 @@ const AnimatedRoutes = () => {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/donation-complete" element={<DonationComplete />} />
+          <Route path="/events/register" element={<EventRegistration />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/events" element={<Events />} />
           <Route path="/gallery" element={<Gallery />} />
