@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { Check, Upload, ChevronDown, Shield, Heart, User, FileText, CreditCard } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
+import { PremiumInput, PremiumSelect, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
 
 const steps = [
   { label: "About You", icon: User },
@@ -11,26 +12,6 @@ const steps = [
   { label: "Documents", icon: FileText },
   { label: "Confirm & Pay", icon: CreditCard },
 ];
-
-const FormInput = ({ label, required, ...props }: { label: string; required?: boolean } & React.InputHTMLAttributes<HTMLInputElement>) => (
-  <div>
-    <label className="text-[11px] font-[600] text-[var(--dark)] mb-1.5 block uppercase tracking-[0.08em]">
-      {label} {required && <span className="text-[#DC2626]">*</span>}
-    </label>
-    <input {...props} className="w-full h-[48px] px-4 text-[14px] text-[var(--dark)] bg-[var(--bg)] border border-[var(--border-color)] rounded-[12px] outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/10 transition-all placeholder:text-[var(--light)]" />
-  </div>
-);
-
-const FormSelect = ({ label, required, children, ...props }: { label: string; required?: boolean; children: React.ReactNode } & React.SelectHTMLAttributes<HTMLSelectElement>) => (
-  <div>
-    <label className="text-[11px] font-[600] text-[var(--dark)] mb-1.5 block uppercase tracking-[0.08em]">
-      {label} {required && <span className="text-[#DC2626]">*</span>}
-    </label>
-    <select {...props} className="w-full h-[48px] px-4 text-[14px] text-[var(--dark)] bg-[var(--bg)] border border-[var(--border-color)] rounded-[12px] outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/10 transition-all appearance-none">
-      {children}
-    </select>
-  </div>
-);
 
 const RegisterParent = () => {
   useSEO("Register Parent", "Register your elderly parent in Kolkata for emergency medical support through AGSWS.");
@@ -45,11 +26,11 @@ const RegisterParent = () => {
     return (
       <main id="main-content" className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }} className="text-center max-w-md mx-auto px-6">
-          <div className="w-20 h-20 bg-[var(--teal)] rounded-full flex items-center justify-center mx-auto mb-6"><Check size={40} className="text-white" /></div>
+          <div className="w-20 h-20 bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-[var(--shadow-lg)]"><Check size={40} className="text-white" /></div>
           <h2 className="text-3xl font-bold text-[var(--teal)] mb-2">Registration Complete!</h2>
           <p className="text-lg font-bold text-[var(--teal)] mb-4">REG-2025-{Math.floor(1000 + Math.random() * 9000)}</p>
           <p className="text-[var(--mid)] mb-8">A confirmation has been emailed to you. Our coordinator will contact your parent within 24 hours.</p>
-          <button className="bg-[var(--yellow)] text-[var(--dark)] font-semibold px-8 py-3 rounded-full shadow-[var(--shadow-yellow)]">Download Registration PDF</button>
+          <PremiumButton className="mx-auto !bg-[var(--yellow)] !text-[var(--dark)]">Download Registration PDF</PremiumButton>
         </motion.div>
       </main>
     );
@@ -60,7 +41,7 @@ const RegisterParent = () => {
       <PageHero title="Register Your Parent for Emergency Care" subtitle="You're far. We're here. Register your parent today." bgVariant="warm" size="md" breadcrumb={[{ label: "Home", href: "/" }, { label: "Register Parent" }]} />
 
       {/* Stepper */}
-      <div className="bg-white border-b border-[var(--border-color)] py-6">
+      <div className="bg-[var(--white)] border-b border-[var(--border-color)] py-6">
         <div className="max-w-[700px] mx-auto px-6">
           <div className="flex items-center justify-between">
             {steps.map((step, i) => (
@@ -69,7 +50,7 @@ const RegisterParent = () => {
                   <motion.div
                     animate={{ scale: i === currentStep ? 1.1 : 1, backgroundColor: i < currentStep ? "var(--teal)" : i === currentStep ? "white" : "var(--bg)" }}
                     className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                      i < currentStep ? "text-white" : i === currentStep ? "border-2 border-[var(--teal)] text-[var(--teal)]" : "text-[var(--light)] border border-[var(--border-color)]"
+                      i < currentStep ? "text-white shadow-[var(--shadow-md)]" : i === currentStep ? "border-2 border-[var(--teal)] text-[var(--teal)]" : "text-[var(--light)] border border-[var(--border-color)]"
                     }`}
                   >
                     {i < currentStep ? <Check size={16} /> : <step.icon size={16} />}
@@ -91,61 +72,58 @@ const RegisterParent = () => {
         <div className="max-w-[640px] mx-auto px-6">
           <AnimatePresence mode="wait">
             <motion.div key={currentStep} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
-              <div className="bg-white rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-8">
+              <PremiumCard>
                 {currentStep === 0 && (
-                  <div className="space-y-5">
+                  <div className="space-y-6">
                     <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-1">About You</h3>
-                    <div className="bg-[var(--yellow-light)] rounded-[12px] p-4 flex items-start gap-3">
+                    <div className="bg-[var(--yellow-light)] rounded-[14px] p-4 flex items-start gap-3">
                       <Shield size={18} className="text-[var(--yellow)] mt-0.5 flex-shrink-0" />
                       <p className="text-[13px] text-[var(--mid)] leading-[1.6]">We'll send you a Registration ID and keep you updated about your parent's care.</p>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormInput label="Your Name" required {...register("yourName")} placeholder="Full name" />
-                      <FormInput label="Your City" required {...register("yourCity")} placeholder="City (outside Kolkata)" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <PremiumInput label="Your Name" required {...register("yourName")} placeholder="Full name" />
+                      <PremiumInput label="Your City" required {...register("yourCity")} placeholder="City (outside Kolkata)" />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormInput label="Your Phone" required {...register("yourPhone")} type="tel" placeholder="+91 98765 43210" />
-                      <FormInput label="Your Email" required {...register("yourEmail")} type="email" placeholder="your@email.com" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <PremiumInput label="Your Phone" required {...register("yourPhone")} type="tel" placeholder="+91 98765 43210" />
+                      <PremiumInput label="Your Email" required {...register("yourEmail")} type="email" placeholder="your@email.com" />
                     </div>
-                    <FormSelect label="Relation to Parent" required {...register("relation")}>
+                    <PremiumSelect label="Relation to Parent" required {...register("relation")}>
                       <option value="">Select relationship</option>
                       <option>Son</option><option>Daughter</option><option>Relative</option><option>Other</option>
-                    </FormSelect>
+                    </PremiumSelect>
                   </div>
                 )}
 
                 {currentStep === 1 && (
-                  <div className="space-y-5">
+                  <div className="space-y-6">
                     <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-1">About Your Parent</h3>
-                    <div className="bg-[var(--teal-light)] rounded-[12px] p-4 flex items-start gap-3">
+                    <div className="bg-[var(--teal-light)] rounded-[14px] p-4 flex items-start gap-3">
                       <Heart size={18} className="text-[var(--teal)] mt-0.5 flex-shrink-0" />
                       <p className="text-[13px] text-[var(--mid)] leading-[1.6]">This information helps us respond faster in an emergency.</p>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormInput label="Parent's Full Name" required {...register("parentName")} placeholder="Full name" />
-                      <FormInput label="Age" required {...register("parentAge")} type="number" placeholder="Age" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <PremiumInput label="Parent's Full Name" required {...register("parentName")} placeholder="Full name" />
+                      <PremiumInput label="Age" required {...register("parentAge")} type="number" placeholder="Age" />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormInput label="Emergency Contact Name" required {...register("emergencyName")} placeholder="Name in Kolkata" />
-                      <FormInput label="Emergency Contact Phone" required {...register("emergencyPhone")} type="tel" placeholder="Phone number" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <PremiumInput label="Emergency Contact Name" required {...register("emergencyName")} placeholder="Name in Kolkata" />
+                      <PremiumInput label="Emergency Contact Phone" required {...register("emergencyPhone")} type="tel" placeholder="Phone number" />
                     </div>
-                    <div>
-                      <label className="text-[11px] font-[600] text-[var(--dark)] mb-1.5 block uppercase tracking-[0.08em]">Address in Kolkata <span className="text-[#DC2626]">*</span></label>
-                      <textarea {...register("parentAddress")} placeholder="Full address" rows={3} className="w-full px-4 py-3 text-[14px] text-[var(--dark)] bg-[var(--bg)] border border-[var(--border-color)] rounded-[12px] outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/10 transition-all resize-none placeholder:text-[var(--light)]" />
-                    </div>
-                    <FormSelect label="Primary Medical Condition" required {...register("medicalCondition")}>
+                    <PremiumTextarea label="Address in Kolkata" required {...register("parentAddress")} placeholder="Full address" rows={3} />
+                    <PremiumSelect label="Primary Medical Condition" required {...register("medicalCondition")}>
                       <option value="">Select condition</option>
                       <option>Cardiac</option><option>Diabetes</option><option>Respiratory</option><option>Orthopedic</option><option>Other</option>
-                    </FormSelect>
+                    </PremiumSelect>
                   </div>
                 )}
 
                 {currentStep === 2 && (
-                  <div className="space-y-5">
+                  <div className="space-y-6">
                     <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-1">Upload Documents</h3>
                     <p className="text-[13px] text-[var(--mid)]">Upload identification and medical documents for faster processing.</p>
                     {[["Aadhar / ID Proof", true], ["Recent Medical Report", false], ["Recent Photo", false]].map(([label, required]) => (
-                      <motion.div key={label as string} whileHover={{ borderColor: "var(--teal)" }} className="border-2 border-dashed border-[var(--border-color)] rounded-[16px] p-6 text-center cursor-pointer transition-colors bg-[var(--bg)]/50 hover:bg-[var(--teal-light)]/30">
+                      <motion.div key={label as string} whileHover={{ borderColor: "var(--teal)", scale: 1.01 }} className="border-2 border-dashed border-[var(--border-color)] rounded-[18px] p-6 text-center cursor-pointer transition-all bg-[var(--bg)]/50 hover:bg-[var(--teal-light)]/30">
                         <Upload size={24} className="text-[var(--teal)] mx-auto mb-3" />
                         <p className="text-[14px] font-[600] text-[var(--dark)]">{label as string} {required ? <span className="text-[#DC2626]">*</span> : <span className="text-[var(--light)] font-[400] text-[12px]">(optional)</span>}</p>
                         <p className="text-[11px] text-[var(--light)] mt-1">PDF, JPG, PNG — Max 5MB</p>
@@ -155,9 +133,9 @@ const RegisterParent = () => {
                 )}
 
                 {currentStep === 3 && (
-                  <div className="space-y-5">
+                  <div className="space-y-6">
                     <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-1">Confirm & Pay ₹100</h3>
-                    <div className="bg-[var(--bg)] rounded-[14px] p-6">
+                    <div className="bg-[var(--bg)] rounded-[16px] p-6">
                       <h4 className="font-[600] text-[var(--dark)] mb-4 text-[12px] uppercase tracking-[0.08em]">Registration Summary</h4>
                       <div className="space-y-3">
                         {[["Registrant", getValues("yourName") || "—"], ["Parent", getValues("parentName") || "—"], ["City", getValues("yourCity") || "—"], ["Condition", getValues("medicalCondition") || "—"]].map(([l, v]) => (
@@ -168,26 +146,26 @@ const RegisterParent = () => {
                         ))}
                       </div>
                     </div>
-                    <details className="bg-[var(--bg)] rounded-[14px] overflow-hidden">
+                    <details className="bg-[var(--bg)] rounded-[16px] overflow-hidden">
                       <summary className="flex items-center justify-between p-5 cursor-pointer text-[14px] font-[600] text-[var(--dark)]">Why ₹100? <ChevronDown size={16} className="text-[var(--light)]" /></summary>
                       <p className="px-5 pb-5 text-[13px] text-[var(--mid)] leading-[1.6]">The ₹100 fee covers admin processing, SMS alert setup, coordinator assignment, and registration card printing.</p>
                     </details>
-                    <motion.button onClick={() => setSuccess(true)} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[52px] bg-[var(--yellow)] text-[var(--dark)] font-[700] text-[15px] rounded-full shadow-[var(--shadow-yellow)] transition-all">
+                    <PremiumButton onClick={() => setSuccess(true)} className="w-full !bg-[var(--yellow)] !text-[var(--dark)] shadow-[var(--shadow-yellow)]">
                       Pay ₹100 & Register →
-                    </motion.button>
+                    </PremiumButton>
                     <p className="text-[11px] text-[var(--light)] text-center">One-time platform maintenance fee. Non-refundable.</p>
                   </div>
                 )}
-              </div>
+              </PremiumCard>
             </motion.div>
           </AnimatePresence>
 
           <div className="flex justify-between mt-6">
             {currentStep > 0 && (
-              <motion.button onClick={prevStep} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="px-6 py-2.5 border border-[var(--border-color)] text-[var(--mid)] rounded-full text-[14px] font-[600] hover:bg-white transition-colors">← Back</motion.button>
+              <PremiumButton variant="secondary" onClick={prevStep}>← Back</PremiumButton>
             )}
             {currentStep < 3 && (
-              <motion.button onClick={nextStep} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="ml-auto px-8 py-2.5 bg-[var(--teal)] text-white rounded-full text-[14px] font-[600] hover:bg-[var(--teal-dark)] transition-colors">Continue →</motion.button>
+              <PremiumButton onClick={nextStep} className="ml-auto">Continue →</PremiumButton>
             )}
           </div>
         </div>
