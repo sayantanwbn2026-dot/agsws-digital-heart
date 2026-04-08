@@ -14,7 +14,444 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cms_blog_posts: {
+        Row: {
+          author: string | null
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          image: string | null
+          is_published: boolean
+          published_at: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          image?: string | null
+          is_published?: boolean
+          published_at?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          image?: string | null
+          is_published?: boolean
+          published_at?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_events: {
+        Row: {
+          capacity: number | null
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          image: string | null
+          is_published: boolean
+          location: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          image?: string | null
+          is_published?: boolean
+          location?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          image?: string | null
+          is_published?: boolean
+          location?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_faqs: {
+        Row: {
+          answer: string
+          category: string | null
+          created_at: string
+          id: string
+          question: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          question: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          question?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_gallery: {
+        Row: {
+          caption: string | null
+          category: string | null
+          created_at: string
+          id: string
+          image: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          image: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          image?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_hero: {
+        Row: {
+          background_image: string | null
+          created_at: string
+          cta_link: string
+          cta_text: string
+          headline: string
+          id: string
+          section_key: string
+          subtitle: string
+          updated_at: string
+        }
+        Insert: {
+          background_image?: string | null
+          created_at?: string
+          cta_link?: string
+          cta_text?: string
+          headline?: string
+          id?: string
+          section_key?: string
+          subtitle?: string
+          updated_at?: string
+        }
+        Update: {
+          background_image?: string | null
+          created_at?: string
+          cta_link?: string
+          cta_text?: string
+          headline?: string
+          id?: string
+          section_key?: string
+          subtitle?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_initiatives: {
+        Row: {
+          created_at: string
+          description: string
+          icon: string | null
+          id: string
+          image: string | null
+          link: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          icon?: string | null
+          id?: string
+          image?: string | null
+          link?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          icon?: string | null
+          id?: string
+          image?: string | null
+          link?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_partners: {
+        Row: {
+          created_at: string
+          id: string
+          logo: string | null
+          name: string
+          sort_order: number
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name: string
+          sort_order?: number
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo?: string | null
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      cms_site_settings: {
+        Row: {
+          announcement_active: boolean
+          announcement_text: string | null
+          contact_address: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          footer_tagline: string | null
+          id: string
+          site_name: string
+          social_facebook: string | null
+          social_instagram: string | null
+          social_linkedin: string | null
+          social_twitter: string | null
+          social_youtube: string | null
+          updated_at: string
+        }
+        Insert: {
+          announcement_active?: boolean
+          announcement_text?: string | null
+          contact_address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          footer_tagline?: string | null
+          id?: string
+          site_name?: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          social_youtube?: string | null
+          updated_at?: string
+        }
+        Update: {
+          announcement_active?: boolean
+          announcement_text?: string | null
+          contact_address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          footer_tagline?: string | null
+          id?: string
+          site_name?: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          social_youtube?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_stats: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          label: string
+          sort_order: number
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      cms_stories: {
+        Row: {
+          category: string | null
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          image: string | null
+          is_published: boolean
+          published_at: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          image?: string | null
+          is_published?: boolean
+          published_at?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          image?: string | null
+          is_published?: boolean
+          published_at?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_team: {
+        Row: {
+          bio: string | null
+          created_at: string
+          id: string
+          image: string | null
+          name: string
+          role: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          image?: string | null
+          name: string
+          role?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          image?: string | null
+          name?: string
+          role?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_testimonials: {
+        Row: {
+          avatar: string | null
+          created_at: string
+          id: string
+          name: string
+          quote: string
+          role: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          avatar?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          quote: string
+          role?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          avatar?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          quote?: string
+          role?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
