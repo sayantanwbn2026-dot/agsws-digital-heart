@@ -1,4 +1,7 @@
-import { corsHeaders } from '@supabase/supabase-js/cors'
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 const ADMIN_EMAIL = 'sayantanmukherjee2505@gmail.com'
 const ADMIN_PASSWORD = 'Admin@2025'
@@ -12,7 +15,6 @@ Deno.serve(async (req) => {
     const { email, password } = await req.json()
 
     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      // Generate a simple session token
       const token = btoa(`${email}:${Date.now()}:${crypto.randomUUID()}`)
       return new Response(JSON.stringify({ success: true, token }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
