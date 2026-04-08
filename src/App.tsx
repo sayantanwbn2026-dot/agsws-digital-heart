@@ -116,6 +116,25 @@ const AnimatedRoutes = () => {
   );
 };
 
+const AppLayout = () => {
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith('/admin');
+
+  return (
+    <>
+      {!isAdmin && <DonateChoiceOverlay />}
+      {!isAdmin && <LiveTicker />}
+      {!isAdmin && <Navbar />}
+      <AnimatedRoutes />
+      {!isAdmin && <Footer />}
+      {!isAdmin && <StickyDonationRibbon />}
+      {!isAdmin && <BackToTop />}
+      {!isAdmin && <MobileBottomNav />}
+      {!isAdmin && <CookieConsent />}
+    </>
+  );
+};
+
 const AppInner = () => {
   useLenis();
 
@@ -147,15 +166,7 @@ const AppInner = () => {
       />
       <BrowserRouter>
         <ScrollToTop />
-        <DonateChoiceOverlay />
-        <LiveTicker />
-        <Navbar />
-        <AnimatedRoutes />
-        <Footer />
-        <StickyDonationRibbon />
-        <BackToTop />
-        <MobileBottomNav />
-        <CookieConsent />
+        <AppLayout />
       </BrowserRouter>
     </>
   );
