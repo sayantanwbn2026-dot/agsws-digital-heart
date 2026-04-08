@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Shield } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -17,15 +18,13 @@ const AdminLogin = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const res = await supabase.functions.invoke('cms-auth', {
+        body: { email, password },
       });
-      const data = await res.json();
-      if (res.ok) {
+      
+      if (res.data?.success) {
         localStorage.setItem('agsws_admin', 'true');
-        localStorage.setItem('agsws_admin_token', data.access_token);
+        localStorage.setItem('agsws_admin_token', res.data.token);
         navigate('/admin');
       } else {
         setShake(true);
@@ -41,54 +40,81 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-teal-dark flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--primary)/0.05)] via-background to-[hsl(var(--primary)/0.08)] flex items-center justify-center px-4">
       <motion.div
-        animate={shake ? { x: [0, -8, 8, -4, 4, 0] } : {}}
-        transition={{ duration: 0.4 }}
-        className="bg-card rounded-xl shadow-lg p-12 w-full max-w-[400px]"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className="text-center mb-8">
-          <span className="font-bold text-2xl text-teal">AGSWS</span>
-          <p className="label-text text-text-light mt-2">Admin Access</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="text-sm font-medium text-text-dark mb-1 block">Email</label>
-            <input placeholder=" "
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="global-card w-full h-12 outline-none focus: focus:ring-2 focus:ring-teal/15"
-              required
-            />
+        <motion.div
+          animate={shake ? { x: [0, -8, 8, -4, 4, 0] } : {}}
+          transition={{ duration: 0.4 }}
+          className="bg-card rounded-2xl shadow-lg border border-border p-10 w-full max-w-[420px]"
+        >
+          <div className="text-center mb-8">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Shield className="text-primary" size={24} />
+            </div>
+            <h1 className="font-bold text-xl text-foreground">CMS Dashboard</h1>
+            <p className="text-xs text-muted-foreground mt-1.5">Sign in to manage website content</p>
           </div>
-          <div>
-            <label className="text-sm font-medium text-text-dark mb-1 block">Password</label>
-            <div className="relative">
-              <input placeholder=" "
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="global-card w-full h-12 pr-12 outline-none focus: focus:ring-2 focus:ring-teal/15"
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@agsws.org"
+                className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                 required
               />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-light hover:text-text-mid">
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
             </div>
-          </div>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full h-11 px-4 pr-12 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
 
-          {error && <p className="text-sm text-destructive text-center">{error}</p>}
+            {error && (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-xs text-destructive text-center bg-destructive/5 rounded-lg py-2"
+              >
+                {error}
+              </motion.p>
+            )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full h-12 bg-teal text-primary-foreground font-bold rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-60"
-          >
-            {loading ? <Loader2 size={18} className="animate-spin" /> : "Sign In"}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 bg-primary text-primary-foreground font-semibold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-60 text-sm"
+            >
+              {loading ? <Loader2 size={16} className="animate-spin" /> : "Sign In"}
+            </button>
+          </form>
+
+          <p className="text-center text-[10px] text-muted-foreground/50 mt-6">
+            Secure admin access · AGSWS CMS
+          </p>
+        </motion.div>
       </motion.div>
     </div>
   );
