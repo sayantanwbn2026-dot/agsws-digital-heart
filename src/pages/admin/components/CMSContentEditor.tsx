@@ -7,7 +7,7 @@ import {
 import {
   arrayMove, SortableContext, verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers' as any;
+
 import SortableItem from './SortableItem';
 import CMSFieldRenderer from './CMSFieldRenderer';
 import { useCMSApi } from '@/hooks/useCMSApi';
