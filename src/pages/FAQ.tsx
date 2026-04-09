@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
-import { faqs } from "@/data/faqs";
+import { faqs as staticFaqs } from "@/data/faqs";
+import { useCMSList } from "@/hooks/useCMSList";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { StaggerContainer } from "@/components/ui/StaggerContainer";
