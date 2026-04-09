@@ -19,16 +19,16 @@ const Gallery = () => {
 
   const { data: cmsGallery } = useCMSList<any>('cms_gallery', [], { orderBy: { column: 'sort_order', ascending: true } });
 
-  const photos = useMemo(() => {
+  const photos: any[] = useMemo(() => {
     if (cmsGallery.length > 0) {
-      return cmsGallery.map((g: any, i: number) => ({
+      return cmsGallery.map((g: any) => ({
         id: g.id,
         category: g.category || 'community',
         caption: g.caption || '',
         image: g.image,
       }));
     }
-    return galleryPhotos;
+    return galleryPhotos.map(p => ({ ...p, image: '' }));
   }, [cmsGallery]);
 
   const [filter, setFilter] = useState<string>("all");
