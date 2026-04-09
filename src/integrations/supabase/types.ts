@@ -317,6 +317,51 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_resources: {
+        Row: {
+          category: string | null
+          color: string | null
+          created_at: string
+          description: string | null
+          file_size: string | null
+          file_type: string | null
+          file_url: string | null
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          year: string | null
+        }
+        Insert: {
+          category?: string | null
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          year?: string | null
+        }
+        Update: {
+          category?: string | null
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: string | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          year?: string | null
+        }
+        Relationships: []
+      }
       cms_site_settings: {
         Row: {
           announcement_active: boolean
