@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { supabase } from '@/integrations/supabase/client'
 
 interface Options {
   filter?: { column: string; value: any }
@@ -16,7 +16,7 @@ export function useCMSList<T>(
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    let query = supabase.from(table).select('*')
+    let query = (supabase.from(table as any) as any).select('*')
 
     if (options?.filter) {
       query = query.eq(options.filter.column, options.filter.value)
@@ -30,7 +30,7 @@ export function useCMSList<T>(
       query = query.limit(options.limit)
     }
 
-    query.then(({ data: rows }) => {
+    query.then(({ data: rows }: any) => {
       if (rows?.length) setData(rows as T[])
       setLoading(false)
     })

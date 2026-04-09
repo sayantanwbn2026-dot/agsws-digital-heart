@@ -1,6 +1,7 @@
 import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
-import { team } from "@/data/team";
+import { team as staticTeam } from "@/data/team";
+import { useCMSList } from "@/hooks/useCMSList";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Building2, Award, Globe, FileCheck, Heart, Target, Eye, ArrowRight, Quote } from "lucide-react";
@@ -35,6 +36,10 @@ const values = [
 const About = () => {
   useSEO("About Us", "Learn about AGSWS — our mission, team, and journey of impact in Kolkata.");
   const parallaxRef = useRef(null);
+  const { data: cmsTeam } = useCMSList<any>('cms_team', [], { orderBy: { column: 'sort_order' } });
+  const team = cmsTeam.length ? cmsTeam.map((m: any) => ({
+    name: m.name, role: m.role, bio: m.bio, initials: m.name?.split(' ').map((w: string) => w[0]).join('').slice(0, 2) ?? '', color: 'teal'
+  })) : staticTeam;
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], [-40, 40]);
 

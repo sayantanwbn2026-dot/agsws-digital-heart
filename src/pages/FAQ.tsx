@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
-import { faqs } from "@/data/faqs";
+import { faqs as staticFaqs } from "@/data/faqs";
+import { useCMSList } from "@/hooks/useCMSList";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { StaggerContainer } from "@/components/ui/StaggerContainer";
@@ -13,6 +14,8 @@ const FAQ = () => {
   useSEO("FAQ", "Frequently asked questions about AGSWS donations, registration, and services.");
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const { data: cmsFaqs } = useCMSList<any>('cms_faqs', [], { orderBy: { column: 'sort_order' } });
+  const faqs = cmsFaqs.length ? cmsFaqs.map((f: any) => ({ question: f.question, answer: f.answer, category: f.category })) : staticFaqs;
 
   const filtered = faqs.filter((f) => f.category === activeCategory);
 

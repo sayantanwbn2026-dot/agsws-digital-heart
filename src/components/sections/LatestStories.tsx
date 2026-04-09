@@ -6,7 +6,7 @@ import ImagePlaceholder from "../ui/ImagePlaceholder";
 import { useCMSList } from "@/hooks/useCMSList";
 
 const LatestStories = () => {
-  const { data: cmsPosts } = useCMSList<any>('blog_posts', [], {
+  const { data: cmsPosts } = useCMSList<any>('cms_blog_posts', [], {
     filter: { column: 'is_published', value: true },
     orderBy: { column: 'published_at', ascending: false },
     limit: 3
@@ -16,9 +16,9 @@ const LatestStories = () => {
         slug: p.slug,
         title: p.title,
         excerpt: p.excerpt ?? '',
-        category: p.category ?? 'Story',
-        date: p.published_at ?? p.date ?? '',
-        readTime: p.read_time ?? '',
+        category: 'Story',
+        date: p.published_at ? new Date(p.published_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '',
+        readTime: '',
       }))
     : staticStories;
   const latest = stories.slice(0, 3);
@@ -46,7 +46,6 @@ const LatestStories = () => {
                 <div key={story.slug} className="md:col-span-2 lg:col-span-3 h-full">
                   <Link to={`/blog/${story.slug}`} className="group block h-full">
                     <div className="global-card flex flex-col md:flex-row h-full">
-                      
                       <div className="w-full md:w-[40%] relative overflow-hidden h-[200px] md:h-auto flex-shrink-0">
                         <ImagePlaceholder
                           category="community"
@@ -57,7 +56,6 @@ const LatestStories = () => {
                           {story.category}
                         </span>
                       </div>
-
                       <div className="w-full md:w-[60%] p-[20px] md:p-[32px] flex flex-col justify-center relative z-10">
                         <p className="text-[12px] text-[var(--light)] mb-3">{story.date}</p>
                         <h4 className="text-[20px] lg:text-[24px] font-semibold text-[var(--dark)] mb-3 line-clamp-2 group-hover:text-[var(--teal)] transition-colors">
@@ -68,7 +66,6 @@ const LatestStories = () => {
                         </p>
                         <span className="inline-block mt-6 text-[var(--teal)] font-semibold text-[13px]">Read Story →</span>
                       </div>
-
                     </div>
                   </Link>
                 </div>
