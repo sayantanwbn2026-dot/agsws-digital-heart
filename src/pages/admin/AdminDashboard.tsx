@@ -352,7 +352,7 @@ const OverviewDashboard = ({ counts, allData }: { counts: Record<string, number>
     acc[m][a.type as 'medical' | 'education']++;
     return acc;
   }, {});
-  const appChartData = Object.entries(appsByMonth).map(([month, data]) => ({ month, ...data }));
+  const appChartData = Object.entries(appsByMonth).map(([month, data]) => ({ month, ...(data as object) }));
 
   return (
     <div className="space-y-6">
