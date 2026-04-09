@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard, Image, Type, Heart, BookOpen, Users, Star,
   FileText, Calendar, HelpCircle, ImageIcon,
-  Handshake, Settings, LogOut, PanelLeftClose, PanelLeft, Database
+  Handshake, Settings, LogOut, PanelLeftClose, PanelLeft, Database,
+  TrendingUp, Eye
 } from "lucide-react";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
 import { useCMSApi } from "@/hooks/useCMSApi";
@@ -22,7 +23,6 @@ const statsFields: FieldConfig[] = [
   { key: 'label', label: 'Label', type: 'text', required: true },
   { key: 'value', label: 'Value', type: 'text', required: true },
   { key: 'icon', label: 'Icon Name', type: 'text', placeholder: 'e.g. Heart, Users, BookOpen' },
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const initiativeFields: FieldConfig[] = [
@@ -31,7 +31,6 @@ const initiativeFields: FieldConfig[] = [
   { key: 'image', label: 'Card Image', type: 'image', resolution: '600×400px', imageFolder: 'initiatives' },
   { key: 'link', label: 'Link URL', type: 'text' },
   { key: 'icon', label: 'Icon Name', type: 'text' },
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const testimonialFields: FieldConfig[] = [
@@ -39,7 +38,6 @@ const testimonialFields: FieldConfig[] = [
   { key: 'role', label: 'Role / Title', type: 'text' },
   { key: 'quote', label: 'Quote', type: 'textarea', required: true },
   { key: 'avatar', label: 'Avatar', type: 'image', resolution: '200×200px', imageFolder: 'avatars' },
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const storyFields: FieldConfig[] = [
@@ -55,7 +53,6 @@ const storyFields: FieldConfig[] = [
   ]},
   { key: 'is_published', label: 'Published', type: 'boolean' },
   { key: 'published_at', label: 'Publish Date', type: 'date' },
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const eventFields: FieldConfig[] = [
@@ -66,7 +63,6 @@ const eventFields: FieldConfig[] = [
   { key: 'image', label: 'Event Image', type: 'image', resolution: '800×450px', imageFolder: 'events' },
   { key: 'capacity', label: 'Capacity', type: 'number' },
   { key: 'is_published', label: 'Published', type: 'boolean' },
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const teamFields: FieldConfig[] = [
@@ -74,7 +70,6 @@ const teamFields: FieldConfig[] = [
   { key: 'role', label: 'Role', type: 'text' },
   { key: 'bio', label: 'Bio', type: 'textarea' },
   { key: 'image', label: 'Photo', type: 'image', resolution: '400×400px', imageFolder: 'team' },
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const faqFields: FieldConfig[] = [
@@ -85,7 +80,6 @@ const faqFields: FieldConfig[] = [
     { label: 'Parent Registration', value: 'Parent Registration' },
     { label: 'About AGSWS', value: 'About AGSWS' },
   ]},
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const galleryFields: FieldConfig[] = [
@@ -97,14 +91,12 @@ const galleryFields: FieldConfig[] = [
     { label: 'Community', value: 'community' },
     { label: 'Elderly', value: 'elderly' },
   ]},
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const partnerFields: FieldConfig[] = [
   { key: 'name', label: 'Partner Name', type: 'text', required: true },
   { key: 'logo', label: 'Logo', type: 'image', resolution: '300×120px (transparent PNG)', imageFolder: 'partners' },
   { key: 'website', label: 'Website URL', type: 'text' },
-  { key: 'sort_order', label: 'Sort Order', type: 'number' },
 ];
 
 const blogFields: FieldConfig[] = [
@@ -135,6 +127,7 @@ const settingsFields: FieldConfig[] = [
 
 // ─── Sidebar Sections ────────────────────────────────────────────
 const sections = [
+  { id: 'overview', label: 'Overview', icon: TrendingUp, table: '', fields: [], isOverview: true },
   { id: 'hero', label: 'Hero Section', icon: Type, table: 'cms_hero', fields: heroFields, singleRow: true },
   { id: 'stats', label: 'Impact Stats', icon: LayoutDashboard, table: 'cms_stats', fields: statsFields },
   { id: 'initiatives', label: 'Initiatives', icon: Heart, table: 'cms_initiatives', fields: initiativeFields },
@@ -149,8 +142,109 @@ const sections = [
   { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true },
 ];
 
+/* ─── Overview Dashboard Component ──────────────────────────── */
+const OverviewDashboard = ({ counts }: { counts: Record<string, number> }) => {
+  const contentSections = sections.filter(s => !s.isOverview && !s.singleRow);
+  const totalItems = Object.values(counts).reduce((sum, n) => sum + n, 0);
+
+  return (
+    <div className="space-y-6">
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Content</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{totalItems}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Sections</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{sections.length - 1}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Blog Posts</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{counts.blog || 0}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Events</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{counts.events || 0}</p>
+        </div>
+      </div>
+
+      {/* Per-section breakdown */}
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <h3 className="text-sm font-bold text-foreground">Content Breakdown</h3>
+        </div>
+        <div className="divide-y divide-border">
+          {contentSections.map(s => {
+            const count = counts[s.id] || 0;
+            return (
+              <div key={s.id} className="flex items-center gap-4 px-6 py-3.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <s.icon size={14} className="text-primary" />
+                </div>
+                <span className="flex-1 text-sm font-medium text-foreground">{s.label}</span>
+                <span className="text-sm font-bold text-foreground">{count}</span>
+                <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all"
+                    style={{ width: `${totalItems ? (count / totalItems) * 100 : 0}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h3 className="text-sm font-bold text-foreground mb-3">Quick Actions</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <a href="/" target="_blank" rel="noopener" className="flex items-center gap-2 px-4 py-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+            <Eye size={14} className="text-primary" />
+            <span className="text-xs font-medium text-foreground">View Live Site</span>
+          </a>
+          <a href="/about" target="_blank" rel="noopener" className="flex items-center gap-2 px-4 py-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+            <Users size={14} className="text-primary" />
+            <span className="text-xs font-medium text-foreground">About Page</span>
+          </a>
+          <a href="/blog" target="_blank" rel="noopener" className="flex items-center gap-2 px-4 py-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+            <FileText size={14} className="text-primary" />
+            <span className="text-xs font-medium text-foreground">Blog Page</span>
+          </a>
+        </div>
+      </div>
+
+      {/* Image Resolution Guide */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h4 className="text-xs font-bold text-foreground mb-3 flex items-center gap-2">
+          <Image size={14} className="text-primary" />
+          Image Resolution Guide
+        </h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+          {[
+            { label: 'Hero Background', size: '1920×800px' },
+            { label: 'Card Images', size: '600×400px' },
+            { label: 'Blog Cover', size: '1200×630px' },
+            { label: 'Gallery Photos', size: '1200×800px' },
+            { label: 'Team Photos', size: '400×400px' },
+            { label: 'Avatars', size: '200×200px' },
+            { label: 'Partner Logos', size: '300×120px' },
+            { label: 'Event Images', size: '800×450px' },
+          ].map(item => (
+            <div key={item.label} className="bg-background rounded-lg p-3 border border-border">
+              <p className="text-[10px] text-muted-foreground">{item.label}</p>
+              <p className="text-xs font-bold text-foreground mt-0.5">{item.size}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminDashboard = () => {
-  const [activeSection, setActiveSection] = useState('hero');
+  const [activeSection, setActiveSection] = useState('overview');
   const [collapsed, setCollapsed] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const navigate = useNavigate();
@@ -159,9 +253,8 @@ const AdminDashboard = () => {
   const currentSection = sections.find(s => s.id === activeSection)!;
 
   useEffect(() => {
-    // Fetch counts for sidebar badges
     sections.forEach(async (s) => {
-      if (s.singleRow) return;
+      if (s.singleRow || s.isOverview) return;
       try {
         const data = await getAll(s.table);
         setCounts(prev => ({ ...prev, [s.id]: Array.isArray(data) ? data.length : 0 }));
@@ -183,7 +276,6 @@ const AdminDashboard = () => {
         transition={{ duration: 0.2, ease: 'easeInOut' }}
         className="bg-card border-r border-border flex flex-col shrink-0 sticky top-0 h-screen overflow-hidden z-20"
       >
-        {/* Logo */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-border">
           {!collapsed && (
             <div className="flex items-center gap-2.5">
@@ -209,38 +301,39 @@ const AdminDashboard = () => {
           </button>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 py-3 overflow-y-auto px-2 space-y-0.5">
-          {sections.map((section) => {
+          {sections.map((section, idx) => {
             const isActive = activeSection === section.id;
+            const showDivider = idx === 1; // After overview
             return (
-              <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
-                }`}
-                title={collapsed ? section.label : undefined}
-              >
-                <section.icon size={16} className="shrink-0" />
-                {!collapsed && (
-                  <>
-                    <span className="truncate flex-1 text-left">{section.label}</span>
-                    {!section.singleRow && counts[section.id] !== undefined && (
-                      <span className={`text-[10px] font-bold min-w-[20px] h-5 flex items-center justify-center rounded-md ${isActive ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                        {counts[section.id]}
-                      </span>
-                    )}
-                  </>
-                )}
-              </button>
+              <div key={section.id}>
+                {showDivider && <div className="h-px bg-border mx-2 my-2" />}
+                <button
+                  onClick={() => setActiveSection(section.id)}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
+                    isActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                  }`}
+                  title={collapsed ? section.label : undefined}
+                >
+                  <section.icon size={16} className="shrink-0" />
+                  {!collapsed && (
+                    <>
+                      <span className="truncate flex-1 text-left">{section.label}</span>
+                      {!section.singleRow && !section.isOverview && counts[section.id] !== undefined && (
+                        <span className={`text-[10px] font-bold min-w-[20px] h-5 flex items-center justify-center rounded-md ${isActive ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                          {counts[section.id]}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </button>
+              </div>
             );
           })}
         </nav>
 
-        {/* Sign out */}
         <div className="p-3 border-t border-border">
           <button
             onClick={handleSignOut}
@@ -261,9 +354,9 @@ const AdminDashboard = () => {
             </div>
             <div>
               <h1 className="text-sm font-bold text-foreground">{currentSection.label}</h1>
-              <p className="text-[10px] text-muted-foreground">
-                {currentSection.table}
-              </p>
+              {currentSection.table && (
+                <p className="text-[10px] text-muted-foreground">{currentSection.table}</p>
+              )}
             </div>
           </div>
         </header>
@@ -275,38 +368,17 @@ const AdminDashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <CMSContentEditor
-              table={currentSection.table}
-              title={currentSection.label}
-              fields={currentSection.fields}
-              singleRow={currentSection.singleRow}
-            />
+            {currentSection.isOverview ? (
+              <OverviewDashboard counts={counts} />
+            ) : (
+              <CMSContentEditor
+                table={currentSection.table}
+                title={currentSection.label}
+                fields={currentSection.fields}
+                singleRow={currentSection.singleRow}
+              />
+            )}
           </motion.div>
-
-          {/* Resolution Guide */}
-          <div className="mt-8 bg-card border border-border rounded-xl p-6">
-            <h4 className="text-xs font-bold text-foreground mb-3 flex items-center gap-2">
-              <Image size={14} className="text-primary" />
-              Image Resolution Guide
-            </h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-              {[
-                { label: 'Hero Background', size: '1920×800px' },
-                { label: 'Card Images', size: '600×400px' },
-                { label: 'Blog Cover', size: '1200×630px' },
-                { label: 'Gallery Photos', size: '1200×800px' },
-                { label: 'Team Photos', size: '400×400px' },
-                { label: 'Avatars', size: '200×200px' },
-                { label: 'Partner Logos', size: '300×120px' },
-                { label: 'Event Images', size: '800×450px' },
-              ].map(item => (
-                <div key={item.label} className="bg-background rounded-lg p-3 border border-border">
-                  <p className="text-[10px] text-muted-foreground">{item.label}</p>
-                  <p className="text-xs font-bold text-foreground mt-0.5">{item.size}</p>
-                </div>
-              ))}
-            </div>
-          </div>
         </main>
       </div>
     </div>
