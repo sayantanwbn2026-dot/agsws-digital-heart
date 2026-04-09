@@ -13,10 +13,15 @@ const Updates = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
-  const handleEmailSub = (e: React.FormEvent) => {
+  const handleEmailSub = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    toast.success("Subscribed! Check your inbox for a confirmation.");
+    try {
+      await (supabase.from('newsletter_subscriptions' as any) as any).insert({ email, name: name || null, source: 'updates-page' });
+      toast.success("Subscribed! Check your inbox for a confirmation.");
+    } catch {
+      toast.error("Already subscribed or error occurred.");
+    }
     setEmail(""); setName("");
   };
 
