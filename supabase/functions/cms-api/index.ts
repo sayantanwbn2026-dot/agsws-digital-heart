@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     if (req.method === 'GET') {
       let query = supabaseAdmin.from(table).select('*')
       // Tables with sort_order
-      if (table !== 'cms_site_settings') {
+      if (table !== 'cms_site_settings' && table !== 'cms_hero') {
         query = query.order('sort_order', { ascending: true })
       }
       const { data, error } = await query
