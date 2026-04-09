@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
+import { supabase } from "@/integrations/supabase/client";
 import { updates, updateCategoryColors } from "@/data/updates";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { Mail, Phone, CheckCircle } from "lucide-react";
