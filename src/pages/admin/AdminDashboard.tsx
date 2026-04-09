@@ -8,7 +8,7 @@ import {
   TrendingUp, Eye, Mail, ClipboardList, CreditCard,
   BarChart3, PieChart, Activity, Download, ExternalLink,
   AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown, Keyboard,
-  Zap, Globe, Shield, FolderOpen
+  Globe, Shield, FolderOpen
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
