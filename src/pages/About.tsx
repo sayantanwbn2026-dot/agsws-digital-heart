@@ -1,6 +1,7 @@
 import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
-import { team } from "@/data/team";
+import { team as staticTeam } from "@/data/team";
+import { useCMSList } from "@/hooks/useCMSList";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Building2, Award, Globe, FileCheck, Heart, Target, Eye, ArrowRight, Quote } from "lucide-react";
