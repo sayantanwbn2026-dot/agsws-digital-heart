@@ -11,16 +11,24 @@ const ImpactStats = () => {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
-  const { data: cmsStats } = useCMSList<any>('impact_stats', [], {
-    filter: { column: 'is_active', value: true },
-    orderBy: { column: 'display_order' }
+  const { data: cmsStats } = useCMSList<any>('cms_stats', [], {
+    orderBy: { column: 'sort_order' }
   });
-  const stats = cmsStats.length ? cmsStats.map((s: any) => ({
-    label: s.label,
-    targetValue: s.value,
-    prefix: s.prefix ?? '',
-    suffix: s.suffix ?? '',
-  })) : staticStats;
+
+  const stats = cmsStats.length ? cmsStats.map((s: any) => {
+    // Parse value like "2400+" or "₹48L+"
+    const raw = s.value || '0';
+    const numMatch = raw.match(/[\d,]+/);
+    const numVal = numMatch ? parseInt(numMatch[0].replace(/,/g, ''), 10) : 0;
+    const prefix = raw.match(/^[^\d]*/)?.[0] || '';
+    const suffix = raw.replace(/^[^\d]*[\d,]+/, '') || '';
+    return {
+      label: s.label,
+      targetValue: numVal,
+      prefix,
+      suffix,
+    };
+  }) : staticStats;
 
   const [increments, setIncrements] = useState<number[]>(new Array(stats.length).fill(0));
   const [flashIndex, setFlashIndex] = useState<number | null>(null);

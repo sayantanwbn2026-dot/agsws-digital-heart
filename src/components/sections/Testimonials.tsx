@@ -10,16 +10,15 @@ import { Quote } from "lucide-react";
 
 const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const { data: cmsTestimonials } = useCMSList<any>('testimonials', [], {
-    filter: { column: 'is_active', value: true },
-    orderBy: { column: 'display_order' }
+  const { data: cmsTestimonials } = useCMSList<any>('cms_testimonials', [], {
+    orderBy: { column: 'sort_order' }
   });
   const testimonials = cmsTestimonials.length
     ? cmsTestimonials.map((t: any) => ({
         quote: t.quote,
-        author: t.author,
-        role: t.role ?? t.subtitle ?? '',
-        initials: t.initials ?? t.author?.slice(0, 2).toUpperCase() ?? 'AA',
+        author: t.name,
+        role: t.role ?? '',
+        initials: t.name?.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase() ?? 'AA',
       }))
     : staticTestimonials;
 
@@ -43,15 +42,12 @@ const Testimonials = () => {
             {testimonials.map((t, i) => (
               <SwiperSlide key={i}>
                 <div className="text-center max-w-[640px] mx-auto px-6 relative">
-                  {/* Quote icon */}
                   <div className="w-12 h-12 rounded-2xl bg-[var(--teal-light)] flex items-center justify-center mx-auto mb-8">
                     <Quote size={20} className="text-[var(--teal)]" />
                   </div>
-
                   <p className="text-[clamp(17px,2vw,21px)] font-[500] text-[var(--dark)] italic leading-[1.85] mb-10">
                     "{t.quote}"
                   </p>
-
                   <div className="flex items-center justify-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] flex items-center justify-center text-white font-[700] text-[14px] shadow-[0_4px_12px_rgba(31,154,168,0.25)]">
                       {t.initials}
@@ -66,7 +62,6 @@ const Testimonials = () => {
             ))}
           </Swiper>
 
-          {/* Dots */}
           <div className="mt-10 flex justify-center items-center gap-2 relative z-20">
             {testimonials.map((_, i) => (
               <button
