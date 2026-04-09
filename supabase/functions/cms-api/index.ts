@@ -11,7 +11,7 @@ const supabaseAdmin = createClient(
 )
 
 // Tables that don't have sort_order column
-const NO_SORT_ORDER = ['cms_site_settings', 'cms_hero', 'cms_blog_posts', 'cms_payment_config', 'newsletter_subscriptions', 'support_applications']
+const NO_SORT_ORDER = ['cms_site_settings', 'cms_hero', 'cms_payment_config', 'newsletter_subscriptions', 'support_applications']
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
   const id = url.searchParams.get('id')
 
   // Allow cms_ tables, plus newsletter_subscriptions, support_applications
-  const allowedPrefixes = ['cms_', 'newsletter_', 'support_']
+  const allowedPrefixes = ['cms_', 'newsletter_', 'support_', 'cms_resources']
   if (!table || !allowedPrefixes.some(p => table.startsWith(p))) {
     return new Response(JSON.stringify({ error: 'Invalid table' }), {
       status: 400,
