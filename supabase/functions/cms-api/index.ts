@@ -10,6 +10,9 @@ const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 )
 
+// Tables that don't have sort_order column
+const NO_SORT_ORDER = ['cms_site_settings', 'cms_hero', 'cms_blog_posts', 'cms_payment_config', 'newsletter_subscriptions', 'support_applications']
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -27,7 +30,9 @@ Deno.serve(async (req) => {
   const table = url.searchParams.get('table')
   const id = url.searchParams.get('id')
 
-  if (!table || !table.startsWith('cms_')) {
+  // Allow cms_ tables, plus newsletter_subscriptions, support_applications
+  const allowedPrefixes = ['cms_', 'newsletter_', 'support_']
+  if (!table || !allowedPrefixes.some(p => table.startsWith(p))) {
     return new Response(JSON.stringify({ error: 'Invalid table' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -37,9 +42,14 @@ Deno.serve(async (req) => {
   try {
     if (req.method === 'GET') {
       let query = supabaseAdmin.from(table).select('*')
-      // Tables with sort_order
-      if (table !== 'cms_site_settings' && table !== 'cms_hero') {
+      if (!NO_SORT_ORDER.includes(table)) {
         query = query.order('sort_order', { ascending: true })
+      }
+      if (table === 'support_applications' || table === 'newsletter_subscriptions') {
+        query = query.order('created_at', { ascending: false })
+      }
+      if (table === 'cms_blog_posts') {
+        query = query.order('created_at', { ascending: false })
       }
       const { data, error } = await query
       if (error) throw error

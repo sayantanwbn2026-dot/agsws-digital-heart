@@ -7,6 +7,8 @@ import { z } from "zod";
 import { Heart, GraduationCap, CheckCircle, Phone, ArrowRight } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
 import FadeInUp from "@/components/ui/FadeInUp";
+import { supabase } from "@/integrations/supabase/client";
+import toast from "react-hot-toast";
 
 const medicalSchema = z.object({
   patientName: z.string().min(2, "Required"),
@@ -51,6 +53,7 @@ const ApplyForSupport = () => {
   useSEO("Apply for Support", "Apply for AGSWS medical or education support. Free and confidential.");
   const [activeForm, setActiveForm] = useState<"medical" | "education" | null>(null);
   const [submitted, setSubmitted] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const med = useForm({ resolver: zodResolver(medicalSchema) });
   const edu = useForm<z.infer<typeof educationSchema>>({
@@ -58,8 +61,47 @@ const ApplyForSupport = () => {
     defaultValues: { needFees: false, needBooks: false, needMeals: false, needUniform: false, needExamFees: false },
   });
 
-  const onMedicalSubmit = () => setSubmitted(`APP-MED-${String(Math.floor(Math.random() * 9000) + 1000)}`);
-  const onEducationSubmit = () => setSubmitted(`APP-EDU-${String(Math.floor(Math.random() * 9000) + 1000)}`);
+  const onMedicalSubmit = async (data: any) => {
+    setSubmitting(true);
+    try {
+      const { error } = await (supabase.from('support_applications' as any) as any).insert({
+        type: 'medical',
+        applicant_name: data.patientName,
+        email: data.email,
+        phone: data.phone,
+        form_data: data,
+      });
+      if (error) throw error;
+      const ref = `APP-MED-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+      setSubmitted(ref);
+      toast.success('Application submitted!');
+    } catch (err: any) {
+      toast.error(err.message || 'Submission failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onEducationSubmit = async (data: any) => {
+    setSubmitting(true);
+    try {
+      const { error } = await (supabase.from('support_applications' as any) as any).insert({
+        type: 'education',
+        applicant_name: data.childName,
+        email: data.parentEmail,
+        phone: data.parentPhone,
+        form_data: data,
+      });
+      if (error) throw error;
+      const ref = `APP-EDU-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+      setSubmitted(ref);
+      toast.success('Application submitted!');
+    } catch (err: any) {
+      toast.error(err.message || 'Submission failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (submitted) {
     return (
@@ -86,7 +128,6 @@ const ApplyForSupport = () => {
 
       <section className="bg-[var(--bg)] py-[64px] lg:py-[96px]">
         <div className="max-w-[900px] mx-auto px-[var(--container-px)]">
-          {/* Choose type */}
           {!activeForm && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
@@ -114,7 +155,6 @@ const ApplyForSupport = () => {
             </div>
           )}
 
-          {/* Medical Form */}
           <AnimatePresence mode="wait">
             {activeForm === "medical" && (
               <motion.div key="med" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
@@ -158,8 +198,8 @@ const ApplyForSupport = () => {
                         <input {...med.register("email")} type="email" placeholder="Email" className="no-float" />
                       </FormField>
                     </div>
-                    <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[48px] bg-[var(--teal)] text-white font-[600] rounded-full text-[14px] hover:bg-[var(--teal-dark)] transition-colors mt-2">
-                      Submit Application
+                    <motion.button type="submit" disabled={submitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[48px] bg-[var(--teal)] text-white font-[600] rounded-full text-[14px] hover:bg-[var(--teal-dark)] transition-colors mt-2 disabled:opacity-50">
+                      {submitting ? 'Submitting...' : 'Submit Application'}
                     </motion.button>
                   </form>
                 </div>
@@ -230,8 +270,8 @@ const ApplyForSupport = () => {
                     <FormField label="Brief reason (optional)">
                       <textarea {...edu.register("reason")} placeholder="Why is support needed?" rows={2} maxLength={300} className="no-float" />
                     </FormField>
-                    <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[48px] bg-[var(--purple)] text-white font-[600] rounded-full text-[14px] hover:opacity-90 transition-opacity mt-2">
-                      Submit Application
+                    <motion.button type="submit" disabled={submitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[48px] bg-[var(--purple)] text-white font-[600] rounded-full text-[14px] hover:opacity-90 transition-opacity mt-2 disabled:opacity-50">
+                      {submitting ? 'Submitting...' : 'Submit Application'}
                     </motion.button>
                   </form>
                 </div>
@@ -239,7 +279,6 @@ const ApplyForSupport = () => {
             )}
           </AnimatePresence>
 
-          {/* Help note */}
           <FadeInUp className="mt-12 text-center">
             <div className="inline-flex items-center gap-3 bg-white rounded-full border border-[var(--border-color)] px-6 py-3 shadow-[var(--shadow-card)]">
               <Phone size={16} className="text-[var(--teal)]" />

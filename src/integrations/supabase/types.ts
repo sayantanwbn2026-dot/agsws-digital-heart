@@ -25,6 +25,7 @@ export type Database = {
           is_published: boolean
           published_at: string | null
           slug: string
+          sort_order: number
           title: string
           updated_at: string
         }
@@ -38,6 +39,7 @@ export type Database = {
           is_published?: boolean
           published_at?: string | null
           slug: string
+          sort_order?: number
           title: string
           updated_at?: string
         }
@@ -51,6 +53,7 @@ export type Database = {
           is_published?: boolean
           published_at?: string | null
           slug?: string
+          sort_order?: number
           title?: string
           updated_at?: string
         }
@@ -260,6 +263,60 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_payment_config: {
+        Row: {
+          bank_account_number: string | null
+          bank_branch: string | null
+          bank_ifsc: string | null
+          bank_name: string | null
+          created_at: string
+          currency: string
+          id: string
+          max_donation: number
+          min_donation: number
+          razorpay_enabled: boolean
+          razorpay_key_id: string | null
+          receipt_prefix: string
+          tax_deduction_percentage: number
+          updated_at: string
+          upi_id: string | null
+        }
+        Insert: {
+          bank_account_number?: string | null
+          bank_branch?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          max_donation?: number
+          min_donation?: number
+          razorpay_enabled?: boolean
+          razorpay_key_id?: string | null
+          receipt_prefix?: string
+          tax_deduction_percentage?: number
+          updated_at?: string
+          upi_id?: string | null
+        }
+        Update: {
+          bank_account_number?: string | null
+          bank_branch?: string | null
+          bank_ifsc?: string | null
+          bank_name?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          max_donation?: number
+          min_donation?: number
+          razorpay_enabled?: boolean
+          razorpay_key_id?: string | null
+          receipt_prefix?: string
+          tax_deduction_percentage?: number
+          updated_at?: string
+          upi_id?: string | null
+        }
+        Relationships: []
+      }
       cms_site_settings: {
         Row: {
           announcement_active: boolean
@@ -448,6 +505,81 @@ export type Database = {
           quote?: string
           role?: string | null
           sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_subscriptions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          name: string | null
+          source: string | null
+          subscribed_at: string
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          name?: string | null
+          source?: string | null
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          name?: string | null
+          source?: string | null
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+        }
+        Relationships: []
+      }
+      support_applications: {
+        Row: {
+          admin_notes: string | null
+          applicant_name: string
+          application_ref: string
+          created_at: string
+          email: string
+          form_data: Json
+          id: string
+          phone: string
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          applicant_name: string
+          application_ref?: string
+          created_at?: string
+          email: string
+          form_data?: Json
+          id?: string
+          phone: string
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          applicant_name?: string
+          application_ref?: string
+          created_at?: string
+          email?: string
+          form_data?: Json
+          id?: string
+          phone?: string
+          status?: string
+          type?: string
           updated_at?: string
         }
         Relationships: []
