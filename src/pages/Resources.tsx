@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { useSEO } from "@/hooks/useSEO";
-import FadeInUp from "@/components/ui/FadeInUp";
 import { resources as fallbackResources } from "@/data/resources";
 import { useCMSList } from "@/hooks/useCMSList";
 import { Download, Search } from "lucide-react";

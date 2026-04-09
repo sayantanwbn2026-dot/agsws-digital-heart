@@ -30,7 +30,7 @@ const Blog = () => {
     orderBy: { column: 'created_at', ascending: false }
   });
 
-  const blogPosts = useMemo(() => {
+  const blogPosts: any[] = useMemo(() => {
     if (cmsBlog.length > 0) {
       return cmsBlog.map((p: any) => ({
         slug: p.slug,
@@ -39,11 +39,11 @@ const Blog = () => {
         category: 'Community',
         date: p.published_at ? new Date(p.published_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '',
         readTime: '5 min read',
-        image: p.image,
+        image: p.image || '',
         author: p.author,
       }));
     }
-    return stories;
+    return stories.map(s => ({ ...s, image: '' }));
   }, [cmsBlog]);
 
   const featured = blogPosts[0];
