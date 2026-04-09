@@ -36,6 +36,10 @@ const values = [
 const About = () => {
   useSEO("About Us", "Learn about AGSWS — our mission, team, and journey of impact in Kolkata.");
   const parallaxRef = useRef(null);
+  const { data: cmsTeam } = useCMSList<any>('cms_team', [], { orderBy: { column: 'sort_order' } });
+  const team = cmsTeam.length ? cmsTeam.map((m: any) => ({
+    name: m.name, role: m.role, bio: m.bio, initials: m.name?.split(' ').map((w: string) => w[0]).join('').slice(0, 2) ?? '', color: 'teal'
+  })) : staticTeam;
   const { scrollYProgress } = useScroll({ target: parallaxRef, offset: ["start end", "end start"] });
   const parallaxY = useTransform(scrollYProgress, [0, 1], [-40, 40]);
 

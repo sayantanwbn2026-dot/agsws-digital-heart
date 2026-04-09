@@ -14,6 +14,8 @@ const FAQ = () => {
   useSEO("FAQ", "Frequently asked questions about AGSWS donations, registration, and services.");
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const { data: cmsFaqs } = useCMSList<any>('cms_faqs', [], { orderBy: { column: 'sort_order' } });
+  const faqs = cmsFaqs.length ? cmsFaqs.map((f: any) => ({ question: f.question, answer: f.answer, category: f.category })) : staticFaqs;
 
   const filtered = faqs.filter((f) => f.category === activeCategory);
 
