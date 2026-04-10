@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard, Image, Type, Heart, BookOpen, Users, Star,
+  LayoutDashboard, Type, Heart, BookOpen, Users, Star,
   FileText, Calendar, HelpCircle, ImageIcon,
   Handshake, Settings, LogOut, PanelLeftClose, PanelLeft, Database,
   TrendingUp, Eye, Mail, ClipboardList, CreditCard,
   BarChart3, PieChart, Activity, Download, ExternalLink,
-  AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown, Keyboard,
+  AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown,
   Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
