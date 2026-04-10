@@ -17,7 +17,7 @@ export const PremiumInput = React.forwardRef<
         ref={ref}
         {...props}
         className={cn(
-          "w-full h-[52px] px-4 text-[14px] text-[var(--dark)] bg-[var(--white)] border-[1.5px] rounded-[14px] outline-none transition-all duration-300",
+          "no-float w-full h-[52px] px-4 text-[14px] text-[var(--dark)] bg-[var(--white)] border-[1.5px] rounded-[14px] outline-none transition-all duration-300",
           "border-[var(--border-color)] hover:border-[var(--mid)]/30",
           "focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.08)]",
           "placeholder:text-[var(--light)]/60",
@@ -49,7 +49,7 @@ export const PremiumTextarea = React.forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        "w-full px-4 py-3.5 text-[14px] text-[var(--dark)] bg-[var(--white)] border-[1.5px] rounded-[14px] outline-none transition-all duration-300 resize-none",
+        "no-float w-full px-4 py-3.5 text-[14px] text-[var(--dark)] bg-[var(--white)] border-[1.5px] rounded-[14px] outline-none transition-all duration-300 resize-none",
         "border-[var(--border-color)] hover:border-[var(--mid)]/30",
         "focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.08)]",
         "placeholder:text-[var(--light)]/60",
@@ -75,7 +75,7 @@ export const PremiumSelect = React.forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        "w-full h-[52px] px-4 text-[14px] text-[var(--dark)] bg-[var(--white)] border-[1.5px] rounded-[14px] outline-none transition-all duration-300 appearance-none cursor-pointer",
+        "no-float w-full h-[52px] px-4 text-[14px] text-[var(--dark)] bg-[var(--white)] border-[1.5px] rounded-[14px] outline-none transition-all duration-300 appearance-none cursor-pointer",
         "border-[var(--border-color)] hover:border-[var(--mid)]/30",
         "focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.08)]",
         "bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23888%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>')] bg-[position:right_16px_center] bg-no-repeat",
