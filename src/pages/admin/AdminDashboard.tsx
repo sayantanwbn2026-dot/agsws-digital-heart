@@ -997,6 +997,7 @@ const AdminDashboard = () => {
     if (activeSection === 'newsletter') return <NewsletterManager items={allData.newsletter || []} />;
     if (activeSection === 'seo') return <SEOChecker allData={allData} />;
     if (activeSection === 'scheduler') return <ContentScheduler allData={allData} />;
+    if (activeSection === 'import') return <BulkImport onRefresh={fetchAllCounts} />;
     return null;
   };
 
