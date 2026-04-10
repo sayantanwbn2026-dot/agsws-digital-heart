@@ -3,9 +3,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const ADMIN_EMAIL = 'sayantanmukherjee2505@gmail.com'
-const ADMIN_PASSWORD = 'Admin@2025'
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -14,7 +11,17 @@ Deno.serve(async (req) => {
   try {
     const { email, password } = await req.json()
 
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    const adminEmail = Deno.env.get('CMS_ADMIN_EMAIL')
+    const adminPassword = Deno.env.get('CMS_ADMIN_PASSWORD')
+
+    if (!adminEmail || !adminPassword) {
+      return new Response(JSON.stringify({ error: 'Admin credentials not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (email === adminEmail && password === adminPassword) {
       const token = btoa(`${email}:${Date.now()}:${crypto.randomUUID()}`)
       return new Response(JSON.stringify({ success: true, token }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
