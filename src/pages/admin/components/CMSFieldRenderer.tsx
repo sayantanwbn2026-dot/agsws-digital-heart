@@ -10,7 +10,7 @@ interface CMSFieldRendererProps {
 }
 
 const inputClass =
-  "w-full rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all";
+  "no-float w-full rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all";
 
 const CMSFieldRenderer = ({ field, item, onChange, uploadImage }: CMSFieldRendererProps) => {
   const value = item[field.key];
