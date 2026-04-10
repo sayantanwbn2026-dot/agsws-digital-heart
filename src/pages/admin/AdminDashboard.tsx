@@ -8,11 +8,12 @@ import {
   TrendingUp, Eye, Mail, ClipboardList, CreditCard,
   BarChart3, PieChart, Activity, Download, ExternalLink,
   AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown, Keyboard,
-  Globe, Shield, FolderOpen
+  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
 import { useCMSApi } from "@/hooks/useCMSApi";
+import toast from "react-hot-toast";
 
 // ─── CMS Section Configurations ─────────────────────────────────
 const heroFields: FieldConfig[] = [
@@ -178,11 +179,13 @@ const sections = [
   { id: 'divider1', label: '', icon: null as any, table: '', fields: [], isDivider: true },
   { id: 'applications', label: 'Applications', icon: ClipboardList, table: 'support_applications', fields: [], isCustom: true },
   { id: 'newsletter', label: 'Newsletter', icon: Mail, table: 'newsletter_subscriptions', fields: [], isCustom: true },
+  { id: 'seo', label: 'SEO Checker', icon: FileSearch, table: '', fields: [], isCustom: true },
+  { id: 'scheduler', label: 'Scheduler', icon: CalendarClock, table: '', fields: [], isCustom: true },
+  { id: 'divider2', label: '', icon: null as any, table: '', fields: [], isDivider: true },
   { id: 'payment', label: 'Payment & Tax', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true },
   { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true },
 ];
 
-// Page preview URLs for content preview feature
 const previewUrls: Record<string, string> = {
   hero: '/', stats: '/', initiatives: '/initiatives', testimonials: '/',
   stories: '/', events: '/events', team: '/about', faqs: '/faq',
@@ -191,7 +194,6 @@ const previewUrls: Record<string, string> = {
 
 const CHART_COLORS = ['hsl(187, 68%, 39%)', 'hsl(242, 29%, 50%)', 'hsl(28, 22%, 62%)', 'hsl(47, 80%, 55%)', 'hsl(0, 70%, 55%)', 'hsl(160, 60%, 45%)', 'hsl(280, 50%, 55%)'];
 
-// ─── Feature 1: CSV Export utility ──────────────────────────────
 const exportToCSV = (data: any[], filename: string) => {
   if (!data.length) return;
   const keys = Object.keys(data[0]).filter(k => k !== 'form_data');
@@ -229,27 +231,24 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
   };
 
   const handleNoteSave = async (id: string) => {
-    try { await update('support_applications', id, { admin_notes: notesEdit[id] || '' }); onRefresh(); } catch {}
+    try { await update('support_applications', id, { admin_notes: notesEdit[id] || '' }); onRefresh(); toast.success('Notes saved'); } catch {}
   };
 
   return (
     <div className="space-y-6">
-      {/* Feature 1: CSV Export */}
-      <div className="flex items-center justify-between">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 flex-1">
-          {[
-            { label: 'Total', count: items.length, color: 'bg-primary/10 text-primary' },
-            { label: 'Pending', count: statusCounts.pending || 0, color: 'bg-amber-100 text-amber-700' },
-            { label: 'Reviewing', count: statusCounts.reviewing || 0, color: 'bg-blue-100 text-blue-700' },
-            { label: 'Approved', count: statusCounts.approved || 0, color: 'bg-emerald-100 text-emerald-700' },
-            { label: 'Rejected', count: statusCounts.rejected || 0, color: 'bg-red-100 text-red-700' },
-          ].map(s => (
-            <button key={s.label} onClick={() => setFilter(s.label === 'Total' ? 'all' : s.label.toLowerCase())} className={`rounded-xl border border-border p-4 text-left transition-all ${filter === (s.label === 'Total' ? 'all' : s.label.toLowerCase()) ? 'ring-2 ring-primary' : ''}`}>
-              <p className="text-2xl font-bold text-foreground">{s.count}</p>
-              <p className={`text-[10px] font-bold rounded-full px-2 py-0.5 inline-block mt-1 ${s.color}`}>{s.label}</p>
-            </button>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {[
+          { label: 'Total', count: items.length, color: 'bg-primary/10 text-primary', filterVal: 'all' },
+          { label: 'Pending', count: statusCounts.pending || 0, color: 'bg-amber-100 text-amber-700', filterVal: 'pending' },
+          { label: 'Reviewing', count: statusCounts.reviewing || 0, color: 'bg-blue-100 text-blue-700', filterVal: 'reviewing' },
+          { label: 'Approved', count: statusCounts.approved || 0, color: 'bg-emerald-100 text-emerald-700', filterVal: 'approved' },
+          { label: 'Rejected', count: statusCounts.rejected || 0, color: 'bg-red-100 text-red-700', filterVal: 'rejected' },
+        ].map(s => (
+          <button key={s.label} onClick={() => setFilter(s.filterVal)} className={`rounded-xl border border-border p-4 text-left transition-all hover:shadow-sm ${filter === s.filterVal ? 'ring-2 ring-primary shadow-sm' : ''}`}>
+            <p className="text-2xl font-bold text-foreground">{s.count}</p>
+            <p className={`text-[10px] font-bold rounded-full px-2 py-0.5 inline-block mt-1 ${s.color}`}>{s.label}</p>
+          </button>
+        ))}
       </div>
 
       <div className="flex gap-2">
@@ -276,7 +275,7 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
         <div className="px-6 py-4 border-b border-border">
           <h3 className="text-sm font-bold text-foreground">Applications ({filtered.length})</h3>
         </div>
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-border max-h-[500px] overflow-y-auto">
           {filtered.map(app => (
             <div key={app.id} className="px-6 py-4">
               <div className="flex items-center gap-4 cursor-pointer" onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}>
@@ -285,12 +284,12 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
                   <p className="text-sm font-medium text-foreground truncate">{app.applicant_name}</p>
                   <p className="text-xs text-muted-foreground">{app.email} · {app.phone}</p>
                 </div>
-                <span className="text-[10px] text-muted-foreground">{app.application_ref}</span>
+                <span className="text-[10px] text-muted-foreground hidden sm:inline">{app.application_ref}</span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${statusColors[app.status]}`}>{app.status}</span>
-                <span className="text-xs text-muted-foreground">{new Date(app.created_at).toLocaleDateString()}</span>
+                <span className="text-xs text-muted-foreground hidden md:inline">{new Date(app.created_at).toLocaleDateString()}</span>
               </div>
               {expandedId === app.id && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 pl-4 border-l-2 border-primary/20">
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 pl-4 border-l-2 border-primary/20 space-y-3">
                   <div className="bg-background rounded-lg p-4 text-xs space-y-2">
                     {app.form_data && Object.entries(app.form_data).map(([key, val]) => (
                       <div key={key} className="flex gap-2">
@@ -299,18 +298,17 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
                       </div>
                     ))}
                   </div>
-                  {/* Feature 8: Admin Notes */}
-                  <div className="mt-3">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Admin Notes</label>
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Admin Notes</label>
                     <textarea
                       value={notesEdit[app.id] ?? app.admin_notes ?? ''}
                       onChange={e => setNotesEdit(prev => ({ ...prev, [app.id]: e.target.value }))}
                       placeholder="Add internal notes..."
-                      className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background text-xs resize-none h-16 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      className="no-float w-full px-3 py-2 rounded-lg border border-border bg-background text-xs resize-none h-16 focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                     <button onClick={() => handleNoteSave(app.id)} className="mt-1 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-md">Save Notes</button>
                   </div>
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex gap-2">
                     {['pending', 'reviewing', 'approved', 'rejected'].map(s => (
                       <button key={s} onClick={() => handleStatusChange(app.id, s)} className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors ${app.status === s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>{s}</button>
                     ))}
@@ -338,20 +336,18 @@ const NewsletterManager = ({ items }: { items: any[] }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="grid grid-cols-3 gap-4 flex-1">
-          <div className="bg-card border border-border rounded-xl p-5">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase">Total Subscribers</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{items.length}</p>
-          </div>
-          <div className="bg-card border border-border rounded-xl p-5">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase">Active</p>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">{activeCount}</p>
-          </div>
-          <div className="bg-card border border-border rounded-xl p-5">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase">Unsubscribed</p>
-            <p className="text-2xl font-bold text-red-500 mt-1">{items.length - activeCount}</p>
-          </div>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Total</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{items.length}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Active</p>
+          <p className="text-2xl font-bold text-emerald-600 mt-1">{activeCount}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Unsubscribed</p>
+          <p className="text-2xl font-bold text-red-500 mt-1">{items.length - activeCount}</p>
         </div>
       </div>
 
@@ -361,7 +357,7 @@ const NewsletterManager = ({ items }: { items: any[] }) => {
 
       {chartData.length > 0 && (
         <div className="bg-card border border-border rounded-xl p-6">
-          <h4 className="text-xs font-bold text-foreground mb-4 flex items-center gap-2"><BarChart3 size={14} className="text-primary" /> Subscription Growth</h4>
+          <h4 className="text-xs font-bold text-foreground mb-4 flex items-center gap-2"><BarChart3 size={14} className="text-primary" /> Growth</h4>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -381,10 +377,10 @@ const NewsletterManager = ({ items }: { items: any[] }) => {
         <div className="max-h-[400px] overflow-y-auto divide-y divide-border">
           {items.map(sub => (
             <div key={sub.id} className="px-6 py-3 flex items-center gap-4">
-              <div className={`w-2 h-2 rounded-full ${sub.is_active ? 'bg-emerald-500' : 'bg-red-400'}`} />
-              <span className="text-sm text-foreground flex-1">{sub.email}</span>
-              <span className="text-xs text-muted-foreground">{sub.name || '—'}</span>
-              <span className="text-xs text-muted-foreground">{sub.source}</span>
+              <div className={`w-2 h-2 rounded-full shrink-0 ${sub.is_active ? 'bg-emerald-500' : 'bg-red-400'}`} />
+              <span className="text-sm text-foreground flex-1 truncate">{sub.email}</span>
+              <span className="text-xs text-muted-foreground hidden sm:inline">{sub.name || '—'}</span>
+              <span className="text-xs text-muted-foreground hidden md:inline">{sub.source}</span>
               <span className="text-xs text-muted-foreground">{new Date(sub.created_at).toLocaleDateString()}</span>
             </div>
           ))}
@@ -395,18 +391,317 @@ const NewsletterManager = ({ items }: { items: any[] }) => {
   );
 };
 
-/* ─── Feature 7: Health Check Component ──────────────────────────── */
+/* ─── NEW FEATURE 1: SEO Checker ──────────────────────────── */
+const SEOChecker = ({ allData }: { allData: Record<string, any[]> }) => {
+  const issues: { severity: 'error' | 'warning' | 'ok'; page: string; message: string }[] = [];
+
+  // Check blog posts
+  const blogs = allData.blog || [];
+  blogs.forEach((b: any) => {
+    if (!b.excerpt || b.excerpt.length < 50) issues.push({ severity: 'warning', page: `Blog: ${b.title}`, message: 'Meta description (excerpt) is too short. Aim for 120-160 characters.' });
+    if (b.title && b.title.length > 60) issues.push({ severity: 'warning', page: `Blog: ${b.title}`, message: 'Title exceeds 60 characters — may be truncated in search results.' });
+    if (!b.image) issues.push({ severity: 'warning', page: `Blog: ${b.title}`, message: 'Missing cover image — social sharing will look poor.' });
+    if (!b.slug || b.slug.includes(' ')) issues.push({ severity: 'error', page: `Blog: ${b.title}`, message: 'Invalid URL slug — should be lowercase with hyphens.' });
+  });
+
+  // Check stories
+  const stories = allData.stories || [];
+  stories.forEach((s: any) => {
+    if (!s.excerpt) issues.push({ severity: 'warning', page: `Story: ${s.title}`, message: 'Missing excerpt for SEO.' });
+    if (!s.image) issues.push({ severity: 'warning', page: `Story: ${s.title}`, message: 'Missing cover image.' });
+  });
+
+  // Check events
+  const events = allData.events || [];
+  events.forEach((e: any) => {
+    if (!e.description) issues.push({ severity: 'warning', page: `Event: ${e.title}`, message: 'Missing description for search visibility.' });
+  });
+
+  // Check initiatives
+  const inits = allData.initiatives || [];
+  if (inits.length < 3) issues.push({ severity: 'warning', page: 'Initiatives', message: 'Less than 3 initiatives — page may look empty.' });
+
+  // Global checks
+  const stats = allData.stats || [];
+  if (stats.length < 3) issues.push({ severity: 'warning', page: 'Homepage', message: 'Add at least 3 impact stats for credibility.' });
+
+  const faqs = allData.faqs || [];
+  if (faqs.length < 5) issues.push({ severity: 'warning', page: 'FAQ', message: 'Add at least 5 FAQs for FAQ rich snippets in Google.' });
+
+  if (issues.length === 0) issues.push({ severity: 'ok', page: 'All Pages', message: 'No SEO issues found! Content looks good.' });
+
+  const errorCount = issues.filter(i => i.severity === 'error').length;
+  const warningCount = issues.filter(i => i.severity === 'warning').length;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Issues</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{issues.length}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Errors</p>
+          <p className="text-2xl font-bold text-red-500 mt-1">{errorCount}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Warnings</p>
+          <p className="text-2xl font-bold text-amber-500 mt-1">{warningCount}</p>
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <h3 className="text-sm font-bold text-foreground">SEO Audit Results</h3>
+        </div>
+        <div className="divide-y divide-border max-h-[500px] overflow-y-auto">
+          {issues.map((issue, i) => (
+            <div key={i} className="px-6 py-3 flex items-start gap-3">
+              {issue.severity === 'error' ? (
+                <AlertTriangle size={14} className="text-red-500 mt-0.5 shrink-0" />
+              ) : issue.severity === 'warning' ? (
+                <AlertTriangle size={14} className="text-amber-500 mt-0.5 shrink-0" />
+              ) : (
+                <CheckCircle size={14} className="text-emerald-500 mt-0.5 shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-foreground">{issue.page}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{issue.message}</p>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded shrink-0 ${
+                issue.severity === 'error' ? 'bg-red-100 text-red-700' :
+                issue.severity === 'warning' ? 'bg-amber-100 text-amber-700' :
+                'bg-emerald-100 text-emerald-700'
+              }`}>{issue.severity}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── NEW FEATURE 2: Content Scheduler ──────────────────────────── */
+const ContentScheduler = ({ allData }: { allData: Record<string, any[]> }) => {
+  const scheduled: { title: string; type: string; date: string; published: boolean }[] = [];
+
+  // Collect scheduled items from blog and stories
+  (allData.blog || []).forEach((b: any) => {
+    if (b.published_at) {
+      scheduled.push({ title: b.title, type: 'Blog', date: b.published_at, published: b.is_published });
+    }
+  });
+  (allData.stories || []).forEach((s: any) => {
+    if (s.published_at) {
+      scheduled.push({ title: s.title, type: 'Story', date: s.published_at, published: s.is_published });
+    }
+  });
+  (allData.events || []).forEach((e: any) => {
+    if (e.event_date) {
+      scheduled.push({ title: e.title, type: 'Event', date: e.event_date, published: e.is_published });
+    }
+  });
+
+  const sorted = scheduled.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const upcoming = sorted.filter(s => new Date(s.date) >= new Date());
+  const past = sorted.filter(s => new Date(s.date) < new Date()).slice(-10).reverse();
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Total Scheduled</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{scheduled.length}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Upcoming</p>
+          <p className="text-2xl font-bold text-primary mt-1">{upcoming.length}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase">Published</p>
+          <p className="text-2xl font-bold text-emerald-600 mt-1">{sorted.filter(s => s.published).length}</p>
+        </div>
+      </div>
+
+      {upcoming.length > 0 && (
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-border">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2"><CalendarClock size={14} className="text-primary" /> Upcoming</h3>
+          </div>
+          <div className="divide-y divide-border">
+            {upcoming.map((item, i) => (
+              <div key={i} className="px-6 py-3 flex items-center gap-4">
+                <div className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                  item.type === 'Blog' ? 'bg-purple-100 text-purple-700' :
+                  item.type === 'Event' ? 'bg-blue-100 text-blue-700' :
+                  'bg-primary/10 text-primary'
+                }`}>{item.type}</div>
+                <span className="text-sm font-medium text-foreground flex-1 truncate">{item.title}</span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${item.published ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground'}`}>
+                  {item.published ? 'Published' : 'Draft'}
+                </span>
+                <span className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {past.length > 0 && (
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-border">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2"><Clock size={14} className="text-muted-foreground" /> Past Content</h3>
+          </div>
+          <div className="divide-y divide-border">
+            {past.map((item, i) => (
+              <div key={i} className="px-6 py-3 flex items-center gap-4 opacity-60">
+                <div className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                  item.type === 'Blog' ? 'bg-purple-100 text-purple-700' :
+                  item.type === 'Event' ? 'bg-blue-100 text-blue-700' :
+                  'bg-primary/10 text-primary'
+                }`}>{item.type}</div>
+                <span className="text-sm text-foreground flex-1 truncate">{item.title}</span>
+                <span className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {scheduled.length === 0 && (
+        <div className="bg-card border border-border rounded-xl p-12 text-center">
+          <CalendarClock size={32} className="text-muted-foreground/30 mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground">No scheduled content yet. Add publish dates to blog posts, stories, or events.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── NEW FEATURE 3: Bulk Import ──────────────────────────── */
+const BulkImport = ({ onRefresh }: { onRefresh: () => void }) => {
+  const { create } = useCMSApi();
+  const [importing, setImporting] = useState(false);
+  const [targetTable, setTargetTable] = useState('cms_faqs');
+  const [jsonInput, setJsonInput] = useState('');
+  const [result, setResult] = useState<string | null>(null);
+
+  const importableTables = [
+    { value: 'cms_faqs', label: 'FAQs' },
+    { value: 'cms_gallery', label: 'Gallery' },
+    { value: 'cms_team', label: 'Team Members' },
+    { value: 'cms_testimonials', label: 'Testimonials' },
+    { value: 'cms_partners', label: 'Partners' },
+    { value: 'cms_stats', label: 'Impact Stats' },
+    { value: 'cms_resources', label: 'Resources' },
+  ];
+
+  const handleImport = async () => {
+    try {
+      const data = JSON.parse(jsonInput);
+      const items = Array.isArray(data) ? data : [data];
+      setImporting(true);
+      let count = 0;
+      for (const item of items) {
+        delete item.id;
+        delete item.created_at;
+        delete item.updated_at;
+        await create(targetTable, item);
+        count++;
+      }
+      setResult(`Successfully imported ${count} items into ${importableTables.find(t => t.value === targetTable)?.label}`);
+      setJsonInput('');
+      onRefresh();
+      toast.success(`${count} items imported`);
+    } catch (err: any) {
+      setResult(`Error: ${err.message}`);
+      toast.error(err.message);
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><Upload size={14} className="text-primary" /> Bulk Import</h3>
+        <p className="text-xs text-muted-foreground mb-4">Paste JSON data below to bulk import items into any CMS section.</p>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Target Section</label>
+            <select
+              value={targetTable}
+              onChange={(e) => setTargetTable(e.target.value)}
+              className="no-float w-full h-10 px-3 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none"
+            >
+              {importableTables.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-muted-foreground mb-1.5">JSON Data</label>
+            <textarea
+              value={jsonInput}
+              onChange={(e) => setJsonInput(e.target.value)}
+              placeholder={`[\n  { "question": "What is AGSWS?", "answer": "A social welfare organization.", "category": "About AGSWS" }\n]`}
+              rows={10}
+              className="no-float w-full px-3 py-2.5 rounded-lg border border-border bg-background text-xs font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
+          <button
+            onClick={handleImport}
+            disabled={!jsonInput.trim() || importing}
+            className="flex items-center gap-1.5 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {importing ? <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Upload size={14} />}
+            {importing ? 'Importing...' : 'Import Data'}
+          </button>
+
+          {result && (
+            <div className={`p-3 rounded-lg text-xs font-medium ${result.startsWith('Error') ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}`}>
+              {result}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h4 className="text-xs font-bold text-foreground mb-3">Example JSON Format</h4>
+        <pre className="text-[10px] bg-background border border-border rounded-lg p-4 overflow-x-auto text-muted-foreground font-mono">
+{`// FAQs
+[
+  { "question": "...", "answer": "...", "category": "About AGSWS" }
+]
+
+// Team Members
+[
+  { "name": "...", "role": "...", "bio": "..." }
+]
+
+// Gallery
+[
+  { "image": "https://...", "caption": "...", "category": "medical" }
+]`}
+        </pre>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Health Check ──────────────────────────── */
 const HealthCheck = ({ counts }: { counts: Record<string, number> }) => {
   const checks = [
-    { label: 'Hero Section', ok: (counts.hero || 0) > 0 || true, section: 'hero' },
-    { label: 'Impact Stats', ok: (counts.stats || 0) >= 3, section: 'stats', recommend: 'Add at least 3 stats' },
-    { label: 'Testimonials', ok: (counts.testimonials || 0) >= 2, section: 'testimonials', recommend: 'Add at least 2 testimonials' },
-    { label: 'Blog Posts', ok: (counts.blog || 0) >= 1, section: 'blog', recommend: 'Publish at least 1 blog post' },
-    { label: 'Gallery Photos', ok: (counts.gallery || 0) >= 6, section: 'gallery', recommend: 'Add at least 6 gallery photos' },
-    { label: 'Events', ok: (counts.events || 0) >= 1, section: 'events', recommend: 'Add upcoming events' },
-    { label: 'FAQs', ok: (counts.faqs || 0) >= 3, section: 'faqs', recommend: 'Add at least 3 FAQs' },
-    { label: 'Team Members', ok: (counts.team || 0) >= 2, section: 'team', recommend: 'Add team members' },
-    { label: 'Resources', ok: (counts.resources || 0) >= 1, section: 'resources', recommend: 'Add downloadable resources' },
+    { label: 'Hero Section', ok: true },
+    { label: 'Impact Stats', ok: (counts.stats || 0) >= 3, recommend: 'Add at least 3 stats' },
+    { label: 'Testimonials', ok: (counts.testimonials || 0) >= 2, recommend: 'Add at least 2 testimonials' },
+    { label: 'Blog Posts', ok: (counts.blog || 0) >= 1, recommend: 'Publish at least 1 blog post' },
+    { label: 'Gallery Photos', ok: (counts.gallery || 0) >= 6, recommend: 'Add at least 6 photos' },
+    { label: 'Events', ok: (counts.events || 0) >= 1, recommend: 'Add upcoming events' },
+    { label: 'FAQs', ok: (counts.faqs || 0) >= 3, recommend: 'Add at least 3 FAQs' },
+    { label: 'Team Members', ok: (counts.team || 0) >= 2, recommend: 'Add team members' },
+    { label: 'Resources', ok: (counts.resources || 0) >= 1, recommend: 'Add resources' },
   ];
   const score = Math.round((checks.filter(c => c.ok).length / checks.length) * 100);
 
@@ -421,9 +716,9 @@ const HealthCheck = ({ counts }: { counts: Record<string, number> }) => {
           <div key={c.label} className="flex items-center gap-3 py-1.5">
             {c.ok ? <CheckCircle size={14} className="text-emerald-500 shrink-0" /> : <AlertTriangle size={14} className="text-amber-500 shrink-0" />}
             <span className="text-xs text-foreground flex-1">{c.label}</span>
-            {!c.ok && <span className="text-[10px] text-muted-foreground">{c.recommend}</span>}
+            {!c.ok && <span className="text-[10px] text-muted-foreground hidden sm:inline">{c.recommend}</span>}
             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${c.ok ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-              {c.ok ? 'OK' : 'Needs attention'}
+              {c.ok ? 'OK' : 'Fix'}
             </span>
           </div>
         ))}
@@ -432,20 +727,18 @@ const HealthCheck = ({ counts }: { counts: Record<string, number> }) => {
   );
 };
 
-/* ─── Feature 2: Activity Timeline ──────────────────────────── */
+/* ─── Activity Timeline ──────────────────────────── */
 const ActivityTimeline = ({ allData }: { allData: Record<string, any[]> }) => {
-  const activities: { label: string; time: string; type: string; section: string }[] = [];
-
+  const activities: { label: string; time: string; type: string }[] = [];
   Object.entries(allData).forEach(([sectionId, items]) => {
     if (!Array.isArray(items)) return;
     items.forEach(item => {
       const time = item.updated_at || item.created_at;
       if (!time) return;
       const titleField = item.title || item.name || item.question || item.label || item.email || item.headline || '';
-      activities.push({ label: String(titleField).slice(0, 40), time, type: sectionId, section: sectionId });
+      activities.push({ label: String(titleField).slice(0, 40), time, type: sectionId });
     });
   });
-
   const sorted = activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 10);
 
   return (
@@ -467,7 +760,7 @@ const ActivityTimeline = ({ allData }: { allData: Record<string, any[]> }) => {
   );
 };
 
-/* ─── Feature 9: Content Creation Trend Chart ──────────────── */
+/* ─── Content Trend Chart ──────────────── */
 const ContentTrendChart = ({ allData }: { allData: Record<string, any[]> }) => {
   const monthMap: Record<string, number> = {};
   Object.values(allData).forEach(items => {
@@ -480,7 +773,6 @@ const ContentTrendChart = ({ allData }: { allData: Record<string, any[]> }) => {
     });
   });
   const data = Object.entries(monthMap).map(([month, count]) => ({ month, count })).slice(-12);
-
   if (data.length === 0) return null;
 
   return (
@@ -524,7 +816,10 @@ const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<str
           { label: 'Newsletter', value: counts.newsletter || 0, icon: Mail, color: 'text-emerald-600' },
           { label: 'Blog Posts', value: counts.blog || 0, icon: FileText, color: 'text-purple-600' },
         ].map(card => (
-          <div key={card.label} className="bg-card border border-border rounded-xl p-5 hover:shadow-sm transition-shadow">
+          <div key={card.label} className="bg-card border border-border rounded-xl p-5 hover:shadow-sm transition-shadow cursor-pointer" onClick={() => {
+            const sectionId = card.label === 'Total Content' ? 'overview' : card.label.toLowerCase().replace(' ', '');
+            if (sectionId !== 'overview') onNavigate(sectionId === 'blogposts' ? 'blog' : sectionId);
+          }}>
             <div className="flex items-center gap-2 mb-2">
               <card.icon size={14} className={card.color} />
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{card.label}</p>
@@ -534,29 +829,27 @@ const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<str
         ))}
       </div>
 
-      {/* Feature 10: System Status */}
+      {/* System Status */}
       <div className="bg-card border border-border rounded-xl p-5">
         <div className="flex items-center gap-6 flex-wrap">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2"><span className="animate-ping absolute h-full w-full rounded-full bg-emerald-400 opacity-75" /><span className="relative rounded-full h-2 w-2 bg-emerald-500" /></span>
             <span className="text-xs font-medium text-foreground">System Online</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Globe size={12} className="text-primary" />
-            <span className="text-xs text-muted-foreground">CMS API: Active</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Database size={12} className="text-primary" />
-            <span className="text-xs text-muted-foreground">Database: Connected</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Shield size={12} className="text-primary" />
-            <span className="text-xs text-muted-foreground">RLS: Enabled</span>
-          </div>
+          {[
+            { icon: Globe, label: 'CMS API: Active' },
+            { icon: Database, label: 'Database: Connected' },
+            { icon: Shield, label: 'RLS: Enabled' },
+          ].map(s => (
+            <div key={s.label} className="flex items-center gap-2">
+              <s.icon size={12} className="text-primary" />
+              <span className="text-xs text-muted-foreground">{s.label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Charts row */}
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {pieData.length > 0 && (
           <div className="bg-card border border-border rounded-xl p-6">
@@ -588,10 +881,8 @@ const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<str
         )}
       </div>
 
-      {/* Feature 9: Content Trend */}
       <ContentTrendChart allData={allData} />
 
-      {/* Feature 7: Health Check + Feature 2: Activity Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <HealthCheck counts={counts} />
         <ActivityTimeline allData={allData} />
@@ -618,7 +909,7 @@ const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<str
                 </div>
                 <span className="flex-1 text-sm font-medium text-foreground">{s.label}</span>
                 <span className="text-sm font-bold text-foreground">{count}</span>
-                <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden hidden sm:block">
                   <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${totalItems ? (count / totalItems) * 100 : 0}%` }} />
                 </div>
                 <ExternalLink size={12} className="text-muted-foreground" />
@@ -628,7 +919,7 @@ const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<str
         </div>
       </div>
 
-      {/* Feature 3: Quick Links to preview pages */}
+      {/* Quick Links */}
       <div className="bg-card border border-border rounded-xl p-6">
         <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2"><Eye size={14} className="text-primary" /> Preview Live Pages</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -645,41 +936,6 @@ const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<str
           })}
         </div>
       </div>
-
-      {/* Feature 5: Image Resolution Guide */}
-      <div className="bg-card border border-border rounded-xl p-6">
-        <h4 className="text-xs font-bold text-foreground mb-3 flex items-center gap-2"><Image size={14} className="text-primary" /> Image Resolution Guide</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-          {[
-            { label: 'Hero Background', size: '1920×800px' }, { label: 'Card Images', size: '600×400px' },
-            { label: 'Blog Cover', size: '1200×630px' }, { label: 'Gallery Photos', size: '1200×800px' },
-            { label: 'Team Photos', size: '400×400px' }, { label: 'Avatars', size: '200×200px' },
-            { label: 'Partner Logos', size: '300×120px' }, { label: 'Event Images', size: '800×450px' },
-          ].map(item => (
-            <div key={item.label} className="bg-background rounded-lg p-3 border border-border">
-              <p className="text-[10px] text-muted-foreground">{item.label}</p>
-              <p className="text-xs font-bold text-foreground mt-0.5">{item.size}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Feature 4: Keyboard Shortcuts */}
-      <div className="bg-card border border-border rounded-xl p-6">
-        <h4 className="text-xs font-bold text-foreground mb-3 flex items-center gap-2"><Keyboard size={14} className="text-primary" /> Keyboard Shortcuts</h4>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {[
-            { keys: 'Ctrl + N', action: 'New Item' }, { keys: 'Ctrl + S', action: 'Save' },
-            { keys: 'Escape', action: 'Close Modal' }, { keys: '↑ ↓', action: 'Navigate Sections' },
-            { keys: 'Ctrl + E', action: 'Export CSV' }, { keys: 'Ctrl + R', action: 'Refresh Data' },
-          ].map(s => (
-            <div key={s.keys} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-background border border-border">
-              <kbd className="text-[10px] font-mono font-bold bg-muted px-2 py-0.5 rounded text-foreground">{s.keys}</kbd>
-              <span className="text-xs text-muted-foreground">{s.action}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };
@@ -690,6 +946,7 @@ const AdminDashboard = () => {
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [allData, setAllData] = useState<Record<string, any[]>>({});
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [sidebarSearch, setSidebarSearch] = useState('');
   const navigate = useNavigate();
   const { getAll } = useCMSApi();
 
@@ -697,7 +954,7 @@ const AdminDashboard = () => {
 
   const fetchAllCounts = useCallback(() => {
     sections.forEach(async (s) => {
-      if (s.singleRow || s.isOverview || s.isDivider) return;
+      if (s.singleRow || s.isOverview || s.isDivider || !s.table) return;
       try {
         const data = await getAll(s.table);
         const arr = Array.isArray(data) ? data : [data];
@@ -710,13 +967,9 @@ const AdminDashboard = () => {
 
   useEffect(() => { fetchAllCounts(); }, []);
 
-  // Feature 4: Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === 'r') { e.preventDefault(); fetchAllCounts(); }
-      }
-      // Navigate sections with number keys
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r') { e.preventDefault(); fetchAllCounts(); }
       const sectionKeys = sections.filter(s => !s.isDivider);
       const num = parseInt(e.key);
       if (!isNaN(num) && num >= 1 && num <= 9 && !e.ctrlKey && !e.metaKey && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
@@ -734,9 +987,15 @@ const AdminDashboard = () => {
     navigate("/admin/login");
   };
 
+  const filteredSections = sidebarSearch
+    ? sections.filter(s => !s.isDivider && s.label.toLowerCase().includes(sidebarSearch.toLowerCase()))
+    : sections;
+
   const renderCustomSection = () => {
     if (activeSection === 'applications') return <ApplicationsManager items={allData.applications || []} onRefresh={fetchAllCounts} />;
     if (activeSection === 'newsletter') return <NewsletterManager items={allData.newsletter || []} />;
+    if (activeSection === 'seo') return <SEOChecker allData={allData} />;
+    if (activeSection === 'scheduler') return <ContentScheduler allData={allData} />;
     return null;
   };
 
@@ -764,32 +1023,45 @@ const AdminDashboard = () => {
           </button>
         </div>
 
-        <nav className="flex-1 py-3 overflow-y-auto px-2 space-y-0.5">
-          {sections.map((section, idx) => {
+        {/* Sidebar search */}
+        {!collapsed && (
+          <div className="px-3 py-2 border-b border-border">
+            <div className="relative">
+              <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={sidebarSearch}
+                onChange={(e) => setSidebarSearch(e.target.value)}
+                placeholder="Search sections…"
+                className="no-float w-full h-8 pl-7 pr-3 rounded-md border border-border bg-background text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+              />
+            </div>
+          </div>
+        )}
+
+        <nav className="flex-1 py-2 overflow-y-auto px-2 space-y-0.5">
+          {filteredSections.map((section) => {
             if (section.isDivider) return <div key={section.id} className="h-px bg-border mx-2 my-3" />;
             const isActive = activeSection === section.id;
-            const showDivider = idx === 1;
             return (
-              <div key={section.id}>
-                {showDivider && <div className="h-px bg-border mx-2 my-2" />}
-                <button
-                  onClick={() => setActiveSection(section.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'}`}
-                  title={collapsed ? section.label : undefined}
-                >
-                  {section.icon && <section.icon size={16} className="shrink-0" />}
-                  {!collapsed && (
-                    <>
-                      <span className="truncate flex-1 text-left">{section.label}</span>
-                      {!section.singleRow && !section.isOverview && counts[section.id] !== undefined && (
-                        <span className={`text-[10px] font-bold min-w-[20px] h-5 flex items-center justify-center rounded-md ${isActive ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                          {counts[section.id]}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 ${isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'}`}
+                title={collapsed ? section.label : undefined}
+              >
+                {section.icon && <section.icon size={16} className="shrink-0" />}
+                {!collapsed && (
+                  <>
+                    <span className="truncate flex-1 text-left">{section.label}</span>
+                    {!section.singleRow && !section.isOverview && !section.isCustom && counts[section.id] !== undefined && (
+                      <span className={`text-[10px] font-bold min-w-[20px] h-5 flex items-center justify-center rounded-md ${isActive ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                        {counts[section.id]}
+                      </span>
+                    )}
+                  </>
+                )}
+              </button>
             );
           })}
         </nav>
@@ -824,14 +1096,12 @@ const AdminDashboard = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {/* Feature 3: Preview link */}
             {previewUrls[activeSection] && (
               <a href={previewUrls[activeSection]} target="_blank" rel="noopener" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
-                <Eye size={12} /> Preview Page
+                <Eye size={12} /> Preview
               </a>
             )}
-            {/* Feature 1: CSV Export for current section */}
-            {!currentSection.isOverview && !currentSection.singleRow && allData[activeSection]?.length > 0 && (
+            {!currentSection.isOverview && !currentSection.singleRow && !currentSection.isCustom && allData[activeSection]?.length > 0 && (
               <button onClick={() => exportToCSV(allData[activeSection], activeSection)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
                 <Download size={12} /> Export
               </button>
