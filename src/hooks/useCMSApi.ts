@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface UseCMSApiOptions {
   onSuccess?: () => void;
@@ -51,21 +50,21 @@ export function useCMSApi() {
   const remove = (table: string, id: string) => cmsFetch(table, 'DELETE', undefined, id);
 
   const uploadImage = useCallback(async (file: File, folder = 'general') => {
-    const ext = file.name.split('.').pop();
-    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    
-    const { data, error } = await supabase.storage
-      .from('cms-uploads')
-      .upload(path, file, { cacheControl: '3600', upsert: false });
-    
-    if (error) throw error;
-    
-    const { data: urlData } = supabase.storage
-      .from('cms-uploads')
-      .getPublicUrl(data.path);
-    
-    return urlData.publicUrl;
-  }, []);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', folder);
 
+    const res = await fetch(`${baseUrl}/cms-api/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
+    return data.url;
+  }, [token, baseUrl]);
   return { getAll, create, update, remove, uploadImage, loading };
 }
