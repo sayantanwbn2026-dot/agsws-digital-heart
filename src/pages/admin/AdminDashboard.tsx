@@ -181,6 +181,7 @@ const sections = [
   { id: 'newsletter', label: 'Newsletter', icon: Mail, table: 'newsletter_subscriptions', fields: [], isCustom: true },
   { id: 'seo', label: 'SEO Checker', icon: FileSearch, table: '', fields: [], isCustom: true },
   { id: 'scheduler', label: 'Scheduler', icon: CalendarClock, table: '', fields: [], isCustom: true },
+  { id: 'import', label: 'Bulk Import', icon: Upload, table: '', fields: [], isCustom: true },
   { id: 'divider2', label: '', icon: null as any, table: '', fields: [], isDivider: true },
   { id: 'payment', label: 'Payment & Tax', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true },
   { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true },
