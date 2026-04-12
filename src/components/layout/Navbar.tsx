@@ -42,7 +42,7 @@ const Navbar = () => {
   const initiativeChildren = [
     { label: "Medical Aid", path: "/initiatives/medical", icon: Heart, desc: "Emergency care & hospital support" },
     { label: "Education Support", path: "/initiatives/education", icon: BookOpen, desc: "Scholarships & tutoring programs" },
-    { label: "Parent Registration", path: "/register-parent", icon: Users, desc: "Emergency care for elderly parents" },
+    { label: "GoldenAge Care", path: "/register-parent", icon: Users, desc: "Emergency care for elderly parents" },
     { label: "CSR Partnership", path: "/csr", icon: Handshake, desc: "Corporate social responsibility" },
     { label: "Volunteer Portal", path: "/volunteer-portal", icon: Award, desc: "Track hours & get certified" },
   ];
@@ -109,7 +109,7 @@ const Navbar = () => {
             </AnimatePresence>
           </span>
         </div>
-        <Link to="/register-parent" className="hidden sm:inline-block text-[var(--yellow)] text-[11px] font-semibold hover:underline tracking-wide">Register →</Link>
+        <Link to="/register-parent" className="hidden sm:inline-block text-[var(--yellow)] text-[11px] font-semibold hover:underline tracking-wide">GoldenAge Care →</Link>
       </div>
 
       <motion.nav

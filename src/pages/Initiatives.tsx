@@ -26,11 +26,11 @@ const defaultInitiatives = [
     gradient: "from-[var(--purple)] to-[#4A48A0]", lightBg: "bg-[var(--purple-light)]", textColor: "text-[var(--purple)]",
   },
   {
-    icon: Users, title: "Parent Medical Support Registration",
-    desc: "Designed for NRKs whose elderly parents live alone in Kolkata. Register your parent, and we become their local emergency contact.",
+    icon: Users, title: "GoldenAge Care",
+    desc: "Designed for NRKs whose elderly parents live alone in Kolkata. Enroll your parent, and we become their local emergency contact.",
     features: ["24/7 emergency helpline", "Hospital admission coordination", "Regular wellness check-ins", "Real-time family updates"],
     stats: [{ value: "120+", label: "Families" }, { value: "24/7", label: "Helpline" }, { value: "2hr", label: "Response" }],
-    link: "/register-parent", detailLink: "/register-parent", linkText: "Register a Parent",
+    link: "/register-parent", detailLink: "/register-parent", linkText: "Enroll a Parent",
     gradient: "from-[var(--beige)] to-[var(--teal)]", lightBg: "bg-[var(--yellow-light)]", textColor: "text-[var(--beige)]",
   },
 ];

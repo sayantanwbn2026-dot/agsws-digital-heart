@@ -40,10 +40,10 @@ const cards = [
   },
   {
     icon: Users,
-    title: "Parent Medical Support",
-    desc: "Register your elderly parents in Kolkata for emergency medical response. We become their local emergency contact.",
+    title: "GoldenAge Care",
+    desc: "Enroll your elderly parents in Kolkata for emergency medical response. We become their local emergency contact.",
     link: "/register-parent",
-    linkText: "Register Now",
+    linkText: "Enroll Now",
     chip: "₹100 Platform Fee",
     gradient: "from-[var(--beige)] to-[var(--teal)]",
     lightBg: "bg-[var(--yellow-light)]",

@@ -7,7 +7,7 @@ export const translations: Record<string, Record<Language, string>> = {
   "nav.events": { en: "Events", bn: "ইভেন্ট" },
   "nav.resources": { en: "Resources", bn: "সম্পদ" },
   "nav.blog": { en: "Blog", bn: "ব্লগ" },
-  "nav.register": { en: "Register Parent", bn: "নিবন্ধন করুন" },
+  "nav.register": { en: "GoldenAge Care", bn: "গোল্ডেনএজ কেয়ার" },
   "nav.contact": { en: "Contact", bn: "যোগাযোগ" },
   "nav.donate": { en: "Donate Now", bn: "এখনই দান করুন" },
   "hero.cta_donate": { en: "Donate Now →", bn: "এখনই দান করুন →" },

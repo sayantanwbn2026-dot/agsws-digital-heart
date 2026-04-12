@@ -80,7 +80,7 @@ const faqFields: FieldConfig[] = [
   { key: 'answer', label: 'Answer', type: 'textarea', required: true },
   { key: 'category', label: 'Category', type: 'select', options: [
     { label: 'Donations & Tax', value: 'Donations & Tax' },
-    { label: 'Parent Registration', value: 'Parent Registration' },
+    { label: 'GoldenAge Care', value: 'GoldenAge Care' },
     { label: 'About AGSWS', value: 'About AGSWS' },
   ]},
 ];

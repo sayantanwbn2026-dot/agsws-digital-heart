@@ -14,7 +14,7 @@ const steps = [
 ];
 
 const RegisterParent = () => {
-  useSEO("Register Parent", "Register your elderly parent in Kolkata for emergency medical support through AGSWS.");
+  useSEO("GoldenAge Care", "Enroll your elderly parent in Kolkata for emergency medical support through AGSWS GoldenAge Care.");
   const [currentStep, setCurrentStep] = useState(0);
   const [success, setSuccess] = useState(false);
   const { register, getValues } = useForm();
