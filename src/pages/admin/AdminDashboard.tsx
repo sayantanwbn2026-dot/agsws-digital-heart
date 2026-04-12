@@ -692,6 +692,100 @@ const BulkImport = ({ onRefresh }: { onRefresh: () => void }) => {
   );
 };
 
+/* ─── Landing Page CMS ──────────────────────────── */
+const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) => {
+  const landingSections = [
+    { id: 'hero', label: 'Hero Section', desc: 'Main headline, subtitle, CTA button, and background image', icon: Type, color: 'bg-primary/10 text-primary' },
+    { id: 'stats', label: 'Impact Stats', desc: 'Counter numbers shown below hero (e.g. 2,400+ Patients)', icon: LayoutDashboard, color: 'bg-emerald-100 text-emerald-700' },
+    { id: 'initiatives', label: 'Initiative Cards', desc: 'Three main cause cards with images, descriptions, and links', icon: Heart, color: 'bg-red-100 text-red-700' },
+    { id: 'testimonials', label: 'Testimonials', desc: 'Rotating quotes from donors, volunteers, and beneficiaries', icon: Star, color: 'bg-amber-100 text-amber-700' },
+    { id: 'stories', label: 'Impact Stories', desc: 'Featured success stories shown in the scrolling strip', icon: BookOpen, color: 'bg-purple-100 text-purple-700' },
+    { id: 'partners', label: 'Partner Strip', desc: 'Scrolling list of partner organizations', icon: Handshake, color: 'bg-blue-100 text-blue-700' },
+    { id: 'blog', label: 'Latest Stories', desc: 'Blog posts shown in the "Latest Stories" section', icon: FileText, color: 'bg-pink-100 text-pink-700' },
+    { id: 'settings', label: 'Site Settings', desc: 'Site name, announcement bar, social links, contact info', icon: Settings, color: 'bg-gray-100 text-gray-700' },
+    { id: 'payment', label: 'Payment & Tax', desc: 'Razorpay config, 80G tax %, bank details, donation limits', icon: CreditCard, color: 'bg-orange-100 text-orange-700' },
+  ];
+
+  const staticSections = [
+    { label: 'How It Works', desc: '3-step process (Choose → Donate → Impact). Currently static — edit code to change steps.', static: true },
+    { label: 'Impact Map', desc: 'Kolkata district pins with impact zones. Currently static — edit code to change locations.', static: true },
+    { label: 'Analytics Infographic', desc: 'Bar charts & donut showing fund allocation. Currently static visual.', static: true },
+    { label: 'Trust Band', desc: '80G Tax Benefit, NGO Registration, Secure Payments, Transparency badges. Static.', static: true },
+    { label: 'Impact Story (Ranu)', desc: 'Featured case study with timeline card. Static content.', static: true },
+    { label: 'Scrolling Stories Strip', desc: 'Animated pill badges (e.g. "Kalinda, 8 got school books"). Static.', static: true },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-card border border-border rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Home size={18} className="text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-foreground">Landing Page Control Center</h3>
+            <p className="text-xs text-muted-foreground">Manage every section of the homepage from here. Click any card to edit.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {landingSections.map(s => (
+          <button
+            key={s.id}
+            onClick={() => onNavigate(s.id)}
+            className="bg-card border border-border rounded-xl p-5 text-left hover:shadow-md hover:border-primary/30 transition-all group"
+          >
+            <div className="flex items-start gap-3 mb-3">
+              <div className={`w-9 h-9 rounded-lg ${s.color} flex items-center justify-center shrink-0`}>
+                <s.icon size={16} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{s.label}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{s.desc}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-[10px] font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+              Edit Content <ExternalLink size={10} />
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h4 className="text-xs font-bold text-foreground mb-4 flex items-center gap-2">
+          <Shield size={14} className="text-muted-foreground" /> Static Sections (Code-Level)
+        </h4>
+        <p className="text-[11px] text-muted-foreground mb-4">These sections use hardcoded data. To change them, modify the component source code.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {staticSections.map(s => (
+            <div key={s.label} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+              <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 mt-1.5 shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-foreground">{s.label}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
+        <h4 className="text-xs font-bold text-primary mb-2">💡 Quick Tips for Launch</h4>
+        <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
+          <li>Upload real images in <strong>Initiatives</strong> cards (600×400px recommended)</li>
+          <li>Set your <strong>Hero</strong> headline and background image (1920×800px)</li>
+          <li>Add at least 3 <strong>Impact Stats</strong> (e.g. "2400+", "850+", "120+")</li>
+          <li>Configure <strong>Site Settings</strong> — contact info, social links, announcement bar</li>
+          <li>Add 2-3 <strong>Testimonials</strong> with real quotes</li>
+          <li>Publish at least 1 <strong>Blog Post</strong> for the Latest Stories section</li>
+          <li>Set <strong>Payment & Tax</strong> config — 80G percentage, donation limits</li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
 /* ─── Health Check ──────────────────────────── */
 const HealthCheck = ({ counts }: { counts: Record<string, number> }) => {
   const checks = [
