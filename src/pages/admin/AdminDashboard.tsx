@@ -8,8 +8,7 @@ import {
   TrendingUp, Eye, Mail, ClipboardList, CreditCard,
   BarChart3, PieChart, Activity, Download, ExternalLink,
   AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown,
-  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload,
-  Home, Pencil, Save
+  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
@@ -165,6 +164,7 @@ const paymentFields: FieldConfig[] = [
 // ─── Sidebar Sections ────────────────────────────────────────────
 const sections = [
   { id: 'overview', label: 'Overview', icon: TrendingUp, table: '', fields: [], isOverview: true },
+  { id: 'landing', label: 'Landing Page', icon: Home, table: '', fields: [], isCustom: true },
   { id: 'hero', label: 'Hero Section', icon: Type, table: 'cms_hero', fields: heroFields, singleRow: true },
   { id: 'stats', label: 'Impact Stats', icon: LayoutDashboard, table: 'cms_stats', fields: statsFields },
   { id: 'initiatives', label: 'Initiatives', icon: Heart, table: 'cms_initiatives', fields: initiativeFields },
