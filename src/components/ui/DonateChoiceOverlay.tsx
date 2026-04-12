@@ -137,7 +137,7 @@ const DonateChoiceOverlay = () => {
                     </motion.button>
                   </div>
 
-                  {/* Separator + Parent Registration */}
+                  {/* Separator + GoldenAge Care */}
                   <div className="mt-6 pt-5 border-t border-[var(--border-color)]">
                     <button
                       onClick={() => handleChoice("/register-parent")}
@@ -147,7 +147,7 @@ const DonateChoiceOverlay = () => {
                         <Users size={18} className="text-white" />
                       </div>
                       <div className="text-left flex-1">
-                        <p className="text-[14px] font-[600] text-[var(--dark)]">Register your parent for emergency care</p>
+                        <p className="text-[14px] font-[600] text-[var(--dark)]">GoldenAge Care — Enroll your parent</p>
                         <p className="text-[12px] text-[var(--mid)]">24/7 helpline & hospital coordination</p>
                       </div>
                       <ArrowRight size={16} className="text-[var(--light)] group-hover:text-[var(--teal)] group-hover:translate-x-1 transition-all" />

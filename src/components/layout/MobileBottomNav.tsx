@@ -10,7 +10,7 @@ const MobileBottomNav = () => {
     { icon: Home, label: "Home", path: "/" },
     { icon: Layers, label: "Initiatives", path: "/initiatives" },
     { icon: Heart, label: "Donate", action: openOverlay, center: true },
-    { icon: UserPlus, label: "Register", path: "/register-parent" },
+    { icon: UserPlus, label: "GoldenAge", path: "/register-parent" },
     { icon: Info, label: "About", path: "/about" },
   ];
 

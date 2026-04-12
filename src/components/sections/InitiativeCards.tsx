@@ -3,8 +3,9 @@ import { Heart, BookOpen, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SectionHeader } from "../ui/SectionHeader";
 import ImagePlaceholder from "../ui/ImagePlaceholder";
+import { useCMSList } from "@/hooks/useCMSList";
 
-const cards = [
+const defaultCards = [
   {
     icon: Heart,
     title: "Medical Aid & Hospital Support",
@@ -40,10 +41,10 @@ const cards = [
   },
   {
     icon: Users,
-    title: "Parent Medical Support",
-    desc: "Register your elderly parents in Kolkata for emergency medical response. We become their local emergency contact.",
+    title: "GoldenAge Care",
+    desc: "Enroll your elderly parents in Kolkata for emergency medical response. We become their local emergency contact.",
     link: "/register-parent",
-    linkText: "Register Now",
+    linkText: "Enroll Now",
     chip: "₹100 Platform Fee",
     gradient: "from-[var(--beige)] to-[var(--teal)]",
     lightBg: "bg-[var(--yellow-light)]",
@@ -53,7 +54,35 @@ const cards = [
   },
 ];
 
+const iconMap: Record<string, typeof Heart> = { Heart, BookOpen, Users };
+const gradients = [
+  "from-[var(--teal)] to-[var(--teal-dark)]",
+  "from-[var(--purple)] to-[#4A48A0]",
+  "from-[var(--beige)] to-[var(--teal)]",
+];
+const imgCategories: Array<"hospital" | "classroom" | "elderly"> = ["hospital", "classroom", "elderly"];
+
 const InitiativeCards = () => {
+  const { data: cmsInitiatives } = useCMSList<any>('cms_initiatives', [], {
+    orderBy: { column: 'sort_order' }
+  });
+
+  const cards = cmsInitiatives.length
+    ? cmsInitiatives.map((item: any, i: number) => {
+        const base = defaultCards[i] || defaultCards[0];
+        return {
+          ...base,
+          title: item.title,
+          desc: item.description,
+          icon: iconMap[item.icon] || base.icon,
+          link: item.link || base.link,
+          image: item.image || null,
+          gradient: gradients[i % gradients.length],
+          imgCategory: imgCategories[i % imgCategories.length],
+        };
+      })
+    : defaultCards;
+
   return (
     <section className="bg-[var(--bg)] section">
       <div className="container">
@@ -64,7 +93,7 @@ const InitiativeCards = () => {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {cards.map((card, i) => (
+          {cards.map((card: any, i: number) => (
             <motion.div
               key={card.title}
               initial={{ opacity: 0, y: 30 }}
@@ -78,7 +107,6 @@ const InitiativeCards = () => {
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
               >
-                {/* Gradient top accent on hover */}
                 <div className={`h-[3px] bg-gradient-to-r ${card.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
 
                 {card.featured && (
@@ -87,16 +115,18 @@ const InitiativeCards = () => {
                   </div>
                 )}
 
-                {/* Image header */}
                 <div className={`relative h-[160px] lg:h-[180px] w-full bg-gradient-to-br ${card.gradient} flex items-center justify-center overflow-hidden flex-shrink-0`}>
-                  <ImagePlaceholder category={card.imgCategory} className="absolute inset-0 w-full h-full opacity-[0.2] object-cover mix-blend-overlay" />
-                  {card.svgElement}
+                  {card.image ? (
+                    <img src={card.image} alt={card.title} className="absolute inset-0 w-full h-full object-cover" />
+                  ) : (
+                    <ImagePlaceholder category={card.imgCategory} className="absolute inset-0 w-full h-full opacity-[0.2] object-cover mix-blend-overlay" />
+                  )}
+                  {!card.image && card.svgElement}
                   <div className="relative z-10 w-14 h-14 rounded-2xl bg-white/[0.15] backdrop-blur-sm flex items-center justify-center border border-white/[0.2]">
                     <card.icon size={28} className="text-white" />
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="p-6 flex flex-col flex-1">
                   <h3 className="text-[18px] font-[700] text-[var(--dark)] mb-2 tracking-[-0.01em]">{card.title}</h3>
                   <p className="text-[13px] text-[var(--mid)] mb-5 flex-1 leading-[1.65]">{card.desc}</p>

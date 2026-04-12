@@ -7,7 +7,7 @@ import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 const causes = [
   { title: "Medical Aid & Hospital Support", desc: "Fund emergency care, surgeries, and medicines for patients in Kolkata.", raised: 320000, goal: 500000, to: "/donate/medical", color: "teal" },
   { title: "Education Support", desc: "Sponsor a child's full school year — books, fees, and meals.", raised: 180000, goal: 300000, to: "/donate/education", color: "purple" },
-  { title: "Parent Medical Registration", desc: "Enable remote elderly care registration for NRK families.", raised: 45000, goal: 100000, to: "/register-parent", color: "yellow" },
+  { title: "GoldenAge Care", desc: "Enable remote elderly care enrollment for NRK families.", raised: 45000, goal: 100000, to: "/register-parent", color: "yellow" },
 ];
 
 const NotFound = () => {

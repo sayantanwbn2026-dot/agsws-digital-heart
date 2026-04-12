@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const messages = [
-  "Rohan from Bengaluru just registered his mother in Kolkata",
+  "Rohan from Bengaluru just enrolled his mother via GoldenAge Care",
   "A donor from Delhi just sponsored a child's school year",
   "3 patients supported this week in North Kolkata",
-  "New: Parent registration now available for Howrah families",
+  "New: GoldenAge Care now available for Howrah families",
   "₹18,000 raised this week for education support",
-  "2 parent registrations from families in London",
+  "2 GoldenAge Care enrollments from families in London",
 ];
 
 const LiveTicker = () => {
@@ -44,7 +44,7 @@ const LiveTicker = () => {
           </AnimatePresence>
         </div>
         <Link to="/register-parent" className="text-yellow text-[11px] font-semibold whitespace-nowrap hidden sm:inline">
-          Register Parent →
+          GoldenAge Care →
         </Link>
       </div>
     </div>

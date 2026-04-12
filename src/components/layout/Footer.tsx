@@ -11,7 +11,7 @@ const footerLinks = {
   ],
   involved: [
     ["Donate Medical Aid", "/donate/medical"], ["Donate Education", "/donate/education"],
-    ["Register Parent", "/register-parent"], ["Volunteer Portal", "/volunteer-portal"],
+    ["GoldenAge Care", "/register-parent"], ["Volunteer Portal", "/volunteer-portal"],
     ["CSR Partnership", "/csr"], ["Donor Wall", "/donor-wall"],
     ["Apply for Support", "/apply"], ["Transparency", "/transparency"],
   ],
