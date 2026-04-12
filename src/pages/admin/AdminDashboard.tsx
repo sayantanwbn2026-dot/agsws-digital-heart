@@ -1088,6 +1088,7 @@ const AdminDashboard = () => {
     : sections;
 
   const renderCustomSection = () => {
+    if (activeSection === 'landing') return <LandingPageCMS onNavigate={setActiveSection} />;
     if (activeSection === 'applications') return <ApplicationsManager items={allData.applications || []} onRefresh={fetchAllCounts} />;
     if (activeSection === 'newsletter') return <NewsletterManager items={allData.newsletter || []} />;
     if (activeSection === 'seo') return <SEOChecker allData={allData} />;
