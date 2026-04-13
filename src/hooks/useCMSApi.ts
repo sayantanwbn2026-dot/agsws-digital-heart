@@ -1,9 +1,14 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+function getToken() {
+  return localStorage.getItem('agsws_admin_token') ?? '';
+}
 
 export function useCMSApi() {
   const [loading, setLoading] = useState(false);
-  const token = localStorage.getItem('agsws_admin_token') ?? '';
 
   const cmsFetch = useCallback(async (
     table: string,
@@ -16,16 +21,15 @@ export function useCMSApi() {
       const params = new URLSearchParams({ table });
       if (id) params.set('id', id);
 
-      // Use the Supabase URL directly to avoid preview proxy issues
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const url = `${supabaseUrl}/functions/v1/cms-api?${params}`;
+      const url = `${SUPABASE_URL}/functions/v1/cms-api?${params}`;
+      const token = getToken();
 
       const res = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'apikey': ANON_KEY,
         },
         body: body ? JSON.stringify(body) : undefined,
       });
@@ -38,7 +42,7 @@ export function useCMSApi() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   const getAll = (table: string) => cmsFetch(table, 'GET');
   const create = (table: string, body: any) => cmsFetch(table, 'POST', body);
@@ -50,12 +54,12 @@ export function useCMSApi() {
     formData.append('file', file);
     formData.append('folder', folder);
 
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const res = await fetch(`${supabaseUrl}/functions/v1/cms-api/upload`, {
+    const token = getToken();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/cms-api/upload`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        'apikey': ANON_KEY,
       },
       body: formData,
     });
@@ -63,7 +67,7 @@ export function useCMSApi() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Upload failed');
     return data.url;
-  }, [token]);
+  }, []);
 
   return { getAll, create, update, remove, uploadImage, loading };
 }
