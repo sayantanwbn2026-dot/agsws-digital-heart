@@ -1,276 +1,131 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, ChevronDown, HeartHandshake, Shield, Sparkles } from "lucide-react";
+import { Shield, ChevronDown, Heart, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
-import { useCMSData } from "@/hooks/useCMSData";
-import { useCMSList } from "@/hooks/useCMSList";
 
-type HeroRecord = {
-  headline: string;
-  subtitle: string;
-  cta_text: string;
-  cta_link: string;
-  background_image: string | null;
+const CompassionText = () => {
+  const letters = "Compassion".split("");
+  return (
+    <motion.span className="inline-block text-[var(--yellow)]">
+      {letters.map((char, i) => (
+        <motion.span key={i} initial={{ opacity: 0, y: 30, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.5, delay: 0.4 + i * 0.04 }} className="inline-block">
+          {char}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
 };
 
-const fallbackHero: HeroRecord = {
-  headline: "Changing Lives, One Act of Compassion at a Time.",
-  subtitle:
-    "Providing medical aid, education support, and emergency care for families across Kolkata. Every rupee is mapped to real impact.",
-  cta_text: "Donate Now",
-  cta_link: "/donate",
-  background_image: null,
-};
-
-const fallbackStats = [
-  { value: "2,400+", label: "Patients aided" },
-  { value: "850+", label: "Children educated" },
-  { value: "120+", label: "Families registered" },
-];
-
-const trustPoints = ["80G-ready giving", "2-hour emergency coordination", "GoldenAge support in Kolkata"];
-
-const isExternalLink = (link: string) => /^https?:\/\//i.test(link);
-const isDonateLink = (link: string) => /donate/i.test(link);
+const StatCard = ({ value, label, delay }: { value: string; label: string; delay: number }) => (
+  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.5 }} className="text-center px-4">
+    <p className="text-[clamp(24px,3.5vw,36px)] font-[800] text-white leading-none tracking-[-0.02em]">{value}</p>
+    <p className="text-[10px] font-[500] text-white/50 mt-1.5 uppercase tracking-[0.1em]">{label}</p>
+  </motion.div>
+);
 
 const HeroSection = () => {
-  const sectionRef = useRef<HTMLElement | null>(null);
+  const sectionRef = useRef(null);
   const { openOverlay } = useDonateOverlay();
-  const { data: cmsHero } = useCMSData<HeroRecord>("cms_hero", fallbackHero);
-  const { data: cmsStats } = useCMSList<any>("cms_stats", [], {
-    orderBy: { column: "sort_order" },
-    limit: 3,
-  });
-
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 140]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 48]);
-  const opacityOut = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
-
-  const hero = { ...fallbackHero, ...cmsHero };
-  const stats = cmsStats.length
-    ? cmsStats.slice(0, 3).map((item: any) => ({
-        value: item.value || "0",
-        label: item.label || "Impact",
-      }))
-    : fallbackStats;
-
-  const headlineWords = hero.headline.trim().split(/\s+/).filter(Boolean);
-  const accentStart = Math.max(headlineWords.length - 2, 0);
-  const primaryLink = hero.cta_link || fallbackHero.cta_link;
-  const primaryLabel = hero.cta_text || fallbackHero.cta_text;
-
-  const primaryActionClasses =
-    "inline-flex items-center justify-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-bold text-accent-foreground shadow-[var(--shadow-yellow)] transition-transform duration-300 hover:-translate-y-0.5";
-  const secondaryActionClasses =
-    "inline-flex items-center justify-center gap-2 rounded-full border border-background/20 bg-background/10 px-8 py-4 text-sm font-semibold text-background/90 backdrop-blur-xl transition-colors duration-300 hover:bg-background/15";
-
-  const renderPrimaryAction = () => {
-    if (isDonateLink(primaryLink)) {
-      return (
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={openOverlay}
-          className={primaryActionClasses}
-        >
-          {primaryLabel}
-          <ArrowRight size={16} />
-        </motion.button>
-      );
-    }
-
-    if (isExternalLink(primaryLink)) {
-      return (
-        <motion.a
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          href={primaryLink}
-          target="_blank"
-          rel="noreferrer"
-          className={primaryActionClasses}
-        >
-          {primaryLabel}
-          <ArrowRight size={16} />
-        </motion.a>
-      );
-    }
-
-    return (
-      <Link to={primaryLink} className={primaryActionClasses}>
-        {primaryLabel}
-        <ArrowRight size={16} />
-      </Link>
-    );
-  };
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 180]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const opacityOut = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
   return (
-    <section ref={sectionRef} className="relative flex min-h-[100svh] items-center overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
       <motion.div style={{ y: bgY }} className="absolute inset-0 will-change-transform">
-        {hero.background_image && (
-          <img
-            src={hero.background_image}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="eager"
-          />
-        )}
-
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(circle at 18% 18%, hsl(var(--accent) / 0.2), transparent 26%), radial-gradient(circle at 82% 16%, hsl(var(--primary) / 0.25), transparent 30%), linear-gradient(135deg, hsl(var(--foreground) / 0.92), hsl(var(--primary) / 0.78), hsl(var(--foreground) / 0.82))`,
-          }}
-        />
-
-        <div
-          className="absolute inset-0 opacity-[0.08]"
-          style={{
-            backgroundImage:
-              "linear-gradient(hsl(var(--background) / 0.12) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--background) / 0.12) 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
-          }}
-        />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A1415] via-[#0D2B30] to-[#14555E]" />
+        <svg className="absolute right-[-8%] top-[10%] w-[800px] h-[800px] opacity-[0.04]" viewBox="0 0 800 800">
+          <circle cx="400" cy="400" r="380" stroke="white" strokeWidth="0.4" fill="none" />
+          <circle cx="400" cy="400" r="280" stroke="white" strokeWidth="0.4" fill="none" />
+          <circle cx="400" cy="400" r="180" stroke="white" strokeWidth="0.4" fill="none" />
+          <circle cx="400" cy="400" r="80" stroke="white" strokeWidth="0.4" fill="none" />
+        </svg>
+        <div className="absolute top-[10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-[var(--teal)]/[0.08] blur-[120px]" />
+        <div className="absolute bottom-[5%] right-[-5%] w-[400px] h-[400px] rounded-full bg-[var(--yellow)]/[0.05] blur-[100px]" />
+        <div className="absolute bottom-[15%] left-[8%] opacity-[0.05] grid grid-cols-6 gap-4">
+          {Array.from({ length: 24 }).map((_, i) => (<div key={i} className="w-1 h-1 rounded-full bg-white" />))}
+        </div>
+        <svg className="absolute left-[15%] top-[20%] w-[200px] h-[200px] opacity-[0.03]" viewBox="0 0 200 200">
+          <line x1="0" y1="0" x2="200" y2="200" stroke="white" strokeWidth="0.5" />
+          <line x1="0" y1="40" x2="160" y2="200" stroke="white" strokeWidth="0.5" />
+          <line x1="40" y1="0" x2="200" y2="160" stroke="white" strokeWidth="0.5" />
+        </svg>
       </motion.div>
 
-      <div
-        className="absolute inset-0 opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
-      />
+      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+      }} />
 
-      <motion.div style={{ y: contentY, opacity: opacityOut }} className="container relative z-10 py-28 lg:py-32 will-change-transform">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-background/10 bg-background/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-background/70 backdrop-blur-xl">
-          <Sparkles size={12} className="text-accent" />
-          Kolkata care network · CMS-powered launch
-        </div>
-
-        <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
-          <div className="max-w-3xl">
-            <h1 className="max-w-none text-[clamp(3rem,8vw,7rem)] font-black leading-[0.95] tracking-[-0.05em] text-background">
-              {headlineWords.map((word, index) => (
-                <motion.span
-                  key={`${word}-${index}`}
-                  initial={{ opacity: 0, y: 28, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ delay: index * 0.05, duration: 0.45 }}
-                  className={`inline-block mr-3 ${index >= accentStart ? "text-accent" : "text-background"}`}
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35, duration: 0.45 }}
-              className="mt-6 max-w-2xl text-[clamp(1rem,1.8vw,1.2rem)] leading-8 text-background/70"
-            >
-              {hero.subtitle}
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.45 }}
-              className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap"
-            >
-              {renderPrimaryAction()}
-              <Link to="/initiatives" className={secondaryActionClasses}>
-                Explore initiatives
-              </Link>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.65, duration: 0.5 }}
-              className="mt-8 flex flex-wrap gap-3"
-            >
-              {trustPoints.map((point, index) => (
-                <span
-                  key={point}
-                  className="inline-flex items-center gap-2 rounded-full border border-background/10 bg-background/10 px-4 py-2 text-xs font-medium text-background/75 backdrop-blur-xl"
-                >
-                  {index === 0 ? <Shield size={13} className="text-accent" /> : <HeartHandshake size={13} className="text-accent" />}
-                  {point}
-                </span>
-              ))}
-            </motion.div>
-          </div>
-
-          <motion.aside
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55, duration: 0.5 }}
-            className="hidden lg:block"
-          >
-            <div className="rounded-[28px] border border-background/10 bg-background/10 p-6 backdrop-blur-2xl shadow-[var(--shadow-lg)]">
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-background/60">
-                <span className="inline-flex h-2 w-2 rounded-full bg-accent" />
-                response network online
-              </div>
-
-              <div className="mt-6">
-                <p className="text-5xl font-black tracking-[-0.05em] text-background">{stats[0]?.value}</p>
-                <p className="mt-2 text-sm font-medium text-background/70">{stats[0]?.label}</p>
-              </div>
-
-              <div className="mt-6 space-y-3">
-                {stats.slice(1).map((stat) => (
-                  <div key={stat.label} className="flex items-center justify-between rounded-2xl border border-background/10 bg-foreground/20 px-4 py-3">
-                    <span className="text-sm text-background/65">{stat.label}</span>
-                    <span className="text-lg font-bold text-background">{stat.value}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 rounded-[22px] border border-background/10 bg-foreground/25 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">GoldenAge Care</p>
-                <p className="mt-2 text-sm leading-6 text-background/70">
-                  Emergency coordination, family updates, and on-ground support for elders living alone in Kolkata.
-                </p>
-              </div>
-            </div>
-          </motion.aside>
-        </div>
-
-        <div className="mt-12 grid gap-3 sm:grid-cols-3">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 + index * 0.08, duration: 0.45 }}
-              className="rounded-[26px] border border-background/10 bg-background/10 p-5 backdrop-blur-xl"
-            >
-              <p className="text-[clamp(1.8rem,4vw,2.8rem)] font-black leading-none tracking-[-0.04em] text-background">
-                {stat.value}
-              </p>
-              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-background/60">
-                {stat.label}
-              </p>
-              <div className="mt-4 h-px w-full bg-background/10" />
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.15, duration: 0.5 }}
-        className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
-      >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-background/35">Scroll</span>
-        <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
-          <ChevronDown size={15} className="text-background/35" />
+      <motion.div style={{ y: contentY, opacity: opacityOut }} className="relative z-10 text-center max-w-[860px] mx-auto px-6 py-32 will-change-transform">
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="inline-block mb-8">
+          <span className="bg-white/[0.06] backdrop-blur-sm text-white/80 px-5 py-2 rounded-full text-[10px] font-[600] uppercase tracking-[0.12em] border border-white/[0.08]">
+            Kolkata, West Bengal · Est. 2020
+          </span>
         </motion.div>
+
+        <h1 className="display-hero text-white mb-6 max-w-[800px] mx-auto">
+          {["Changing", "Lives,", "One", "Act", "of"].map((word, i) => (
+            <motion.span key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07, duration: 0.45 }} className="inline-block mr-3">{word}</motion.span>
+          ))}
+          <span className="inline-block mr-3"><CompassionText /></span>
+          {["at", "a", "Time."].map((word, i) => (
+            <motion.span key={`end-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 + i * 0.07, duration: 0.45 }} className="inline-block mr-3">{word}</motion.span>
+          ))}
+        </h1>
+
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="text-[clamp(14px,1.6vw,17px)] font-[400] text-white/65 max-w-[540px] mx-auto mb-10 leading-[1.8]">
+          Providing medical aid, education support, and emergency care for families across Kolkata. Every rupee reaches those who need it most.
+        </motion.p>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.5 }} className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mb-12">
+          <motion.button onClick={openOverlay} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="px-9 py-4 text-[14px] font-[700] bg-[var(--yellow)] text-[var(--dark)] rounded-full shadow-[0_4px_16px_rgba(242,183,5,0.25)] hover:shadow-[0_8px_32px_rgba(242,183,5,0.4)] transition-shadow flex items-center justify-center gap-2">
+            Donate Now <ArrowRight size={16} />
+          </motion.button>
+          <Link to="/initiatives" className="px-9 py-4 text-[14px] font-[600] text-white/90 border border-white/[0.15] rounded-full hover:bg-white/[0.06] hover:border-white/[0.25] transition-all text-center">
+            Our Initiatives
+          </Link>
+        </motion.div>
+
+        {/* Stats - hidden on mobile */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.6 }} className="hidden sm:flex flex-wrap justify-center divide-x divide-white/[0.1] mb-8">
+          <StatCard value="2,400+" label="Patients Aided" delay={1.15} />
+          <StatCard value="850+" label="Students Sponsored" delay={1.25} />
+          <StatCard value="120+" label="Families Registered" delay={1.35} />
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.5 }} className="hidden sm:flex flex-wrap justify-center gap-5 text-white/45">
+          {[
+            { icon: Shield, text: "80G Tax Benefits" },
+            { icon: Heart, text: "100% Transparent" },
+            { icon: Users, text: "Registered NGO" },
+          ].map(({ icon: Icon, text }) => (
+            <span key={text} className="flex items-center gap-1.5 text-[11px] font-[500]">
+              <Icon size={12} className="text-[var(--yellow)]/80" />{text}
+            </span>
+          ))}
+        </motion.div>
+      </motion.div>
+
+      {/* Live donation ticker */}
+      <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.6, duration: 0.6 }} className="absolute bottom-28 left-6 z-20 hidden lg:block">
+        <div className="bg-white/[0.06] backdrop-blur-xl rounded-2xl p-4 max-w-[260px] border border-white/[0.08]">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
+            </span>
+            <span className="text-[10px] text-white/40 font-[500]">Live Activity</span>
+          </div>
+          <p className="text-[12px] font-[500] text-white/80 leading-relaxed">Anjali from Pune donated ₹1,000 to Medical Aid</p>
+          <p className="text-[10px] text-white/30 mt-1">Just now</p>
+        </div>
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2">
+        <span className="text-[10px] text-white/30 font-[500] uppercase tracking-[0.14em]">Scroll</span>
+        <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}><ChevronDown size={14} className="text-white/30" /></motion.div>
       </motion.div>
     </section>
   );

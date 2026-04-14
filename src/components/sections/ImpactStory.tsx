@@ -1,202 +1,142 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, CheckCircle2, Clock3, HeartPulse, MapPin, ShieldCheck } from "lucide-react";
+import { CheckCircle, ArrowRight, Clock, MapPin, Heart } from "lucide-react";
+import FadeInUp from "../ui/FadeInUp";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
-import { useCMSList } from "@/hooks/useCMSList";
-import ImagePlaceholder from "../ui/ImagePlaceholder";
 
-const fallbackStory = {
-  title: "How ₹5,000 Changed Ranu's Story",
-  excerpt:
-    "Ranu Mondal, 67, was alone when she needed emergency cardiac care. Her son registered her through AGSWS six months before.",
-  content:
-    "Within 2 hours of her collapse, our team had her admitted to a network hospital and kept her family informed until she was stable and recovering.",
-  category: "Medical",
-  image: null as string | null,
-  slug: "ranu-mondal-emergency-care",
-  published_at: "2025-01-15T00:00:00+00:00",
-};
-
-const timeline = [
-  { icon: Clock3, label: "Alert received", detail: "Family activated the local care network" },
-  { icon: HeartPulse, label: "Field team dispatched", detail: "Emergency coordination began immediately" },
-  { icon: MapPin, label: "Hospital admitted", detail: "Network partner arranged fast intake" },
-  { icon: CheckCircle2, label: "Family updated", detail: "Continuous status updates until recovery" },
+const milestones = [
+  { icon: Clock, label: "Registered", detail: "Son registered from Bengaluru", done: true },
+  { icon: Heart, label: "Emergency", detail: "Cardiac event — team mobilised", done: true },
+  { icon: MapPin, label: "Admitted", detail: "Network hospital in 2 hours", done: true },
+  { icon: CheckCircle, label: "Recovered", detail: "Full recovery in 12 days", done: true },
 ];
 
-const categoryToPlaceholder: Record<string, "medical" | "education" | "elderly" | "community" | "child" | "hospital" | "classroom"> = {
-  Medical: "medical",
-  Education: "classroom",
-  Community: "community",
-  Report: "community",
-};
-
-const formatDate = (value?: string | null) => {
-  if (!value) return "Verified case study";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime())
-    ? value
-    : parsed.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-};
-
 const ImpactStory = () => {
-  const sectionRef = useRef<HTMLElement | null>(null);
+  const sectionRef = useRef(null);
   const { openOverlay } = useDonateOverlay();
-  const { data: cmsStories } = useCMSList<any>("cms_stories", [], {
-    filter: { column: "is_published", value: true },
-    orderBy: { column: "published_at", ascending: false },
-    limit: 1,
-  });
-
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
-  const leftY = useTransform(scrollYProgress, [0, 1], [26, -20]);
-  const rightY = useTransform(scrollYProgress, [0, 1], [-20, 24]);
-
-  const featuredStory = cmsStories[0]
-    ? {
-        title: cmsStories[0].title || fallbackStory.title,
-        excerpt: cmsStories[0].excerpt || fallbackStory.excerpt,
-        content: cmsStories[0].content || fallbackStory.content,
-        category: cmsStories[0].category || fallbackStory.category,
-        image: cmsStories[0].image || null,
-        slug: cmsStories[0].slug || fallbackStory.slug,
-        published_at: cmsStories[0].published_at || cmsStories[0].created_at || fallbackStory.published_at,
-      }
-    : fallbackStory;
-
-  const storyLink = featuredStory.slug ? `/blog/${featuredStory.slug}` : "/blog";
-  const placeholderCategory = categoryToPlaceholder[featuredStory.category] || "community";
+  const leftY = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const rightY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden py-20 lg:py-28">
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(circle at 18% 20%, hsl(var(--accent) / 0.12), transparent 24%), radial-gradient(circle at 82% 18%, hsl(var(--primary) / 0.16), transparent 30%), linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--primary) / 0.92), hsl(var(--foreground) / 0.96))`,
-        }}
-      />
+    <section ref={sectionRef} className="relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#0D1B1C] via-[var(--teal-dark)] to-[#0F1F20] relative">
+        {/* Subtle geometric accents */}
+        <svg className="absolute right-[-5%] top-[-10%] w-[500px] h-[500px] opacity-[0.04] pointer-events-none" viewBox="0 0 500 500">
+          <circle cx="250" cy="250" r="200" stroke="white" strokeWidth="0.5" fill="none" />
+          <circle cx="250" cy="250" r="140" stroke="white" strokeWidth="0.5" fill="none" />
+        </svg>
 
-      <div className="container relative z-10">
-        <div className="grid items-stretch gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10">
-          <motion.article
-            style={{ y: leftY }}
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.55 }}
-            className="overflow-hidden rounded-[32px] border border-background/10 bg-background/10 backdrop-blur-xl shadow-[var(--shadow-lg)]"
-          >
-            <div className="relative min-h-[360px] md:min-h-[460px]">
-              {featuredStory.image ? (
-                <img
-                  src={featuredStory.image}
-                  alt={featuredStory.title}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <ImagePlaceholder category={placeholderCategory} className="absolute inset-0 h-full w-full object-cover" label={featuredStory.category} />
-              )}
-
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(180deg, hsl(var(--foreground) / 0.12) 0%, hsl(var(--foreground) / 0.28) 36%, hsl(var(--foreground) / 0.92) 100%)",
-                }}
-              />
-
-              <div className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full border border-background/10 bg-background/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-background/75 backdrop-blur-xl">
-                {featuredStory.category} · {formatDate(featuredStory.published_at)}
-              </div>
-
-              <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 lg:p-10">
-                <h2 className="max-w-none text-[clamp(2rem,4vw,3.3rem)] font-black leading-[1.02] tracking-[-0.04em] text-background">
-                  {featuredStory.title}
+        <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] py-[80px] lg:py-[120px] relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Left — Story */}
+            <motion.div style={{ y: leftY }} className="will-change-transform">
+              <FadeInUp>
+                <span className="inline-block bg-white/[0.08] text-white/80 text-[11px] font-[600] uppercase tracking-[0.1em] px-4 py-1.5 rounded-full border border-white/[0.1] mb-6">
+                  Impact Story
+                </span>
+                <h2 className="text-[clamp(28px,4vw,40px)] font-[800] text-white leading-[1.1] tracking-[-0.02em] mb-6 max-w-[500px]">
+                  How <span className="text-[var(--yellow)]">₹5,000</span> Changed Ranu's Story
                 </h2>
-                <p className="mt-4 max-w-2xl text-base leading-8 text-background/72">
-                  {featuredStory.excerpt || featuredStory.content}
+                <p className="text-[16px] text-white/70 leading-[1.8] mb-8 max-w-[480px]">
+                  Ranu Mondal, 67, from North Kolkata, was alone when she needed emergency cardiac care. Her son in Bengaluru had registered her through AGSWS six months before. Within 2 hours of her collapse, our team had her admitted at a network hospital.
                 </p>
 
-                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <Link
-                    to={storyLink}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-bold text-accent-foreground shadow-[var(--shadow-yellow)] transition-transform duration-300 hover:-translate-y-0.5"
-                  >
-                    Read full story
-                    <ArrowRight size={16} />
-                  </Link>
+                {/* Stats pills */}
+                <div className="flex flex-wrap gap-3 mb-8">
+                  {["₹5,000 donated", "2-hour response", "Full recovery"].map((text) => (
+                    <span key={text} className="bg-[var(--yellow)]/10 text-[var(--yellow)] text-[12px] font-[600] px-4 py-2 rounded-full border border-[var(--yellow)]/20">
+                      {text}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-3">
                   <button
                     onClick={openOverlay}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-background/10 bg-background/10 px-7 py-3.5 text-sm font-semibold text-background/88 backdrop-blur-xl transition-colors duration-300 hover:bg-background/15"
+                    className="bg-[var(--yellow)] text-[var(--dark)] px-7 py-3 rounded-full font-[700] text-[14px] hover:shadow-[var(--shadow-yellow)] hover:scale-[1.03] active:scale-[0.97] transition-all flex items-center gap-2"
                   >
-                    Support similar care
+                    Donate Now <ArrowRight size={16} />
                   </button>
+                  <Link 
+                    to="/blog" 
+                    className="border border-white/20 text-white px-7 py-3 rounded-full font-[600] text-[14px] hover:bg-white/[0.06] transition-all"
+                  >
+                    Read More Stories
+                  </Link>
                 </div>
-              </div>
-            </div>
-          </motion.article>
+              </FadeInUp>
+            </motion.div>
 
-          <motion.aside
-            style={{ y: rightY }}
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ delay: 0.08, duration: 0.55 }}
-            className="rounded-[28px] border border-background/10 bg-background/10 p-6 backdrop-blur-2xl shadow-[var(--shadow-lg)] md:p-8"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-background/58">Case timeline</span>
-                <p className="mt-2 text-2xl font-black tracking-[-0.04em] text-background">Verified response flow</p>
-              </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/15 text-accent">
-                <ShieldCheck size={20} />
-              </div>
-            </div>
-
-            <div className="mt-8 space-y-4">
-              {timeline.map((item, index) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, x: -12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.14 + index * 0.08, duration: 0.35 }}
-                  className="flex items-start gap-4 rounded-2xl border border-background/10 bg-foreground/20 p-4"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-background/10 text-accent">
-                    <item.icon size={18} />
+            {/* Right — Timeline Card */}
+            <motion.div style={{ y: rightY }} className="will-change-transform">
+              <FadeInUp delay={0.15}>
+                <div className="bg-white rounded-[var(--radius-2xl)] p-8 shadow-[0_24px_64px_rgba(0,0,0,0.3)]">
+                  {/* Card header */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <span className="text-[11px] font-[600] uppercase tracking-[0.1em] text-[var(--teal)]">Registered Case</span>
+                      <p className="text-[20px] font-[700] text-[var(--dark)] mt-1">AGS-2024-082</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-[#16A34A]/10 flex items-center justify-center">
+                      <CheckCircle size={20} className="text-[#16A34A]" />
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-background">{item.label}</p>
-                    <p className="mt-1 text-sm leading-6 text-background/66">{item.detail}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
 
-            <div className="mt-8 grid grid-cols-3 gap-3">
-              {[
-                { value: "2 hrs", label: "response" },
-                { value: "Live", label: "family updates" },
-                { value: "24/7", label: "care line" },
-              ].map((metric) => (
-                <div key={metric.label} className="rounded-2xl border border-background/10 bg-background/10 p-4 text-center">
-                  <p className="text-xl font-black tracking-[-0.03em] text-background">{metric.value}</p>
-                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-background/58">{metric.label}</p>
+                  {/* Timeline */}
+                  <div className="relative pl-6 space-y-0 mb-6">
+                    {/* Vertical line */}
+                    <div className="absolute left-[9px] top-2 bottom-2 w-[2px] bg-[var(--border-color)]" />
+                    
+                    {milestones.map((m, i) => (
+                      <motion.div
+                        key={m.label}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 + i * 0.12, duration: 0.4 }}
+                        className="relative flex items-start gap-4 py-3"
+                      >
+                        <div className="absolute left-[-18px] top-[16px] w-[20px] h-[20px] rounded-full bg-[var(--teal)] flex items-center justify-center z-10 shadow-sm">
+                          <m.icon size={10} className="text-white" />
+                        </div>
+                        <div className="ml-2">
+                          <p className="text-[13px] font-[600] text-[var(--dark)]">{m.label}</p>
+                          <p className="text-[12px] text-[var(--light)]">{m.detail}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Recovery bar */}
+                  <div className="bg-[var(--bg)] rounded-[var(--radius-lg)] p-4">
+                    <div className="flex justify-between text-[12px] mb-2">
+                      <span className="text-[var(--light)] font-[500]">Recovery Progress</span>
+                      <span className="font-[700] text-[#16A34A]">100%</span>
+                    </div>
+                    <div className="w-full h-2 bg-[var(--border-color)] rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-[var(--teal)] to-[#16A34A] rounded-full"
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "100%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Verified badge */}
+                  <div className="mt-5 flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-[var(--teal)]/10 flex items-center justify-center">
+                      <CheckCircle size={12} className="text-[var(--teal)]" />
+                    </div>
+                    <span className="text-[11px] font-[600] text-[var(--teal)] uppercase tracking-[0.06em]">AGSWS Verified · 15 Jan 2025</span>
+                  </div>
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-6 rounded-[24px] border border-background/10 bg-foreground/25 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Why it matters</p>
-              <p className="mt-2 text-sm leading-6 text-background/70">
-                Every verified story becomes proof that coordinated donations can move from concern to care in a matter of hours.
-              </p>
-            </div>
-          </motion.aside>
+              </FadeInUp>
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>
