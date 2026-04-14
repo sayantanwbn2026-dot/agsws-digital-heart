@@ -14,7 +14,7 @@ export function useAdminAPI() {
   ) => {
     const token = getToken()
     const targetUrl = url.startsWith('http') ? url : `${SUPABASE_URL}${url}`
-    const res = await fetch(url, {
+    const res = await fetch(targetUrl, {
       method,
       headers: {
         'Content-Type': 'application/json',
