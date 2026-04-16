@@ -193,6 +193,8 @@ const previewUrls: Record<string, string> = {
   landing: '/', hero: '/', stats: '/', initiatives: '/initiatives', testimonials: '/',
   stories: '/', events: '/events', team: '/about', faqs: '/faq',
   gallery: '/gallery', partners: '/', blog: '/blog', resources: '/resources',
+  how_it_works: '/', scrolling_stories: '/', impact_story: '/',
+  analytics_section: '/', cta_banner: '/', trust_band: '/',
 };
 
 const CHART_COLORS = ['hsl(187, 68%, 39%)', 'hsl(242, 29%, 50%)', 'hsl(28, 22%, 62%)', 'hsl(47, 80%, 55%)', 'hsl(0, 70%, 55%)', 'hsl(160, 60%, 45%)', 'hsl(280, 50%, 55%)'];
