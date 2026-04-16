@@ -245,6 +245,7 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
                 else await create(table, item);
                 toast.success('Saved');
                 fetchItems();
+                notifyCMSContentUpdated();
               } catch (err: any) {
                 toast.error(err.message || 'Save failed');
               }
