@@ -2,14 +2,21 @@ import { useState, useRef } from "react";
 import { MousePointer2, CreditCard, BarChart2 } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import FadeInUp from "../ui/FadeInUp";
+import { useCMSSection } from "@/hooks/useCMSSection";
 
-const steps = [
-  { id: 'choose', icon: MousePointer2, title: "Choose Your Cause", desc: "Pick from Medical Aid, Education Support, or GoldenAge Care. Every cause directly serves families in Kolkata." },
-  { id: 'donate', icon: CreditCard, title: "Make a Secure Donation", desc: "Pay via UPI, card, or netbanking through Razorpay. 256-bit encrypted. 80G receipt generated automatically." },
-  { id: 'impact', icon: BarChart2, title: "See Real Impact", desc: "Receive updates on how your donation is used. Quarterly impact reports. Zero overhead fluff." },
-];
+const iconMap: Record<string, any> = { MousePointer2, CreditCard, BarChart2 };
+
+const defaultData = {
+  steps: [
+    { id: 'choose', icon: 'MousePointer2', title: "Choose Your Cause", desc: "Pick from Medical Aid, Education Support, or GoldenAge Care. Every cause directly serves families in Kolkata." },
+    { id: 'donate', icon: 'CreditCard', title: "Make a Secure Donation", desc: "Pay via UPI, card, or netbanking through Razorpay. 256-bit encrypted. 80G receipt generated automatically." },
+    { id: 'impact', icon: 'BarChart2', title: "See Real Impact", desc: "Receive updates on how your donation is used. Quarterly impact reports. Zero overhead fluff." },
+  ],
+};
 
 const HowItWorks = () => {
+  const { data } = useCMSSection<typeof defaultData>('how_it_works', defaultData);
+  const steps = data.steps;
   const [activeTab, setActiveTab] = useState(0);
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
@@ -31,9 +38,10 @@ const HowItWorks = () => {
           <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-3 pb-4 lg:pb-0 w-full lg:w-[300px] flex-shrink-0">
             {steps.map((step, i) => {
               const isActive = i === activeTab;
+              const Icon = iconMap[step.icon] || MousePointer2;
               return (
                 <motion.button
-                  key={step.id}
+                  key={i}
                   onClick={() => setActiveTab(i)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -43,7 +51,7 @@ const HowItWorks = () => {
                       : "bg-[hsl(var(--card))] border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] hover:border-[hsl(var(--primary))]/30"
                   }`}
                 >
-                  <step.icon size={16} />
+                  <Icon size={16} />
                   {step.title}
                 </motion.button>
               );
@@ -61,11 +69,11 @@ const HowItWorks = () => {
                 className="w-full"
               >
                 <div className="w-14 h-14 bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] rounded-xl flex items-center justify-center mb-6">
-                  {(() => { const Icon = steps[activeTab].icon; return <Icon size={28} />; })()}
+                  {(() => { const Icon = iconMap[steps[activeTab]?.icon] || MousePointer2; return <Icon size={28} />; })()}
                 </div>
-                <h3 className="text-xl font-bold text-[hsl(var(--foreground))] mb-3">{steps[activeTab].title}</h3>
+                <h3 className="text-xl font-bold text-[hsl(var(--foreground))] mb-3">{steps[activeTab]?.title}</h3>
                 <p className="text-[15px] text-[hsl(var(--muted-foreground))] leading-relaxed max-w-[480px]">
-                  {steps[activeTab].desc}
+                  {steps[activeTab]?.desc}
                 </p>
               </motion.div>
             </AnimatePresence>
