@@ -11,6 +11,7 @@ import {
 import SortableItem from './SortableItem';
 import CMSFieldRenderer from './CMSFieldRenderer';
 import { useCMSApi } from '@/hooks/useCMSApi';
+import { notifyCMSContentUpdated } from '@/lib/cms-sync';
 import toast from 'react-hot-toast';
 
 export interface FieldConfig {
@@ -84,6 +85,7 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
       setEditItem(null);
       setIsNew(false);
       fetchItems();
+      notifyCMSContentUpdated();
     } catch (err: any) {
       toast.error(err.message || 'Save failed');
     }
@@ -96,6 +98,7 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
       toast.success('Deleted');
       setSelectedIds(prev => { const n = new Set(prev); n.delete(id); return n; });
       fetchItems();
+      notifyCMSContentUpdated();
     } catch (err: any) {
       toast.error(err.message || 'Delete failed');
     }
@@ -109,6 +112,7 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
       toast.success(`${selectedIds.size} items deleted`);
       setSelectedIds(new Set());
       fetchItems();
+      notifyCMSContentUpdated();
     } catch (err: any) {
       toast.error(err.message || 'Bulk delete failed');
     }
@@ -130,6 +134,7 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
       await create(table, copy);
       toast.success('Item duplicated');
       fetchItems();
+      notifyCMSContentUpdated();
     } catch (err: any) {
       toast.error(err.message || 'Duplicate failed');
     }
@@ -142,6 +147,7 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
       await update(table, item.id, { is_published: !item.is_published });
       toast.success(item.is_published ? 'Unpublished' : 'Published');
       fetchItems();
+      notifyCMSContentUpdated();
     } catch (err: any) {
       toast.error(err.message);
     }
@@ -164,6 +170,7 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
         )
       );
       toast.success('Order updated');
+      notifyCMSContentUpdated();
     } catch (err: any) {
       toast.error('Failed to save order');
       fetchItems(); // Revert
