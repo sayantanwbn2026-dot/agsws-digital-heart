@@ -757,18 +757,29 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
 
       <div className="bg-card border border-border rounded-xl p-6">
         <h4 className="text-xs font-bold text-foreground mb-4 flex items-center gap-2">
-          <Shield size={14} className="text-muted-foreground" /> Static Sections (Code-Level)
+          <Shield size={14} className="text-primary" /> Dynamic Sections (CMS-Editable)
         </h4>
-        <p className="text-[11px] text-muted-foreground mb-4">These sections use hardcoded data. To change them, modify the component source code.</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {staticSections.map(s => (
-            <div key={s.label} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
-              <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 mt-1.5 shrink-0" />
-              <div>
-                <p className="text-xs font-semibold text-foreground">{s.label}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
+        <p className="text-[11px] text-muted-foreground mb-4">These homepage sections are now fully editable from the CMS. Click any card to edit.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {dynamicSections.map(s => (
+            <button
+              key={s.id}
+              onClick={() => onNavigate(s.id)}
+              className="bg-card border border-border rounded-xl p-5 text-left hover:shadow-md hover:border-primary/30 transition-all group"
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <div className={`w-9 h-9 rounded-lg ${s.color} flex items-center justify-center shrink-0`}>
+                  <s.icon size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{s.label}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{s.desc}</p>
+                </div>
               </div>
-            </div>
+              <div className="flex items-center gap-1 text-[10px] font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                Edit Content <ExternalLink size={10} />
+              </div>
+            </button>
           ))}
         </div>
       </div>
