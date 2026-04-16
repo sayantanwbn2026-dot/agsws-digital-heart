@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
+import SectionEditor from "./components/SectionEditor";
 import { useCMSApi } from "@/hooks/useCMSApi";
 import toast from "react-hot-toast";
 
