@@ -709,13 +709,13 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
     { id: 'payment', label: 'Payment & Tax', desc: 'Razorpay config, 80G tax %, bank details, donation limits', icon: CreditCard, color: 'bg-orange-100 text-orange-700' },
   ];
 
-  const staticSections = [
-    { label: 'How It Works', desc: '3-step process (Choose → Donate → Impact). Currently static — edit code to change steps.', static: true },
-    { label: 'Impact Map', desc: 'Kolkata district pins with impact zones. Currently static — edit code to change locations.', static: true },
-    { label: 'Analytics Infographic', desc: 'Bar charts & donut showing fund allocation. Currently static visual.', static: true },
-    { label: 'Trust Band', desc: '80G Tax Benefit, NGO Registration, Secure Payments, Transparency badges. Static.', static: true },
-    { label: 'Impact Story (Ranu)', desc: 'Featured case study with timeline card. Static content.', static: true },
-    { label: 'Scrolling Stories Strip', desc: 'Animated pill badges (e.g. "Kalinda, 8 got school books"). Static.', static: true },
+  const dynamicSections = [
+    { id: 'how_it_works', label: 'How It Works', desc: '3-step process (Choose → Donate → Impact). Editable steps, titles, descriptions.', icon: LayoutDashboard, color: 'bg-indigo-100 text-indigo-700' },
+    { id: 'scrolling_stories', label: 'Story Strip', desc: 'Animated marquee pills (e.g. "Kalinda, 8 got school books").', icon: BookOpen, color: 'bg-cyan-100 text-cyan-700' },
+    { id: 'impact_story', label: 'Impact Story', desc: 'Featured case study with timeline card, milestones, and stats.', icon: Heart, color: 'bg-rose-100 text-rose-700' },
+    { id: 'analytics_section', label: 'Analytics Infographic', desc: 'Bar charts, donut value, and sidebar stats for fund allocation.', icon: BarChart3, color: 'bg-violet-100 text-violet-700' },
+    { id: 'cta_banner', label: 'CTA Banner', desc: 'Call-to-action headline, subtitle, and feature cards.', icon: Type, color: 'bg-lime-100 text-lime-700' },
+    { id: 'trust_band', label: 'Trust Band', desc: '80G Tax, NGO Registration, Secure Payments, Transparency badges.', icon: Shield, color: 'bg-slate-100 text-slate-700' },
   ];
 
   return (
