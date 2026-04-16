@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
+import SectionEditor from "./components/SectionEditor";
 import { useCMSApi } from "@/hooks/useCMSApi";
 import toast from "react-hot-toast";
 
@@ -192,6 +193,8 @@ const previewUrls: Record<string, string> = {
   landing: '/', hero: '/', stats: '/', initiatives: '/initiatives', testimonials: '/',
   stories: '/', events: '/events', team: '/about', faqs: '/faq',
   gallery: '/gallery', partners: '/', blog: '/blog', resources: '/resources',
+  how_it_works: '/', scrolling_stories: '/', impact_story: '/',
+  analytics_section: '/', cta_banner: '/', trust_band: '/',
 };
 
 const CHART_COLORS = ['hsl(187, 68%, 39%)', 'hsl(242, 29%, 50%)', 'hsl(28, 22%, 62%)', 'hsl(47, 80%, 55%)', 'hsl(0, 70%, 55%)', 'hsl(160, 60%, 45%)', 'hsl(280, 50%, 55%)'];
@@ -706,13 +709,13 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
     { id: 'payment', label: 'Payment & Tax', desc: 'Razorpay config, 80G tax %, bank details, donation limits', icon: CreditCard, color: 'bg-orange-100 text-orange-700' },
   ];
 
-  const staticSections = [
-    { label: 'How It Works', desc: '3-step process (Choose → Donate → Impact). Currently static — edit code to change steps.', static: true },
-    { label: 'Impact Map', desc: 'Kolkata district pins with impact zones. Currently static — edit code to change locations.', static: true },
-    { label: 'Analytics Infographic', desc: 'Bar charts & donut showing fund allocation. Currently static visual.', static: true },
-    { label: 'Trust Band', desc: '80G Tax Benefit, NGO Registration, Secure Payments, Transparency badges. Static.', static: true },
-    { label: 'Impact Story (Ranu)', desc: 'Featured case study with timeline card. Static content.', static: true },
-    { label: 'Scrolling Stories Strip', desc: 'Animated pill badges (e.g. "Kalinda, 8 got school books"). Static.', static: true },
+  const dynamicSections = [
+    { id: 'how_it_works', label: 'How It Works', desc: '3-step process (Choose → Donate → Impact). Editable steps, titles, descriptions.', icon: LayoutDashboard, color: 'bg-indigo-100 text-indigo-700' },
+    { id: 'scrolling_stories', label: 'Story Strip', desc: 'Animated marquee pills (e.g. "Kalinda, 8 got school books").', icon: BookOpen, color: 'bg-cyan-100 text-cyan-700' },
+    { id: 'impact_story', label: 'Impact Story', desc: 'Featured case study with timeline card, milestones, and stats.', icon: Heart, color: 'bg-rose-100 text-rose-700' },
+    { id: 'analytics_section', label: 'Analytics Infographic', desc: 'Bar charts, donut value, and sidebar stats for fund allocation.', icon: BarChart3, color: 'bg-violet-100 text-violet-700' },
+    { id: 'cta_banner', label: 'CTA Banner', desc: 'Call-to-action headline, subtitle, and feature cards.', icon: Type, color: 'bg-lime-100 text-lime-700' },
+    { id: 'trust_band', label: 'Trust Band', desc: '80G Tax, NGO Registration, Secure Payments, Transparency badges.', icon: Shield, color: 'bg-slate-100 text-slate-700' },
   ];
 
   return (
@@ -754,18 +757,29 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
 
       <div className="bg-card border border-border rounded-xl p-6">
         <h4 className="text-xs font-bold text-foreground mb-4 flex items-center gap-2">
-          <Shield size={14} className="text-muted-foreground" /> Static Sections (Code-Level)
+          <Shield size={14} className="text-primary" /> Dynamic Sections (CMS-Editable)
         </h4>
-        <p className="text-[11px] text-muted-foreground mb-4">These sections use hardcoded data. To change them, modify the component source code.</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {staticSections.map(s => (
-            <div key={s.label} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
-              <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 mt-1.5 shrink-0" />
-              <div>
-                <p className="text-xs font-semibold text-foreground">{s.label}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
+        <p className="text-[11px] text-muted-foreground mb-4">These homepage sections are now fully editable from the CMS. Click any card to edit.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {dynamicSections.map(s => (
+            <button
+              key={s.id}
+              onClick={() => onNavigate(s.id)}
+              className="bg-card border border-border rounded-xl p-5 text-left hover:shadow-md hover:border-primary/30 transition-all group"
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <div className={`w-9 h-9 rounded-lg ${s.color} flex items-center justify-center shrink-0`}>
+                  <s.icon size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{s.label}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{s.desc}</p>
+                </div>
               </div>
-            </div>
+              <div className="flex items-center gap-1 text-[10px] font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                Edit Content <ExternalLink size={10} />
+              </div>
+            </button>
           ))}
         </div>
       </div>
@@ -1094,6 +1108,12 @@ const AdminDashboard = () => {
     if (activeSection === 'seo') return <SEOChecker allData={allData} />;
     if (activeSection === 'scheduler') return <ContentScheduler allData={allData} />;
     if (activeSection === 'import') return <BulkImport onRefresh={fetchAllCounts} />;
+    if (activeSection === 'how_it_works') return <SectionEditor sectionKey="how_it_works" title="How It Works" description="3-step process shown on the homepage" fields={[]} listKey="steps" listFields={[{ key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }, { key: 'icon', label: 'Icon (MousePointer2, CreditCard, BarChart2)', type: 'text' }]} />;
+    if (activeSection === 'impact_story') return <SectionEditor sectionKey="impact_story" title="Impact Story" description="Featured case study with timeline card" fields={[{ key: 'badge', label: 'Badge Text', type: 'text' }, { key: 'headline', label: 'Headline', type: 'text' }, { key: 'description', label: 'Story Description', type: 'textarea' }, { key: 'case_ref', label: 'Case Reference', type: 'text' }, { key: 'verified_date', label: 'Verified Date', type: 'text' }]} listKey="milestones" listFields={[{ key: 'label', label: 'Label', type: 'text' }, { key: 'detail', label: 'Detail', type: 'text' }]} />;
+    if (activeSection === 'cta_banner') return <SectionEditor sectionKey="cta_banner" title="CTA Banner" description="Call-to-action section with feature cards" fields={[{ key: 'badge', label: 'Badge Text', type: 'text' }, { key: 'headline', label: 'Headline', type: 'text' }, { key: 'highlight', label: 'Highlighted Word(s)', type: 'text', placeholder: 'Part of headline to highlight in yellow' }, { key: 'subtitle', label: 'Subtitle', type: 'textarea' }]} listKey="features" listFields={[{ key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }, { key: 'icon', label: 'Icon (Shield, Clock, HeartHandshake)', type: 'text' }]} />;
+    if (activeSection === 'trust_band') return <SectionEditor sectionKey="trust_band" title="Trust Band" description="Trust badges (80G, NGO, Security, Transparency)" fields={[]} listKey="items" listFields={[{ key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }, { key: 'icon', label: 'Icon (ShieldCheck, FileText, Lock, BarChart3)', type: 'text' }, { key: 'link', label: 'Link URL (optional)', type: 'text' }]} />;
+    if (activeSection === 'analytics_section') return <SectionEditor sectionKey="analytics" title="Analytics Infographic" description="Chart data, donut value, and sidebar stats" fields={[{ key: 'section_badge', label: 'Badge Text', type: 'text' }, { key: 'section_title', label: 'Title', type: 'text' }, { key: 'section_subtitle', label: 'Subtitle', type: 'textarea' }, { key: 'donut_value', label: 'Donut % Value', type: 'number' }, { key: 'donut_label', label: 'Donut Label', type: 'text' }, { key: 'donut_desc', label: 'Donut Description', type: 'text' }]} listKey="sidebar_stats" listFields={[{ key: 'label', label: 'Label', type: 'text' }, { key: 'value', label: 'Value', type: 'number' }, { key: 'icon', label: 'Icon (Heart, GraduationCap, Users, TrendingUp)', type: 'text' }, { key: 'color', label: 'Color CSS', type: 'text', placeholder: 'var(--teal)' }]} />;
+    if (activeSection === 'scrolling_stories') return <SectionEditor sectionKey="scrolling_stories" title="Scrolling Stories Strip" description="Animated marquee pills on the homepage" fields={[]} listKey="pills" listFields={[{ key: 'name', label: 'Name', type: 'text', placeholder: 'Kalinda, 8' }, { key: 'text', label: 'Text', type: 'text', placeholder: 'got school books' }, { key: 'category', label: 'Category', type: 'text', placeholder: 'education, medical, elderly, child, hospital' }]} />;
     return null;
   };
 
