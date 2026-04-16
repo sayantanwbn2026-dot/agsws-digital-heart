@@ -3,6 +3,7 @@ import { Shield, ChevronDown, Heart, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
+import { useCMSData } from "@/hooks/useCMSData";
 
 const CompassionText = () => {
   const letters = "Compassion".split("");
@@ -24,18 +25,38 @@ const StatCard = ({ value, label, delay }: { value: string; label: string; delay
   </motion.div>
 );
 
+const defaultHero = {
+  headline: 'Changing Lives, One Act of Compassion at a Time.',
+  subtitle: 'Providing medical aid, education support, and emergency care for families across Kolkata. Every rupee reaches those who need it most.',
+  cta_text: 'Donate Now',
+  cta_link: '/donate',
+  background_image: null as string | null,
+};
+
 const HeroSection = () => {
   const sectionRef = useRef(null);
   const { openOverlay } = useDonateOverlay();
+  const { data: hero } = useCMSData<typeof defaultHero>('cms_hero', defaultHero);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 180]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 60]);
   const opacityOut = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
+  // Split headline into words, detect "Compassion" for special styling
+  const headlineWords = (hero.headline || defaultHero.headline).split(/\s+/);
+  const compassionIndex = headlineWords.findIndex(w => w.toLowerCase().replace(/[.,!]/g, '') === 'compassion');
+
   return (
     <section ref={sectionRef} className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
       <motion.div style={{ y: bgY }} className="absolute inset-0 will-change-transform">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0A1415] via-[#0D2B30] to-[#14555E]" />
+        {hero.background_image ? (
+          <>
+            <img src={hero.background_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/60" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0A1415] via-[#0D2B30] to-[#14555E]" />
+        )}
         <svg className="absolute right-[-8%] top-[10%] w-[800px] h-[800px] opacity-[0.04]" viewBox="0 0 800 800">
           <circle cx="400" cy="400" r="380" stroke="white" strokeWidth="0.4" fill="none" />
           <circle cx="400" cy="400" r="280" stroke="white" strokeWidth="0.4" fill="none" />
@@ -66,22 +87,23 @@ const HeroSection = () => {
         </motion.div>
 
         <h1 className="display-hero text-white mb-6 max-w-[800px] mx-auto">
-          {["Changing", "Lives,", "One", "Act", "of"].map((word, i) => (
-            <motion.span key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07, duration: 0.45 }} className="inline-block mr-3">{word}</motion.span>
-          ))}
-          <span className="inline-block mr-3"><CompassionText /></span>
-          {["at", "a", "Time."].map((word, i) => (
-            <motion.span key={`end-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 + i * 0.07, duration: 0.45 }} className="inline-block mr-3">{word}</motion.span>
-          ))}
+          {headlineWords.map((word, i) => {
+            if (i === compassionIndex) {
+              return <span key={i} className="inline-block mr-3"><CompassionText /></span>;
+            }
+            return (
+              <motion.span key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07, duration: 0.45 }} className="inline-block mr-3">{word}</motion.span>
+            );
+          })}
         </h1>
 
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="text-[clamp(14px,1.6vw,17px)] font-[400] text-white/65 max-w-[540px] mx-auto mb-10 leading-[1.8]">
-          Providing medical aid, education support, and emergency care for families across Kolkata. Every rupee reaches those who need it most.
+          {hero.subtitle || defaultHero.subtitle}
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.5 }} className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mb-12">
           <motion.button onClick={openOverlay} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="px-9 py-4 text-[14px] font-[700] bg-[var(--yellow)] text-[var(--dark)] rounded-full shadow-[0_4px_16px_rgba(242,183,5,0.25)] hover:shadow-[0_8px_32px_rgba(242,183,5,0.4)] transition-shadow flex items-center justify-center gap-2">
-            Donate Now <ArrowRight size={16} />
+            {hero.cta_text || defaultHero.cta_text} <ArrowRight size={16} />
           </motion.button>
           <Link to="/initiatives" className="px-9 py-4 text-[14px] font-[600] text-white/90 border border-white/[0.15] rounded-full hover:bg-white/[0.06] hover:border-white/[0.25] transition-all text-center">
             Our Initiatives

@@ -58,7 +58,7 @@ const Navbar = () => {
     { label: t("nav.events") || "Events", path: "/events" },
     { label: t("nav.resources") || "Resources", path: "/resources" },
     { label: t("nav.blog") || "Blog", path: "/blog" },
-    { label: t("nav.register") || "Register", path: "/register-parent" },
+    { label: t("nav.register") || "GoldenAge Care", path: "/register-parent" },
     { label: t("nav.contact") || "Contact", path: "/contact" },
   ];
 
