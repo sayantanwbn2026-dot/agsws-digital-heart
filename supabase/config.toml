@@ -1,1 +1,16 @@
 project_id = "hmefhywadbmvdhwysspr"
+
+[functions.create-stripe-donation]
+verify_jwt = false
+
+[functions.payments-webhook]
+verify_jwt = false
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.cms-api]
+verify_jwt = false
+
+[functions.cms-auth]
+verify_jwt = false
