@@ -578,6 +578,135 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          amount_cents: number
+          cause: string
+          created_at: string
+          currency: string
+          donor_email: string
+          donor_name: string
+          donor_phone: string | null
+          gift_message: string | null
+          gift_recipient_email: string | null
+          gift_recipient_name: string | null
+          id: string
+          is_gift: boolean | null
+          metadata: Json | null
+          show_on_wall: boolean | null
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          cause: string
+          created_at?: string
+          currency?: string
+          donor_email: string
+          donor_name: string
+          donor_phone?: string | null
+          gift_message?: string | null
+          gift_recipient_email?: string | null
+          gift_recipient_name?: string | null
+          id?: string
+          is_gift?: boolean | null
+          metadata?: Json | null
+          show_on_wall?: boolean | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          cause?: string
+          created_at?: string
+          currency?: string
+          donor_email?: string
+          donor_name?: string
+          donor_phone?: string | null
+          gift_message?: string | null
+          gift_recipient_email?: string | null
+          gift_recipient_name?: string | null
+          id?: string
+          is_gift?: boolean | null
+          metadata?: Json | null
+          show_on_wall?: boolean | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      goldenage_registrations: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          id: string
+          medical_condition: string | null
+          parent_address: string | null
+          parent_age: number | null
+          parent_name: string
+          registrant_city: string | null
+          registrant_email: string
+          registrant_name: string
+          registrant_phone: string
+          registration_ref: string
+          relation: string | null
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          medical_condition?: string | null
+          parent_address?: string | null
+          parent_age?: number | null
+          parent_name: string
+          registrant_city?: string | null
+          registrant_email: string
+          registrant_name: string
+          registrant_phone: string
+          registration_ref?: string
+          relation?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          medical_condition?: string | null
+          parent_address?: string | null
+          parent_age?: number | null
+          parent_name?: string
+          registrant_city?: string | null
+          registrant_email?: string
+          registrant_name?: string
+          registrant_phone?: string
+          registration_ref?: string
+          relation?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscriptions: {
         Row: {
           created_at: string
