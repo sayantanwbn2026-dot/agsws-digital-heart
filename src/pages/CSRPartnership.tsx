@@ -59,7 +59,7 @@ const CSRPartnership = () => {
     <main id="main-content">
       <PageHero title="Partner With AGSWS" label="CSR Partnership" subtitle="Meaningful impact. Full compliance. Instant documentation." bgVariant="teal-dark" size="md" breadcrumb={[{ label: "Home", href: "/" }, { label: "CSR Partnership" }]}>
         <div className="flex gap-3 mt-4 flex-wrap">
-          {["Schedule VII Compliant", "80G + 12A Certified"].map(b => (
+          {["Schedule VII Compliant", "Registered NGO"].map(b => (
             <span key={b} className="bg-white/[0.08] text-white/90 text-[11px] font-[600] px-4 py-1.5 rounded-full flex items-center gap-1.5 border border-white/[0.1]">
               <ShieldCheck size={12} /> {b}
             </span>

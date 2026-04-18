@@ -226,10 +226,10 @@ const DonateEducation = () => {
               <div className="space-y-4">
                 {recentDonations.filter(d => d.gateway === "Education").slice(0, 4).map((d, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[var(--purple-light)] flex items-center justify-center text-[var(--purple)] font-bold text-sm">{d.name[0]}</div>
+                    <div className="w-9 h-9 rounded-full bg-[var(--purple-light)] flex items-center justify-center text-[var(--purple)] font-bold text-sm">{d.city[0]}</div>
                     <div className="flex-1">
-                      <p className="text-[13px] font-medium text-[var(--dark)]">{d.name} from {d.city}</p>
-                      <p className="text-[11px] text-[var(--light)]">₹{d.amount.toLocaleString()} · {d.timeAgo}</p>
+                      <p className="text-[13px] font-medium text-[var(--dark)]">A donor from {d.city}</p>
+                      <p className="text-[11px] text-[var(--light)]">{d.amount} · {d.time}</p>
                     </div>
                   </div>
                 ))}

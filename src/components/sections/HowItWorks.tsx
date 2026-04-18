@@ -9,7 +9,7 @@ const iconMap: Record<string, any> = { MousePointer2, CreditCard, BarChart2 };
 const defaultData = {
   steps: [
     { id: 'choose', icon: 'MousePointer2', title: "Choose Your Cause", desc: "Pick from Medical Aid, Education Support, or GoldenAge Care. Every cause directly serves families in Kolkata." },
-    { id: 'donate', icon: 'CreditCard', title: "Make a Secure Donation", desc: "Pay via UPI, card, or netbanking through Razorpay. 256-bit encrypted. 80G receipt generated automatically." },
+    { id: 'donate', icon: 'CreditCard', title: "Make a Secure Donation", desc: "Pay by card, UPI, or netbanking through Stripe. SSL-encrypted. Email receipt arrives instantly." },
     { id: 'impact', icon: 'BarChart2', title: "See Real Impact", desc: "Receive updates on how your donation is used. Quarterly impact reports. Zero overhead fluff." },
   ],
 };

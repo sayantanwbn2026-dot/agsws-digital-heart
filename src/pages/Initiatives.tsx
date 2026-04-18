@@ -121,7 +121,7 @@ const Initiatives = () => {
               <Link to="/volunteer-portal" className="px-8 py-4 border border-white/20 text-white font-[600] text-[14px] rounded-full hover:bg-white/[0.06] transition-all text-center">Volunteer With Us</Link>
             </div>
             <div className="flex justify-center gap-5 mt-8">
-              {["80G Tax Benefit", "100% Transparent", "Registered NGO"].map(text => (
+              {["Secure Stripe Checkout", "100% Transparent", "Registered NGO"].map(text => (
                 <span key={text} className="flex items-center gap-1.5 text-[11px] text-white/50 font-[500]"><Shield size={12} className="text-[var(--yellow)]" />{text}</span>
               ))}
             </div>

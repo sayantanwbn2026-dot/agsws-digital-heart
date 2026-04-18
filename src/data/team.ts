@@ -23,7 +23,7 @@ export const team = [
   {
     name: "Meera Chatterjee",
     role: "Operations & Finance",
-    bio: "Meera ensures every rupee is tracked, reported, and maximized. She handles donor relations, compliance, 80G processing, and financial transparency.",
+    bio: "Meera ensures every rupee is tracked, reported, and maximized. She handles donor relations, compliance, and financial transparency.",
     initials: "MC",
     color: "beige",
   },

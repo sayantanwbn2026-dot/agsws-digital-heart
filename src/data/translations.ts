@@ -12,7 +12,7 @@ export const translations: Record<string, Record<Language, string>> = {
   "nav.donate": { en: "Donate Now", bn: "এখনই দান করুন" },
   "hero.cta_donate": { en: "Donate Now →", bn: "এখনই দান করুন →" },
   "hero.cta_initiatives": { en: "Our Initiatives", bn: "আমাদের উদ্যোগ" },
-  "trust.80g": { en: "80G Tax Benefits", bn: "৮০জি কর সুবিধা" },
+  "trust.80g": { en: "Secure Stripe Checkout", bn: "নিরাপদ স্ট্রাইপ চেকআউট" },
   "trust.registered": { en: "Registered NGO", bn: "নিবন্ধিত এনজিও" },
   "trust.transparent": { en: "100% Transparent", bn: "১০০% স্বচ্ছ" },
   "donate.one_time": { en: "One-Time", bn: "একবার" },

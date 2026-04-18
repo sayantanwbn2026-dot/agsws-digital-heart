@@ -119,7 +119,7 @@ const HeroSection = () => {
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.5 }} className="hidden sm:flex flex-wrap justify-center gap-5 text-white/45">
           {[
-            { icon: Shield, text: "80G Tax Benefits" },
+            { icon: Shield, text: "Secure Stripe Checkout" },
             { icon: Heart, text: "100% Transparent" },
             { icon: Users, text: "Registered NGO" },
           ].map(({ icon: Icon, text }) => (
