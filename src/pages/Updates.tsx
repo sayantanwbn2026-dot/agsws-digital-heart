@@ -17,12 +17,18 @@ const Updates = () => {
     e.preventDefault();
     if (!email) return;
     try {
-      await (supabase.from('newsletter_subscriptions' as any) as any).insert({ email, name: name || null, source: 'updates-page' });
+      const { error } = await (supabase.from('newsletter_subscriptions' as any) as any)
+        .insert({ email, name: name || null, source: 'updates-page' });
+      if (error && (error as any).code !== '23505') throw error;
+      // Fire-and-forget welcome email
+      supabase.functions.invoke('send-email', {
+        body: { type: 'newsletter-welcome', to: email, data: { name } },
+      }).catch(err => console.error('[newsletter welcome]', err));
       toast.success("Subscribed! Check your inbox for a confirmation.");
-    } catch {
-      toast.error("Already subscribed or error occurred.");
+      setEmail(""); setName("");
+    } catch (err: any) {
+      toast.error(err?.message || "Subscription failed. Try again.");
     }
-    setEmail(""); setName("");
   };
 
   const handleWhatsApp = () => {

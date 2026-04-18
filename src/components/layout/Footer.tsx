@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Instagram, Linkedin, Heart, ArrowUpRight, Mail, Phone, MapPin } from "lucide-react";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import toast from "react-hot-toast";
 
 const footerLinks = {
   explore: [
@@ -42,6 +44,30 @@ const FooterLink = ({ to, children }: { to: string; children: React.ReactNode })
 const Footer = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || submitting) return;
+    setSubmitting(true);
+    try {
+      const { error } = await (supabase.from('newsletter_subscriptions' as any) as any)
+        .insert({ email, source: 'footer' });
+      // 23505 = unique violation (already subscribed); treat as success
+      if (error && (error as any).code !== '23505') throw error;
+      // Fire-and-forget welcome email
+      supabase.functions.invoke('send-email', {
+        body: { type: 'newsletter-welcome', to: email, data: {} },
+      }).catch(err => console.error('[newsletter welcome]', err));
+      toast.success("Subscribed! Check your inbox.");
+      setEmail("");
+    } catch (err: any) {
+      toast.error(err?.message || "Subscription failed. Try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <footer ref={ref} className="relative bg-[hsl(187,68%,5%)] text-white overflow-hidden">
@@ -61,16 +87,23 @@ const Footer = () => {
             <h3 className="text-lg font-bold text-white">Stay Connected</h3>
             <p className="text-sm text-white/50 mt-1">Get quarterly impact reports and field stories.</p>
           </div>
-          <div className="flex w-full md:w-auto">
+          <form onSubmit={handleSubscribe} className="flex w-full md:w-auto">
             <input
               type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Your email address"
               className="flex-1 md:w-[280px] bg-white/[0.06] border border-white/[0.1] rounded-l-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(var(--primary))]/40 transition-colors"
             />
-            <button className="bg-[hsl(var(--primary))] hover:bg-[hsl(187,70%,34%)] text-white px-6 py-3 rounded-r-xl text-sm font-semibold transition-colors whitespace-nowrap">
-              Subscribe
+            <button
+              type="submit"
+              disabled={submitting}
+              className="bg-[hsl(var(--primary))] hover:bg-[hsl(187,70%,34%)] text-white px-6 py-3 rounded-r-xl text-sm font-semibold transition-colors whitespace-nowrap disabled:opacity-60"
+            >
+              {submitting ? "..." : "Subscribe"}
             </button>
-          </div>
+          </form>
         </div>
       </motion.div>
 
