@@ -27,7 +27,7 @@ const gateways = [
 
 const compliance = [
   { icon: FileCheck, title: "Audited Accounts", desc: "Annual accounts audited by a registered CA firm. Audit reports available for download." },
-  { icon: Award, title: "80G Certified", desc: "All donations eligible for 50% tax deduction. Certificate valid and current." },
+  { icon: Award, title: "Quarterly Reporting", desc: "Detailed income and expenditure breakdowns published every quarter." },
   { icon: Globe, title: "NGO Darpan Listed", desc: "Listed on the Government of India's NGO Darpan portal." },
   { icon: Shield, title: "FCRA Status", desc: "Currently not FCRA registered. Only accepting domestic donations at this time." },
 ];

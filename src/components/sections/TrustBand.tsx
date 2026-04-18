@@ -7,9 +7,9 @@ const iconMap: Record<string, any> = { ShieldCheck, FileText, Lock, BarChart3 };
 
 const defaultData = {
   items: [
-    { icon: "ShieldCheck", title: "80G Tax Benefit", desc: "Donations eligible for 50% tax deduction under Section 80G" },
-    { icon: "FileText", title: "NGO Registration", desc: "Registered under Societies Act, West Bengal. Govt approved." },
-    { icon: "Lock", title: "Secure Payments", desc: "256-bit SSL encrypted via Razorpay. UPI, Cards, Netbanking." },
+    { icon: "ShieldCheck", title: "Verified NGO", desc: "Registered under the West Bengal Societies Registration Act." },
+    { icon: "FileText", title: "Direct Impact", desc: "78% of donations go straight to medical and education programs." },
+    { icon: "Lock", title: "Secure Payments", desc: "SSL-encrypted Stripe checkout. Cards, UPI, and netbanking accepted." },
     { icon: "BarChart3", title: "Full Transparency", desc: "Annual financial reports publicly available in Resources.", link: "/transparency" },
   ],
 };

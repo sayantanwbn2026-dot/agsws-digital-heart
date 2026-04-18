@@ -43,7 +43,7 @@ const Updates = () => {
               <h3 className="heading-3 text-[var(--dark)] mb-2">Monthly Impact Letter</h3>
               <p className="text-sm text-[var(--mid)] mb-4">One email a month. Real stories. Real numbers. Zero spam.</p>
               <ul className="space-y-2 mb-6">
-                {["Monthly impact summary", "New campaign launches", "80G filing reminders (March/April)", "Volunteer opportunities"].map(item => (
+                {["Monthly impact summary", "New campaign launches", "Beneficiary success stories", "Volunteer opportunities"].map(item => (
                   <li key={item} className="flex items-center gap-2 text-sm text-[var(--mid)]">
                     <CheckCircle size={14} className="text-[var(--teal)] flex-shrink-0" />{item}
                   </li>

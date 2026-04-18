@@ -16,8 +16,6 @@ const SiteSettingsForm = () => {
     linkedin: "https://linkedin.com/company/agsws",
     regNumber: "S/IL/2020/XXXXX",
     pan: "AAATA1234Q",
-    cert80g: "80G/2020/XXXXX",
-    cert12a: "12A/2020/XXXXX",
     showAnnouncement: true,
     announcementText: "New: Parent registration now available for Howrah families",
   });
@@ -74,8 +72,6 @@ const SiteSettingsForm = () => {
           {[
             { key: "regNumber", label: "NGO Registration Number" },
             { key: "pan", label: "PAN" },
-            { key: "cert80g", label: "80G Certificate Number" },
-            { key: "cert12a", label: "12A Certificate Number" },
           ].map(({ key, label }) => (
             <div key={key}>
               <label className="text-xs text-[var(--light)] mb-1 block">{label}</label>

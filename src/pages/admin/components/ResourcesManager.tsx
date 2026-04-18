@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const mockResources = [
   { title: "Annual Report 2023-24", category: "Annual Report", year: 2024, size: "2.4 MB", published: true },
-  { title: "80G Certificate", category: "Certificate", year: 2024, size: "340 KB", published: true },
+  { title: "NGO Registration Certificate", category: "Certificate", year: 2024, size: "340 KB", published: true },
   { title: "Audit Statement FY24", category: "Audit Report", year: 2024, size: "1.8 MB", published: false },
 ];
 

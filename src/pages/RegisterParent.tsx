@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { Check, Upload, ChevronDown, Shield, Heart, User, FileText, CreditCard } from "lucide-react";
+import { Check, Upload, ChevronDown, Shield, Heart, User, FileText, CreditCard, Loader2 } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumSelect, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
+import { supabase } from "@/integrations/supabase/client";
+import toast from "react-hot-toast";
 
 const steps = [
   { label: "About You", icon: User },
@@ -16,25 +18,48 @@ const steps = [
 const RegisterParent = () => {
   useSEO("GoldenAge Care", "Enroll your elderly parent in Kolkata for emergency medical support through AGSWS GoldenAge Care.");
   const [currentStep, setCurrentStep] = useState(0);
-  const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, getValues } = useForm();
 
   const nextStep = () => { if (currentStep < 3) setCurrentStep(currentStep + 1); };
   const prevStep = () => { if (currentStep > 0) setCurrentStep(currentStep - 1); };
 
-  if (success) {
-    return (
-      <main id="main-content" className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }} className="text-center max-w-md mx-auto px-6">
-          <div className="w-20 h-20 bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-[var(--shadow-lg)]"><Check size={40} className="text-white" /></div>
-          <h2 className="text-3xl font-bold text-[var(--teal)] mb-2">Registration Complete!</h2>
-          <p className="text-lg font-bold text-[var(--teal)] mb-4">REG-2025-{Math.floor(1000 + Math.random() * 9000)}</p>
-          <p className="text-[var(--mid)] mb-8">A confirmation has been emailed to you. Our coordinator will contact your parent within 24 hours.</p>
-          <PremiumButton className="mx-auto !bg-[var(--yellow)] !text-[var(--dark)]">Download Registration PDF</PremiumButton>
-        </motion.div>
-      </main>
-    );
-  }
+  const handlePay = async () => {
+    const v = getValues();
+    if (!v.yourName || !v.yourEmail || !v.yourPhone || !v.parentName) {
+      toast.error("Please complete all required fields.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-stripe-donation', {
+        body: {
+          cause: 'goldenage',
+          amount: 100,
+          donor_name: v.yourName,
+          donor_email: v.yourEmail,
+          donor_phone: v.yourPhone,
+          registrant_city: v.yourCity,
+          relation: v.relation,
+          parent_name: v.parentName,
+          parent_age: v.parentAge ? Number(v.parentAge) : undefined,
+          parent_address: v.parentAddress,
+          emergency_contact_name: v.emergencyName,
+          emergency_contact_phone: v.emergencyPhone,
+          medical_condition: v.medicalCondition,
+          success_url: `${window.location.origin}/thank-you?cause=goldenage&amount=100&name=${encodeURIComponent(v.yourName)}`,
+          cancel_url: window.location.href,
+        },
+      });
+      if (error) throw error;
+      if (!data?.url) throw new Error('Checkout URL missing');
+      window.location.href = data.url;
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Couldn't start checkout. Please try again.");
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main id="main-content">
@@ -121,7 +146,7 @@ const RegisterParent = () => {
                 {currentStep === 2 && (
                   <div className="space-y-6">
                     <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-1">Upload Documents</h3>
-                    <p className="text-[13px] text-[var(--mid)]">Upload identification and medical documents for faster processing.</p>
+                    <p className="text-[13px] text-[var(--mid)]">You can email these to us after registration if you prefer.</p>
                     {[["Aadhar / ID Proof", true], ["Recent Medical Report", false], ["Recent Photo", false]].map(([label, required]) => (
                       <motion.div key={label as string} whileHover={{ borderColor: "var(--teal)", scale: 1.01 }} className="border-2 border-dashed border-[var(--border-color)] rounded-[18px] p-6 text-center cursor-pointer transition-all bg-[var(--bg)]/50 hover:bg-[var(--teal-light)]/30">
                         <Upload size={24} className="text-[var(--teal)] mx-auto mb-3" />
@@ -150,10 +175,10 @@ const RegisterParent = () => {
                       <summary className="flex items-center justify-between p-5 cursor-pointer text-[14px] font-[600] text-[var(--dark)]">Why ₹100? <ChevronDown size={16} className="text-[var(--light)]" /></summary>
                       <p className="px-5 pb-5 text-[13px] text-[var(--mid)] leading-[1.6]">The ₹100 fee covers admin processing, SMS alert setup, coordinator assignment, and registration card printing.</p>
                     </details>
-                    <PremiumButton onClick={() => setSuccess(true)} className="w-full !bg-[var(--yellow)] !text-[var(--dark)] shadow-[var(--shadow-yellow)]">
-                      Pay ₹100 & Register →
+                    <PremiumButton onClick={handlePay} disabled={isSubmitting} className="w-full !bg-[var(--yellow)] !text-[var(--dark)] shadow-[var(--shadow-yellow)]">
+                      {isSubmitting ? (<><Loader2 className="animate-spin mr-2 inline h-4 w-4" />Redirecting to checkout…</>) : 'Pay ₹100 via Stripe →'}
                     </PremiumButton>
-                    <p className="text-[11px] text-[var(--light)] text-center">One-time platform maintenance fee. Non-refundable.</p>
+                    <p className="text-[11px] text-[var(--light)] text-center">Secure Stripe checkout. One-time platform maintenance fee. Non-refundable.</p>
                   </div>
                 )}
               </PremiumCard>

@@ -90,7 +90,7 @@ const DonateChoiceOverlay = () => {
                         <p className="text-[13px] text-[var(--mid)] leading-relaxed mb-5">Hospital, surgery & emergency care for families in need</p>
 
                         <div className="flex flex-wrap gap-2 mb-5">
-                          {["₹500+", "80G", "Instant Receipt"].map(tag => (
+                          {["₹500+", "Stripe Secure", "Instant Receipt"].map(tag => (
                             <span key={tag} className="text-[10px] font-[600] uppercase tracking-[0.05em] text-[var(--teal)] bg-[var(--teal-light)] px-2.5 py-1 rounded-full">
                               {tag}
                             </span>
@@ -122,7 +122,7 @@ const DonateChoiceOverlay = () => {
                         <p className="text-[13px] text-[var(--mid)] leading-relaxed mb-5">School fees, books & meals for children's futures</p>
 
                         <div className="flex flex-wrap gap-2 mb-5">
-                          {["₹1,500+", "Sponsor", "80G"].map(tag => (
+                          {["₹1,500+", "Sponsor", "Stripe Secure"].map(tag => (
                             <span key={tag} className="text-[10px] font-[600] uppercase tracking-[0.05em] text-[var(--purple)] bg-[var(--purple-light)] px-2.5 py-1 rounded-full">
                               {tag}
                             </span>
@@ -158,7 +158,7 @@ const DonateChoiceOverlay = () => {
                   <div className="flex justify-center gap-6 mt-5">
                     {[
                       { icon: Shield, text: "SSL Encrypted" },
-                      { icon: Heart, text: "Tax Exempt" },
+                      { icon: Heart, text: "Stripe Powered" },
                     ].map(({ icon: Icon, text }) => (
                       <span key={text} className="flex items-center gap-1.5 text-[11px] text-[var(--light)] font-[500]">
                         <Icon size={12} className="text-[var(--teal)]" />

@@ -21,9 +21,9 @@ const timeline = [
 ];
 
 const docs = [
-  { icon: FileCheck, title: "80G Certificate", detail: "Valid: 2024–2027", sub: "Tax exemption under Section 80G" },
   { icon: Building2, title: "NGO Registration", detail: "Reg. No: WB/SOC/2020/1234", sub: "Societies Registration Act" },
-  { icon: Award, title: "12A Certificate", detail: "Income tax exemption", sub: "Under Section 12A" },
+  { icon: FileCheck, title: "Annual Audit", detail: "FY 2024 audited by registered CA firm", sub: "Available in Resources" },
+  { icon: Award, title: "Quarterly Reporting", detail: "Public financial breakdowns", sub: "Updated every quarter" },
   { icon: Globe, title: "FCRA Status", detail: "Application Pending", sub: "Foreign contribution regulation" },
 ];
 
