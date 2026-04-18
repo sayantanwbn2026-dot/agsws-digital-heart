@@ -33,8 +33,8 @@ const DonationComplete = () => {
   const whatsappShareText = encodeURIComponent(`I just donated ₹${amountNum.toLocaleString("en-IN")} to AGSWS — a Kolkata NGO providing medical aid and education support.\n\nJoin me: ${referralUrl}`);
 
   const impactItems = gateway === "medical" 
-    ? [{ label: "Medicines Funded", value: `${Math.ceil(amountNum / 500)} months` }, { label: "Patients Supported", value: `${Math.max(1, Math.floor(amountNum / 2000))}` }, { label: "Tax Saving (30%)", value: `₹${Math.round(amountNum * 0.15).toLocaleString()}` }]
-    : [{ label: "Children Supported", value: `${Math.max(1, Math.floor(amountNum / 1500))}` }, { label: "School Days Funded", value: `${Math.ceil(amountNum / 50)}` }, { label: "Tax Saving (30%)", value: `₹${Math.round(amountNum * 0.15).toLocaleString()}` }];
+    ? [{ label: "Medicines Funded", value: `${Math.ceil(amountNum / 500)} months` }, { label: "Patients Supported", value: `${Math.max(1, Math.floor(amountNum / 2000))}` }, { label: "Cause", value: "Medical Aid" }]
+    : [{ label: "Children Supported", value: `${Math.max(1, Math.floor(amountNum / 1500))}` }, { label: "School Days Funded", value: `${Math.ceil(amountNum / 50)}` }, { label: "Cause", value: "Education" }];
 
   return (
     <main id="main-content" ref={containerRef} className="min-h-screen bg-[var(--bg)]">
@@ -84,12 +84,12 @@ const DonationComplete = () => {
           <div className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 mb-6">
             <div className="flex items-center gap-3 mb-4">
               <ShieldCheck size={18} style={{ color: config.color }} />
-              <p className="text-[14px] font-[600] text-[var(--dark)]">Your 80G Receipt</p>
+              <p className="text-[14px] font-[600] text-[var(--dark)]">Your Donation Receipt</p>
             </div>
-            <p className="text-[13px] text-[var(--mid)] mb-5 leading-[1.6]">A tax-deductible receipt has been emailed to you. You can also download it below.</p>
+            <p className="text-[13px] text-[var(--mid)] mb-5 leading-[1.6]">A confirmation receipt has been emailed to you. You can also print this page for your records.</p>
             <div className="flex flex-wrap gap-3">
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => paymentId ? window.open(`/api/download-receipt?payment_id=${paymentId}`, "_blank") : window.print()} className="h-[44px] px-6 bg-[var(--yellow)] text-[var(--dark)] font-[600] text-[13px] rounded-full shadow-[var(--shadow-yellow)] flex items-center gap-2">
-                <Printer size={14} /> Download Receipt
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => window.print()} className="h-[44px] px-6 bg-[var(--yellow)] text-[var(--dark)] font-[600] text-[13px] rounded-full shadow-[var(--shadow-yellow)] flex items-center gap-2">
+                <Printer size={14} /> Print Receipt
               </motion.button>
               <a href={`https://wa.me/?text=${whatsappShareText}`} target="_blank" rel="noopener noreferrer" className="h-[44px] px-6 border-[1.5px] border-[#25D366] text-[#25D366] font-[600] text-[13px] rounded-full flex items-center gap-2 hover:bg-[#25D366] hover:text-white transition-all">
                 <Share2 size={14} /> Share on WhatsApp

@@ -148,14 +148,11 @@ const settingsFields: FieldConfig[] = [
 ];
 
 const paymentFields: FieldConfig[] = [
-  { key: 'razorpay_enabled', label: 'Razorpay Enabled', type: 'boolean' },
-  { key: 'razorpay_key_id', label: 'Razorpay Key ID', type: 'text', placeholder: 'rzp_live_...' },
-  { key: 'tax_deduction_percentage', label: '80G Tax Deduction %', type: 'number' },
   { key: 'currency', label: 'Currency', type: 'text' },
   { key: 'min_donation', label: 'Min Donation (₹)', type: 'number' },
   { key: 'max_donation', label: 'Max Donation (₹)', type: 'number' },
   { key: 'receipt_prefix', label: 'Receipt Prefix', type: 'text' },
-  { key: 'upi_id', label: 'UPI ID', type: 'text' },
+  { key: 'upi_id', label: 'UPI ID (display only)', type: 'text' },
   { key: 'bank_name', label: 'Bank Name', type: 'text' },
   { key: 'bank_account_number', label: 'Bank Account Number', type: 'text' },
   { key: 'bank_ifsc', label: 'IFSC Code', type: 'text' },
@@ -185,7 +182,7 @@ const sections = [
   { id: 'scheduler', label: 'Scheduler', icon: CalendarClock, table: '', fields: [], isCustom: true },
   { id: 'import', label: 'Bulk Import', icon: Upload, table: '', fields: [], isCustom: true },
   { id: 'divider2', label: '', icon: null as any, table: '', fields: [], isDivider: true },
-  { id: 'payment', label: 'Payment & Tax', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true },
+  { id: 'payment', label: 'Payment Settings', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true },
   { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true },
 ];
 
@@ -706,7 +703,7 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
     { id: 'partners', label: 'Partner Strip', desc: 'Scrolling list of partner organizations', icon: Handshake, color: 'bg-blue-100 text-blue-700' },
     { id: 'blog', label: 'Latest Stories', desc: 'Blog posts shown in the "Latest Stories" section', icon: FileText, color: 'bg-pink-100 text-pink-700' },
     { id: 'settings', label: 'Site Settings', desc: 'Site name, announcement bar, social links, contact info', icon: Settings, color: 'bg-gray-100 text-gray-700' },
-    { id: 'payment', label: 'Payment & Tax', desc: 'Razorpay config, 80G tax %, bank details, donation limits', icon: CreditCard, color: 'bg-orange-100 text-orange-700' },
+    { id: 'payment', label: 'Payment Settings', desc: 'Currency, donation limits, bank details, receipt prefix.', icon: CreditCard, color: 'bg-orange-100 text-orange-700' },
   ];
 
   const dynamicSections = [
@@ -715,7 +712,7 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
     { id: 'impact_story', label: 'Impact Story', desc: 'Featured case study with timeline card, milestones, and stats.', icon: Heart, color: 'bg-rose-100 text-rose-700' },
     { id: 'analytics_section', label: 'Analytics Infographic', desc: 'Bar charts, donut value, and sidebar stats for fund allocation.', icon: BarChart3, color: 'bg-violet-100 text-violet-700' },
     { id: 'cta_banner', label: 'CTA Banner', desc: 'Call-to-action headline, subtitle, and feature cards.', icon: Type, color: 'bg-lime-100 text-lime-700' },
-    { id: 'trust_band', label: 'Trust Band', desc: '80G Tax, NGO Registration, Secure Payments, Transparency badges.', icon: Shield, color: 'bg-slate-100 text-slate-700' },
+    { id: 'trust_band', label: 'Trust Band', desc: 'NGO Registration, Direct Impact, Secure Payments, Transparency badges.', icon: Shield, color: 'bg-slate-100 text-slate-700' },
   ];
 
   return (
@@ -793,7 +790,7 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
           <li>Configure <strong>Site Settings</strong> — contact info, social links, announcement bar</li>
           <li>Add 2-3 <strong>Testimonials</strong> with real quotes</li>
           <li>Publish at least 1 <strong>Blog Post</strong> for the Latest Stories section</li>
-          <li>Set <strong>Payment & Tax</strong> config — 80G percentage, donation limits</li>
+          <li>Set <strong>Payment Settings</strong> — currency, donation limits, bank details</li>
         </ul>
       </div>
     </div>

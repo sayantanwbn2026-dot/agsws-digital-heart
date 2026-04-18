@@ -56,15 +56,9 @@ const ThankYou = () => {
     `Your ₹${amountNum.toLocaleString()} donation will fund ${impact}.`;
 
   const donorData = (() => { try { return JSON.parse(localStorage.getItem("agsws_donor") ?? "{}"); } catch { return {}; } })();
-  const siteUrl = window.location.origin;
-  const whatsappSendText = encodeURIComponent(`Your AGSWS donation receipt:\n\nAmount: ₹${amountNum.toLocaleString("en-IN")}\nPayment ID: ${paymentId}\nCause: ${gateway}\nDate: ${new Date().toLocaleDateString("en-IN")}\n\nYour 80G receipt has been emailed to you.`);
+  const whatsappSendText = encodeURIComponent(`Your AGSWS donation receipt:\n\nAmount: ₹${amountNum.toLocaleString("en-IN")}\nPayment ID: ${paymentId}\nCause: ${gateway}\nDate: ${new Date().toLocaleDateString("en-IN")}\n\nA confirmation has been emailed to you.`);
   const whatsappShareText = encodeURIComponent(`I just donated ₹${amountNum.toLocaleString("en-IN")} to AGSWS — a Kolkata NGO providing medical aid and education support.\n\nJoin me: ${referralUrl}`);
   const whatsappSendUrl = donorData.phone ? `https://wa.me/${donorData.phone}?text=${whatsappSendText}` : `https://wa.me/?text=${whatsappSendText}`;
-
-  const handleDownload80G = () => {
-    if (paymentId) window.open(`${window.location.origin}/api/download-receipt?payment_id=${paymentId}`, "_blank");
-    else window.print();
-  };
 
   return (
     <main id="main-content" className="min-h-screen flex items-center justify-center bg-card">
@@ -99,7 +93,7 @@ const ThankYou = () => {
           {countdown > 0 ? (
             <p className="flex items-center justify-center gap-2">
               <Mail size={14} className="text-teal" />
-              Your 80G receipt arrives in: <strong className="text-teal">{Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, "0")}</strong>
+              Your email receipt arrives in: <strong className="text-teal">{Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, "0")}</strong>
             </p>
           ) : (
             <p>Check your inbox → <a href="mailto:" className="text-teal font-medium hover:underline">Didn't get it? Check spam or contact us.</a></p>
@@ -107,8 +101,8 @@ const ThankYou = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-3 mb-6">
-          <button onClick={handleDownload80G} className="bg-yellow text-text-dark font-semibold px-5 py-3 rounded-full shadow-yellow text-sm flex items-center gap-2">
-            <Printer size={16} /> Download 80G Receipt
+          <button onClick={() => window.print()} className="bg-yellow text-text-dark font-semibold px-5 py-3 rounded-full shadow-yellow text-sm flex items-center gap-2">
+            <Printer size={16} /> Print Confirmation
           </button>
           <a href={whatsappSendUrl} target="_blank" rel="noopener noreferrer" className="bg-[#25D366] text-primary-foreground font-semibold px-5 py-3 rounded-full text-sm flex items-center gap-2">
             <MessageCircle size={16} /> Send to WhatsApp
