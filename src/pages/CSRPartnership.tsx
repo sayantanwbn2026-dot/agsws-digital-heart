@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Heart, BookOpen, Users, ShieldCheck, FileText, CheckCircle, Building } from "lucide-react";
 import { PremiumInput, PremiumSelect, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
+import { supabase } from "@/integrations/supabase/client";
+import toast from "react-hot-toast";
 
 const csrSchema = z.object({
   companyName: z.string().min(2, "Required"),
@@ -35,12 +37,51 @@ const CSRPartnership = () => {
   useSEO("CSR Partnership", "Partner with AGSWS for meaningful CSR impact.");
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [applicationRef, setApplicationRef] = useState<string | null>(null);
   const { register, handleSubmit, watch, formState: { errors } } = useForm<z.infer<typeof csrSchema>>({
     resolver: zodResolver(csrSchema),
     defaultValues: { focusMedical: false, focusEducation: false, focusElderly: false, focusVolunteering: false, consent: false },
   });
   const data = watch();
-  const onSubmit = () => setSubmitted(true);
+
+  const onSubmit = async (values: z.infer<typeof csrSchema>) => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const focusAreas = [
+        values.focusMedical && "Medical",
+        values.focusEducation && "Education",
+        values.focusElderly && "Elderly Care",
+        values.focusVolunteering && "Volunteering",
+      ].filter(Boolean);
+
+      const { data: row, error } = await (supabase.from('support_applications' as any) as any)
+        .insert({
+          type: 'csr',
+          applicant_name: values.contactName || values.companyName,
+          email: values.contactEmail,
+          phone: values.contactPhone,
+          form_data: { ...values, focusAreas },
+        })
+        .select('application_ref, applicant_name, email, phone, type')
+        .single();
+
+      if (error) throw error;
+      setApplicationRef(row?.application_ref || null);
+
+      // Fire-and-forget admin notification
+      supabase.functions.invoke('send-email', {
+        body: { type: 'admin-application', to: 'admin', data: row },
+      }).catch(err => console.error('[csr admin email]', err));
+
+      setSubmitted(true);
+    } catch (err: any) {
+      toast.error(err?.message || "Submission failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (submitted) {
     return (
@@ -48,6 +89,9 @@ const CSRPartnership = () => {
         <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }} className="text-center max-w-md mx-auto px-6 py-16">
           <div className="w-20 h-20 bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-[var(--shadow-lg)]"><CheckCircle size={40} className="text-white" /></div>
           <h2 className="text-[28px] font-[700] text-[var(--teal)] mb-3">Proposal Sent!</h2>
+          {applicationRef && (
+            <p className="text-[12px] text-[var(--light)] uppercase tracking-[0.1em] mb-2">Reference: <span className="font-mono text-[var(--dark)]">{applicationRef}</span></p>
+          )}
           <p className="text-[var(--mid)] text-[14px] mb-6 leading-[1.7]">Our CSR team will follow up within 48 hours at {data.contactEmail}.</p>
           <a href="/" className="text-[var(--teal)] font-[600] text-[14px] hover:underline">← Back to Home</a>
         </motion.div>
