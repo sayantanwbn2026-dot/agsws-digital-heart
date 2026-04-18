@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Heart, BookOpen, Users, ShieldCheck, FileText, CheckCircle, Building } from "lucide-react";
 import { PremiumInput, PremiumSelect, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
+import { supabase } from "@/integrations/supabase/client";
+import toast from "react-hot-toast";
 
 const csrSchema = z.object({
   companyName: z.string().min(2, "Required"),
@@ -48,6 +50,9 @@ const CSRPartnership = () => {
         <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }} className="text-center max-w-md mx-auto px-6 py-16">
           <div className="w-20 h-20 bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-[var(--shadow-lg)]"><CheckCircle size={40} className="text-white" /></div>
           <h2 className="text-[28px] font-[700] text-[var(--teal)] mb-3">Proposal Sent!</h2>
+          {applicationRef && (
+            <p className="text-[12px] text-[var(--light)] uppercase tracking-[0.1em] mb-2">Reference: <span className="font-mono text-[var(--dark)]">{applicationRef}</span></p>
+          )}
           <p className="text-[var(--mid)] text-[14px] mb-6 leading-[1.7]">Our CSR team will follow up within 48 hours at {data.contactEmail}.</p>
           <a href="/" className="text-[var(--teal)] font-[600] text-[14px] hover:underline">← Back to Home</a>
         </motion.div>
