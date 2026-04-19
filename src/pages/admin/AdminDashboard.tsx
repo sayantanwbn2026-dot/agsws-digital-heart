@@ -1157,7 +1157,7 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        <nav className="flex-1 py-2 overflow-y-auto px-2 space-y-0.5">
+        <nav className="flex-1 min-h-0 py-2 overflow-y-auto px-2 space-y-0.5">
           {filteredSections.map((section) => {
             if (section.isDivider) return <div key={section.id} className="h-px bg-border mx-2 my-3" />;
             const isActive = activeSection === section.id;
