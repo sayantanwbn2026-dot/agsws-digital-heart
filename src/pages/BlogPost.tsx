@@ -3,6 +3,7 @@ import { useSEO } from "@/hooks/useSEO";
 import { stories } from "@/data/stories";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Twitter, MessageCircle, Linkedin, Copy, ArrowLeft, Heart, Clock, User, TrendingUp, BookOpen } from "lucide-react";
+import ShareSheet from "@/components/ui/ShareSheet";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { useRef } from "react";
 
@@ -113,18 +114,10 @@ const BlogPost = () => {
 
           {/* Share */}
           <div className="flex items-center gap-3 mt-12 pt-8 border-t border-[var(--border-color)]">
-            <span className="text-[13px] font-[600] text-[var(--mid)]">Share:</span>
-            {[
-              { Icon: Twitter, label: "Twitter" },
-              { Icon: MessageCircle, label: "WhatsApp" },
-              { Icon: Linkedin, label: "LinkedIn" },
-              { Icon: Copy, label: "Copy" },
-            ].map(({ Icon, label }) => (
-              <motion.button key={label} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="w-10 h-10 rounded-2xl bg-[var(--bg)] flex items-center justify-center hover:bg-[var(--teal-light)] transition-colors text-[var(--mid)] hover:text-[var(--teal)]" aria-label={label}>
-                <Icon size={16} />
-              </motion.button>
-            ))}
+            <span className="text-[13px] font-[600] text-[var(--mid)]">Share this story:</span>
+            <ShareSheet title={story.title} text={story.excerpt} />
           </div>
+
         </div>
       </section>
 
