@@ -183,6 +183,15 @@ const sections = [
   { id: 'seo', label: 'SEO Checker', icon: FileSearch, table: '', fields: [], isCustom: true },
   { id: 'scheduler', label: 'Scheduler', icon: CalendarClock, table: '', fields: [], isCustom: true },
   { id: 'import', label: 'Bulk Import', icon: Upload, table: '', fields: [], isCustom: true },
+  { id: 'divider_pages', label: '', icon: null as any, table: '', fields: [], isDivider: true },
+  { id: 'about_mission', label: 'About — Mission', icon: BookOpen, table: '', fields: [], isCustom: true },
+  { id: 'about_values', label: 'About — Values', icon: Heart, table: '', fields: [], isCustom: true },
+  { id: 'about_counters', label: 'About — Counters', icon: LayoutDashboard, table: '', fields: [], isCustom: true },
+  { id: 'about_timeline', label: 'About — Timeline', icon: CalendarClock, table: '', fields: [], isCustom: true },
+  { id: 'about_docs', label: 'About — Docs', icon: Shield, table: '', fields: [], isCustom: true },
+  { id: 'about_cta', label: 'About — CTA', icon: Type, table: '', fields: [], isCustom: true },
+  { id: 'medical_page', label: 'Medical Aid Page', icon: Heart, table: '', fields: [], isCustom: true },
+  { id: 'education_page', label: 'Education Page', icon: BookOpen, table: '', fields: [], isCustom: true },
   { id: 'divider2', label: '', icon: null as any, table: '', fields: [], isDivider: true },
   { id: 'payment', label: 'Payment Settings', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true },
   { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true },
@@ -194,6 +203,9 @@ const previewUrls: Record<string, string> = {
   gallery: '/gallery', partners: '/', blog: '/blog', resources: '/resources',
   how_it_works: '/', scrolling_stories: '/', impact_story: '/',
   analytics_section: '/', cta_banner: '/', trust_band: '/',
+  about_mission: '/about', about_values: '/about', about_counters: '/about',
+  about_timeline: '/about', about_docs: '/about', about_cta: '/about',
+  medical_page: '/initiatives/medical', education_page: '/initiatives/education',
 };
 
 const CHART_COLORS = ['hsl(187, 68%, 39%)', 'hsl(242, 29%, 50%)', 'hsl(28, 22%, 62%)', 'hsl(47, 80%, 55%)', 'hsl(0, 70%, 55%)', 'hsl(160, 60%, 45%)', 'hsl(280, 50%, 55%)'];
