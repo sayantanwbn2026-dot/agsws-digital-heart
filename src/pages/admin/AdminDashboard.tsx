@@ -13,6 +13,7 @@ import {
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
 import SectionEditor from "./components/SectionEditor";
+import PaymentsManager from "./components/PaymentsManager";
 import { useCMSApi } from "@/hooks/useCMSApi";
 import toast from "react-hot-toast";
 
@@ -178,6 +179,7 @@ const sections = [
   { id: 'divider1', label: '', icon: null as any, table: '', fields: [], isDivider: true },
   { id: 'applications', label: 'Applications', icon: ClipboardList, table: 'support_applications', fields: [], isCustom: true },
   { id: 'newsletter', label: 'Newsletter', icon: Mail, table: 'newsletter_subscriptions', fields: [], isCustom: true },
+  { id: 'payments', label: 'Stripe Payments', icon: CreditCard, table: '', fields: [], isCustom: true },
   { id: 'seo', label: 'SEO Checker', icon: FileSearch, table: '', fields: [], isCustom: true },
   { id: 'scheduler', label: 'Scheduler', icon: CalendarClock, table: '', fields: [], isCustom: true },
   { id: 'import', label: 'Bulk Import', icon: Upload, table: '', fields: [], isCustom: true },
@@ -1102,6 +1104,7 @@ const AdminDashboard = () => {
     if (activeSection === 'landing') return <LandingPageCMS onNavigate={setActiveSection} />;
     if (activeSection === 'applications') return <ApplicationsManager items={allData.applications || []} onRefresh={fetchAllCounts} />;
     if (activeSection === 'newsletter') return <NewsletterManager items={allData.newsletter || []} />;
+    if (activeSection === 'payments') return <PaymentsManager />;
     if (activeSection === 'seo') return <SEOChecker allData={allData} />;
     if (activeSection === 'scheduler') return <ContentScheduler allData={allData} />;
     if (activeSection === 'import') return <BulkImport onRefresh={fetchAllCounts} />;

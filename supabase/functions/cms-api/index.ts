@@ -13,7 +13,8 @@ const supabaseAdmin = createClient(
 )
 
 // Tables that don't have sort_order column
-const NO_SORT_ORDER = ['cms_site_settings', 'cms_hero', 'cms_payment_config', 'newsletter_subscriptions', 'support_applications']
+const NO_SORT_ORDER = ['cms_site_settings', 'cms_hero', 'cms_payment_config', 'newsletter_subscriptions', 'support_applications', 'donations', 'goldenage_registrations']
+const DIRECT_TABLES = new Set(['donations', 'goldenage_registrations'])
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -79,7 +80,7 @@ Deno.serve(async (req) => {
 
   // Allow cms_ tables, plus newsletter_subscriptions, support_applications
   const allowedPrefixes = ['cms_', 'newsletter_', 'support_', 'cms_resources']
-  if (!table || !allowedPrefixes.some(p => table.startsWith(p))) {
+  if (!table || (!allowedPrefixes.some(p => table.startsWith(p)) && !DIRECT_TABLES.has(table))) {
     return new Response(JSON.stringify({ error: 'Invalid table' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -92,7 +93,7 @@ Deno.serve(async (req) => {
       if (!NO_SORT_ORDER.includes(table)) {
         query = query.order('sort_order', { ascending: true })
       }
-      if (table === 'support_applications' || table === 'newsletter_subscriptions') {
+      if (table === 'support_applications' || table === 'newsletter_subscriptions' || table === 'donations' || table === 'goldenage_registrations') {
         query = query.order('created_at', { ascending: false })
       }
       if (table === 'cms_blog_posts') {
