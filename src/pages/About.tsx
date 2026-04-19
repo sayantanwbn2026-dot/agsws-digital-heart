@@ -2,6 +2,7 @@ import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { team as staticTeam } from "@/data/team";
 import { useCMSList } from "@/hooks/useCMSList";
+import { useCMSSection } from "@/hooks/useCMSSection";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Building2, Award, Globe, FileCheck, Heart, Target, Eye, ArrowRight, Quote } from "lucide-react";
@@ -9,9 +10,14 @@ import PageHero from "@/components/layout/PageHero";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { StaggerContainer } from "@/components/ui/StaggerContainer";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import ReadingProgress from "@/components/ui/ReadingProgress";
+import AutoTOC from "@/components/ui/AutoTOC";
 import { useRef } from "react";
 
-const timeline = [
+const iconMapValues: Record<string, any> = { Heart, Target, Eye };
+const iconMapDocs: Record<string, any> = { Building2, FileCheck, Award, Globe };
+
+const defaultTimeline = [
   { year: "2020", event: "AGSWS founded in Kolkata with a team of 4 volunteers." },
   { year: "2021", event: "Launched Medical Aid program — 200 patients supported in Year 1." },
   { year: "2022", event: "Education Support launched — first community library opened." },
@@ -20,23 +26,61 @@ const timeline = [
   { year: "2025", event: "Expanded to 6 partner hospitals and 12 school partnerships." },
 ];
 
-const docs = [
-  { icon: Building2, title: "NGO Registration", detail: "Reg. No: WB/SOC/2020/1234", sub: "Societies Registration Act" },
-  { icon: FileCheck, title: "Annual Audit", detail: "FY 2024 audited by registered CA firm", sub: "Available in Resources" },
-  { icon: Award, title: "Quarterly Reporting", detail: "Public financial breakdowns", sub: "Updated every quarter" },
-  { icon: Globe, title: "FCRA Status", detail: "Application Pending", sub: "Foreign contribution regulation" },
+const defaultDocs = [
+  { icon: "Building2", title: "NGO Registration", detail: "Reg. No: WB/SOC/2020/1234", sub: "Societies Registration Act" },
+  { icon: "FileCheck", title: "Annual Audit", detail: "FY 2024 audited by registered CA firm", sub: "Available in Resources" },
+  { icon: "Award", title: "Quarterly Reporting", detail: "Public financial breakdowns", sub: "Updated every quarter" },
+  { icon: "Globe", title: "FCRA Status", detail: "Application Pending", sub: "Foreign contribution regulation" },
 ];
 
-const values = [
-  { icon: Heart, title: "Compassion First", desc: "Every decision starts with empathy for those we serve." },
-  { icon: Target, title: "Direct Impact", desc: "100% of donations reach beneficiaries. Zero overhead waste." },
-  { icon: Eye, title: "Full Transparency", desc: "Real-time tracking, quarterly reports, and open financials." },
+const defaultValues = [
+  { icon: "Heart", title: "Compassion First", desc: "Every decision starts with empathy for those we serve." },
+  { icon: "Target", title: "Direct Impact", desc: "100% of donations reach beneficiaries. Zero overhead waste." },
+  { icon: "Eye", title: "Full Transparency", desc: "Real-time tracking, quarterly reports, and open financials." },
 ];
+
+const defaultMission = {
+  mission_label: "Our Mission",
+  mission_quote: '"We believe every human being — regardless of economic status — deserves dignity, care, and opportunity."',
+  body_p1: "The Ascension Group Social Welfare Society was born from a simple observation: thousands of elderly parents in Kolkata live alone while their children work in cities across India and the world. When a medical emergency strikes, there's often no one to help.",
+  body_p2: "We built AGSWS to bridge that gap — not just for emergencies, but for the everyday dignity of healthcare and education that every family deserves.",
+  founder_initial: "R",
+  founder_name: "Rajesh Kumar Sharma",
+  founder_role: "Founder & President, AGSWS",
+};
+
+const defaultCounters = {
+  items: [
+    { value: "5+", label: "Years Active" },
+    { value: "2,400+", label: "Patients Aided" },
+    { value: "850+", label: "Students Supported" },
+    { value: "120+", label: "Families Registered" },
+  ],
+};
+
+const defaultCTA = {
+  heading: "Join Our Mission",
+  subtitle: "Whether you volunteer, donate, or spread awareness — you can make a difference.",
+  primary_label: "Get In Touch",
+  primary_link: "/contact",
+  secondary_label: "Volunteer Portal",
+  secondary_link: "/volunteer-portal",
+};
 
 const About = () => {
   useSEO("About Us", "Learn about AGSWS — our mission, team, and journey of impact in Kolkata.");
   const parallaxRef = useRef(null);
   const { data: cmsTeam } = useCMSList<any>('cms_team', [], { orderBy: { column: 'sort_order' } });
+  const { data: mission } = useCMSSection<typeof defaultMission>('about_mission', defaultMission);
+  const { data: valuesData } = useCMSSection<{ items: typeof defaultValues }>('about_values', { items: defaultValues });
+  const { data: countersData } = useCMSSection<typeof defaultCounters>('about_counters', defaultCounters);
+  const { data: timelineData } = useCMSSection<{ items: typeof defaultTimeline }>('about_timeline', { items: defaultTimeline });
+  const { data: docsData } = useCMSSection<{ items: typeof defaultDocs }>('about_docs', { items: defaultDocs });
+  const { data: ctaData } = useCMSSection<typeof defaultCTA>('about_cta', defaultCTA);
+  const values = valuesData.items ?? defaultValues;
+  const counters = countersData.items ?? defaultCounters.items;
+  const timeline = timelineData.items ?? defaultTimeline;
+  const docs = docsData.items ?? defaultDocs;
   const team = cmsTeam.length ? cmsTeam.map((m: any) => ({
     name: m.name, role: m.role, bio: m.bio, initials: m.name?.split(' ').map((w: string) => w[0]).join('').slice(0, 2) ?? '', color: 'teal'
   })) : staticTeam;
