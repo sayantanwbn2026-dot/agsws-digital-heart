@@ -11,6 +11,7 @@ import CampaignThermometer from "@/components/campaign/CampaignThermometer";
 import PageHero from "@/components/layout/PageHero";
 import toast from "react-hot-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { createStripeCheckoutRedirect } from "@/lib/stripeCheckout";
 
 const donorSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -64,6 +65,7 @@ const DonateMedical = () => {
       toast.error("Please select or enter a donation amount.");
       return;
     }
+    const checkoutRedirect = createStripeCheckoutRedirect();
     setIsSubmitting(true);
     try {
       localStorage.setItem("agsws_donor", JSON.stringify({
@@ -91,8 +93,9 @@ const DonateMedical = () => {
 
       if (error) throw error;
       if (!result?.url) throw new Error('Checkout URL missing');
-      window.location.href = result.url;
+      checkoutRedirect.redirect(result.url);
     } catch (err: any) {
+      checkoutRedirect.cancel();
       console.error(err);
       toast.error(err.message || "Something went wrong. Please try again.");
       setIsSubmitting(false);

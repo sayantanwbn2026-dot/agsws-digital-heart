@@ -6,6 +6,7 @@ import { Check, Upload, ChevronDown, Shield, Heart, User, FileText, CreditCard, 
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumSelect, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
 import { supabase } from "@/integrations/supabase/client";
+import { createStripeCheckoutRedirect } from "@/lib/stripeCheckout";
 import toast from "react-hot-toast";
 
 const steps = [
@@ -30,6 +31,7 @@ const RegisterParent = () => {
       toast.error("Please complete all required fields.");
       return;
     }
+    const checkoutRedirect = createStripeCheckoutRedirect();
     setIsSubmitting(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-stripe-donation', {
@@ -53,8 +55,9 @@ const RegisterParent = () => {
       });
       if (error) throw error;
       if (!data?.url) throw new Error('Checkout URL missing');
-      window.location.href = data.url;
+      checkoutRedirect.redirect(data.url);
     } catch (err: any) {
+      checkoutRedirect.cancel();
       console.error(err);
       toast.error(err.message || "Couldn't start checkout. Please try again.");
       setIsSubmitting(false);
