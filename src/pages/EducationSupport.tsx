@@ -6,10 +6,33 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
+import { useCMSSection } from "@/hooks/useCMSSection";
+
+const iconMap: Record<string, any> = { GraduationCap, Library, BookOpen, Monitor };
+
+const defaultEducation = {
+  intro: "Education is the most powerful tool for breaking the cycle of poverty. Our programs cover everything from school enrollment to digital literacy, ensuring every child has the opportunity to learn and grow.",
+  cta_label: "Sponsor Education",
+  benefits: [
+    { icon: "GraduationCap", title: "Scholarships", desc: "Full and partial scholarships covering tuition, uniform, and books." },
+    { icon: "Library", title: "Community Libraries", desc: "3 libraries serving 600+ children with books and reading programs." },
+    { icon: "BookOpen", title: "After-School Tutoring", desc: "Daily tutoring sessions in Math, Science, and English." },
+    { icon: "Monitor", title: "Digital Literacy", desc: "Computer skills and internet literacy for students aged 10–16." },
+  ],
+  apply_label: "For Students in Need",
+  apply_heading: "Is Your Child Unable to Continue School?",
+  apply_body: "If you have a child in Kolkata who needs educational support — fees, books, or meals — apply through AGSWS. We assess applications within 3 working days.",
+  helpline_phone: "+919876543210",
+  covers_heading: "What we cover:",
+  covers: ["School fees", "Books & stationery", "School meals", "Uniform", "Exam fees"],
+};
 
 const EducationSupport = () => {
   useSEO("Education Support", "AGSWS Education — scholarships, libraries, and tutoring for underprivileged children.");
   const [showApply, setShowApply] = useState(false);
+  const { data: cms } = useCMSSection<typeof defaultEducation>('education_page', defaultEducation);
+  const benefits = cms.benefits ?? defaultEducation.benefits;
+  const covers = cms.covers ?? defaultEducation.covers;
 
   return (
     <main id="main-content">

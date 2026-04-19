@@ -6,10 +6,33 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
+import { useCMSSection } from "@/hooks/useCMSSection";
+
+const iconMap: Record<string, any> = { Stethoscope, Pill, Users, Heart };
+
+const defaultMedical = {
+  intro: "Our Medical Aid program provides life-saving healthcare access to families across Kolkata who cannot afford treatment. From emergency hospital admissions to long-term medicine support, every donation directly funds patient care.",
+  cta_label: "Donate Medical Aid",
+  benefits: [
+    { icon: "Stethoscope", title: "Emergency Care", desc: "Rapid hospital admission coordination with our 6 partner hospitals." },
+    { icon: "Pill", title: "Medicine Support", desc: "Monthly medicine funding for chronic conditions and post-surgery recovery." },
+    { icon: "Users", title: "Health Camps", desc: "Free quarterly health camps serving 200+ patients each session." },
+    { icon: "Heart", title: "Surgery Support", desc: "Partial to full surgery funding for critical cases." },
+  ],
+  apply_label: "For Families in Need",
+  apply_heading: "Is Your Family Facing a Medical Emergency?",
+  apply_body: "If you or a family member in Kolkata needs emergency medical support and cannot afford treatment, AGSWS is here. Reach out to us directly — our team will assess and respond within 24 hours.",
+  helpline_phone: "+919876543210",
+  covers_heading: "What we cover:",
+  covers: ["Emergency hospitalisation", "Critical medicines", "Specialist consultations", "Surgery support (partial/full)", "Post-discharge care"],
+};
 
 const MedicalAid = () => {
   useSEO("Medical Aid", "AGSWS Medical Aid — emergency care, hospital support, and treatment funding in Kolkata.");
   const [showApply, setShowApply] = useState(false);
+  const { data: cms } = useCMSSection<typeof defaultMedical>('medical_page', defaultMedical);
+  const benefits = cms.benefits ?? defaultMedical.benefits;
+  const covers = cms.covers ?? defaultMedical.covers;
 
   return (
     <main id="main-content">
