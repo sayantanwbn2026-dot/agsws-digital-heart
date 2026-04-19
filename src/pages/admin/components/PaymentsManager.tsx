@@ -31,6 +31,10 @@ type GoldenAgeRecord = {
   stripe_payment_intent?: string | null;
 };
 
+const isDonationRecord = (row: DonationRecord | GoldenAgeRecord): row is DonationRecord => {
+  return "donor_name" in row;
+};
+
 const statusClasses: Record<string, string> = {
   succeeded: "bg-emerald-100 text-emerald-700",
   paid: "bg-emerald-100 text-emerald-700",
@@ -95,7 +99,7 @@ const PaymentsManager = () => {
     const query = search.trim().toLowerCase();
 
     return rows.filter((row) => {
-      const haystack = activeTab === "donations"
+      const haystack = isDonationRecord(row)
         ? [row.donor_name, row.donor_email, row.cause, row.stripe_payment_intent, row.stripe_session_id]
         : [row.registrant_name, row.registrant_email, row.parent_name, row.registration_ref, row.stripe_payment_intent, row.stripe_session_id];
 
@@ -117,7 +121,7 @@ const PaymentsManager = () => {
     failed: rows.filter((row) => FAILED_STATUSES.has(row.status)).length,
   }), [rows]);
 
-  const exportRows = filteredRows.map((row) => activeTab === "donations"
+  const exportRows = filteredRows.map((row) => isDonationRecord(row)
     ? {
         date: new Date(row.created_at).toLocaleString("en-IN"),
         cause: row.cause,
@@ -243,7 +247,7 @@ const PaymentsManager = () => {
                 {filteredRows.map((row) => (
                   <tr key={row.id} className="border-b border-border last:border-0">
                     <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(row.created_at).toLocaleString("en-IN")}</td>
-                    {activeTab === "donations" ? (
+                    {isDonationRecord(row) ? (
                       <>
                         <td className="px-4 py-3 font-medium text-foreground capitalize">{row.cause}</td>
                         <td className="px-4 py-3 font-medium text-foreground">{row.donor_name}</td>
