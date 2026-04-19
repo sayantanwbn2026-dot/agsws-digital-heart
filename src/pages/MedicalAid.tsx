@@ -6,10 +6,33 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
+import { useCMSSection } from "@/hooks/useCMSSection";
+
+const iconMap: Record<string, any> = { Stethoscope, Pill, Users, Heart };
+
+const defaultMedical = {
+  intro: "Our Medical Aid program provides life-saving healthcare access to families across Kolkata who cannot afford treatment. From emergency hospital admissions to long-term medicine support, every donation directly funds patient care.",
+  cta_label: "Donate Medical Aid",
+  benefits: [
+    { icon: "Stethoscope", title: "Emergency Care", desc: "Rapid hospital admission coordination with our 6 partner hospitals." },
+    { icon: "Pill", title: "Medicine Support", desc: "Monthly medicine funding for chronic conditions and post-surgery recovery." },
+    { icon: "Users", title: "Health Camps", desc: "Free quarterly health camps serving 200+ patients each session." },
+    { icon: "Heart", title: "Surgery Support", desc: "Partial to full surgery funding for critical cases." },
+  ],
+  apply_label: "For Families in Need",
+  apply_heading: "Is Your Family Facing a Medical Emergency?",
+  apply_body: "If you or a family member in Kolkata needs emergency medical support and cannot afford treatment, AGSWS is here. Reach out to us directly — our team will assess and respond within 24 hours.",
+  helpline_phone: "+919876543210",
+  covers_heading: "What we cover:",
+  covers: ["Emergency hospitalisation", "Critical medicines", "Specialist consultations", "Surgery support (partial/full)", "Post-discharge care"],
+};
 
 const MedicalAid = () => {
   useSEO("Medical Aid", "AGSWS Medical Aid — emergency care, hospital support, and treatment funding in Kolkata.");
   const [showApply, setShowApply] = useState(false);
+  const { data: cms } = useCMSSection<typeof defaultMedical>('medical_page', defaultMedical);
+  const benefits = cms.benefits ?? defaultMedical.benefits;
+  const covers = cms.covers ?? defaultMedical.covers;
 
   return (
     <main id="main-content">
@@ -19,32 +42,30 @@ const MedicalAid = () => {
         <div className="max-w-[900px] mx-auto px-6">
           <FadeInUp>
             <p className="text-[15px] lg:text-[17px] text-[var(--mid)] mb-12 leading-[1.8] max-w-[700px]">
-              Our Medical Aid program provides life-saving healthcare access to families across Kolkata who cannot afford treatment. From emergency hospital admissions to long-term medicine support, every donation directly funds patient care.
+              {cms.intro}
             </p>
           </FadeInUp>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-16">
-            {[
-              { icon: Stethoscope, title: "Emergency Care", desc: "Rapid hospital admission coordination with our 6 partner hospitals." },
-              { icon: Pill, title: "Medicine Support", desc: "Monthly medicine funding for chronic conditions and post-surgery recovery." },
-              { icon: Users, title: "Health Camps", desc: "Free quarterly health camps serving 200+ patients each session." },
-              { icon: Heart, title: "Surgery Support", desc: "Partial to full surgery funding for critical cases." },
-            ].map((item, i) => (
-              <FadeInUp key={item.title} delay={i * 0.08}>
-                <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-[var(--teal-light)] flex items-center justify-center mb-4">
-                    <item.icon size={22} className="text-[var(--teal)]" />
-                  </div>
-                  <h4 className="text-[16px] font-[700] text-[var(--dark)] mb-2">{item.title}</h4>
-                  <p className="text-[13px] text-[var(--mid)] leading-[1.7]">{item.desc}</p>
-                </motion.div>
-              </FadeInUp>
-            ))}
+            {benefits.map((item: any, i: number) => {
+              const Icon = iconMap[item.icon] || Stethoscope;
+              return (
+                <FadeInUp key={item.title} delay={i * 0.08}>
+                  <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-[var(--teal-light)] flex items-center justify-center mb-4">
+                      <Icon size={22} className="text-[var(--teal)]" />
+                    </div>
+                    <h4 className="text-[16px] font-[700] text-[var(--dark)] mb-2">{item.title}</h4>
+                    <p className="text-[13px] text-[var(--mid)] leading-[1.7]">{item.desc}</p>
+                  </motion.div>
+                </FadeInUp>
+              );
+            })}
           </div>
 
           <FadeInUp className="text-center">
             <Link to="/donate/medical" className="inline-flex items-center gap-2 bg-[var(--yellow)] text-[var(--dark)] font-[700] px-10 py-4 rounded-full shadow-[var(--shadow-yellow)] hover:scale-[1.02] transition-transform text-[14px]">
-              Donate Medical Aid <ArrowRight size={16} />
+              {cms.cta_label} <ArrowRight size={16} />
             </Link>
           </FadeInUp>
         </div>
@@ -53,21 +74,21 @@ const MedicalAid = () => {
       <section className="bg-[var(--teal-light)] border-t-4 border-[var(--teal)] py-16">
         <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 items-start">
           <div>
-            <span className="text-[11px] font-[600] text-[var(--teal)] uppercase tracking-[0.1em] mb-2 block">For Families in Need</span>
-            <h3 className="text-[22px] font-[800] text-[var(--dark)] mb-4 tracking-[-0.01em]">Is Your Family Facing a Medical Emergency?</h3>
+            <span className="text-[11px] font-[600] text-[var(--teal)] uppercase tracking-[0.1em] mb-2 block">{cms.apply_label}</span>
+            <h3 className="text-[22px] font-[800] text-[var(--dark)] mb-4 tracking-[-0.01em]">{cms.apply_heading}</h3>
             <p className="text-[14px] text-[var(--mid)] leading-relaxed mb-6">
-              If you or a family member in Kolkata needs emergency medical support and cannot afford treatment, AGSWS is here. Reach out to us directly — our team will assess and respond within 24 hours.
+              {cms.apply_body}
             </p>
             <div className="flex flex-wrap gap-3">
               <PremiumButton onClick={() => setShowApply(true)}>Apply for Medical Support →</PremiumButton>
-              <a href="tel:+919876543210" className="h-[52px] px-8 border-[1.5px] border-[var(--teal)] text-[var(--teal)] font-[600] rounded-full text-[14px] flex items-center gap-2 hover:bg-[var(--teal)] hover:text-white transition-all">
+              <a href={`tel:${cms.helpline_phone}`} className="h-[52px] px-8 border-[1.5px] border-[var(--teal)] text-[var(--teal)] font-[600] rounded-full text-[14px] flex items-center gap-2 hover:bg-[var(--teal)] hover:text-white transition-all">
                 <Phone size={14} /> Call Our Helpline
               </a>
             </div>
           </div>
           <PremiumCard className="!p-6">
-            <h4 className="font-[600] text-[var(--dark)] mb-4 text-[14px]">What we cover:</h4>
-            {["Emergency hospitalisation", "Critical medicines", "Specialist consultations", "Surgery support (partial/full)", "Post-discharge care"].map((item) => (
+            <h4 className="font-[600] text-[var(--dark)] mb-4 text-[14px]">{cms.covers_heading}</h4>
+            {covers.map((item: string) => (
               <div key={item} className="flex items-center gap-2.5 mb-3">
                 <CheckCircle size={16} className="text-[var(--teal)] flex-shrink-0" />
                 <span className="text-[13px] text-[var(--mid)]">{item}</span>

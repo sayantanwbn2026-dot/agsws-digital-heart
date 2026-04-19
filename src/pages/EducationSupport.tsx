@@ -6,10 +6,33 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
+import { useCMSSection } from "@/hooks/useCMSSection";
+
+const iconMap: Record<string, any> = { GraduationCap, Library, BookOpen, Monitor };
+
+const defaultEducation = {
+  intro: "Education is the most powerful tool for breaking the cycle of poverty. Our programs cover everything from school enrollment to digital literacy, ensuring every child has the opportunity to learn and grow.",
+  cta_label: "Sponsor Education",
+  benefits: [
+    { icon: "GraduationCap", title: "Scholarships", desc: "Full and partial scholarships covering tuition, uniform, and books." },
+    { icon: "Library", title: "Community Libraries", desc: "3 libraries serving 600+ children with books and reading programs." },
+    { icon: "BookOpen", title: "After-School Tutoring", desc: "Daily tutoring sessions in Math, Science, and English." },
+    { icon: "Monitor", title: "Digital Literacy", desc: "Computer skills and internet literacy for students aged 10–16." },
+  ],
+  apply_label: "For Students in Need",
+  apply_heading: "Is Your Child Unable to Continue School?",
+  apply_body: "If you have a child in Kolkata who needs educational support — fees, books, or meals — apply through AGSWS. We assess applications within 3 working days.",
+  helpline_phone: "+919876543210",
+  covers_heading: "What we cover:",
+  covers: ["School fees", "Books & stationery", "School meals", "Uniform", "Exam fees"],
+};
 
 const EducationSupport = () => {
   useSEO("Education Support", "AGSWS Education — scholarships, libraries, and tutoring for underprivileged children.");
   const [showApply, setShowApply] = useState(false);
+  const { data: cms } = useCMSSection<typeof defaultEducation>('education_page', defaultEducation);
+  const benefits = cms.benefits ?? defaultEducation.benefits;
+  const covers = cms.covers ?? defaultEducation.covers;
 
   return (
     <main id="main-content">
@@ -19,32 +42,30 @@ const EducationSupport = () => {
         <div className="max-w-[900px] mx-auto px-6">
           <FadeInUp>
             <p className="text-[15px] lg:text-[17px] text-[var(--mid)] mb-12 leading-[1.8] max-w-[700px]">
-              Education is the most powerful tool for breaking the cycle of poverty. Our programs cover everything from school enrollment to digital literacy, ensuring every child has the opportunity to learn and grow.
+              {cms.intro}
             </p>
           </FadeInUp>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-16">
-            {[
-              { icon: GraduationCap, title: "Scholarships", desc: "Full and partial scholarships covering tuition, uniform, and books." },
-              { icon: Library, title: "Community Libraries", desc: "3 libraries serving 600+ children with books and reading programs." },
-              { icon: BookOpen, title: "After-School Tutoring", desc: "Daily tutoring sessions in Math, Science, and English." },
-              { icon: Monitor, title: "Digital Literacy", desc: "Computer skills and internet literacy for students aged 10–16." },
-            ].map((item, i) => (
-              <FadeInUp key={item.title} delay={i * 0.08}>
-                <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-[var(--purple-light)] flex items-center justify-center mb-4">
-                    <item.icon size={22} className="text-[var(--purple)]" />
-                  </div>
-                  <h4 className="text-[16px] font-[700] text-[var(--dark)] mb-2">{item.title}</h4>
-                  <p className="text-[13px] text-[var(--mid)] leading-[1.7]">{item.desc}</p>
-                </motion.div>
-              </FadeInUp>
-            ))}
+            {benefits.map((item: any, i: number) => {
+              const Icon = iconMap[item.icon] || GraduationCap;
+              return (
+                <FadeInUp key={item.title} delay={i * 0.08}>
+                  <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-[var(--purple-light)] flex items-center justify-center mb-4">
+                      <Icon size={22} className="text-[var(--purple)]" />
+                    </div>
+                    <h4 className="text-[16px] font-[700] text-[var(--dark)] mb-2">{item.title}</h4>
+                    <p className="text-[13px] text-[var(--mid)] leading-[1.7]">{item.desc}</p>
+                  </motion.div>
+                </FadeInUp>
+              );
+            })}
           </div>
 
           <FadeInUp className="text-center">
             <Link to="/donate/education" className="inline-flex items-center gap-2 bg-[var(--yellow)] text-[var(--dark)] font-[700] px-10 py-4 rounded-full shadow-[var(--shadow-yellow)] hover:scale-[1.02] transition-transform text-[14px]">
-              Sponsor Education <ArrowRight size={16} />
+              {cms.cta_label} <ArrowRight size={16} />
             </Link>
           </FadeInUp>
         </div>
@@ -53,21 +74,21 @@ const EducationSupport = () => {
       <section className="bg-[var(--purple-light)] border-t-4 border-[var(--purple)] py-16">
         <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 items-start">
           <div>
-            <span className="text-[11px] font-[600] text-[var(--purple)] uppercase tracking-[0.1em] mb-2 block">For Students in Need</span>
-            <h3 className="text-[22px] font-[800] text-[var(--dark)] mb-4 tracking-[-0.01em]">Is Your Child Unable to Continue School?</h3>
+            <span className="text-[11px] font-[600] text-[var(--purple)] uppercase tracking-[0.1em] mb-2 block">{cms.apply_label}</span>
+            <h3 className="text-[22px] font-[800] text-[var(--dark)] mb-4 tracking-[-0.01em]">{cms.apply_heading}</h3>
             <p className="text-[14px] text-[var(--mid)] leading-relaxed mb-6">
-              If you have a child in Kolkata who needs educational support — fees, books, or meals — apply through AGSWS. We assess applications within 3 working days.
+              {cms.apply_body}
             </p>
             <div className="flex flex-wrap gap-3">
               <PremiumButton onClick={() => setShowApply(true)} className="!bg-[var(--purple)] hover:!bg-[var(--purple)]/90">Apply for Education Support →</PremiumButton>
-              <a href="tel:+919876543210" className="h-[52px] px-8 border-[1.5px] border-[var(--purple)] text-[var(--purple)] font-[600] rounded-full text-[14px] flex items-center gap-2 hover:bg-[var(--purple)] hover:text-white transition-all">
+              <a href={`tel:${cms.helpline_phone}`} className="h-[52px] px-8 border-[1.5px] border-[var(--purple)] text-[var(--purple)] font-[600] rounded-full text-[14px] flex items-center gap-2 hover:bg-[var(--purple)] hover:text-white transition-all">
                 <Phone size={14} /> Call Us
               </a>
             </div>
           </div>
           <PremiumCard className="!p-6">
-            <h4 className="font-[600] text-[var(--dark)] mb-4 text-[14px]">What we cover:</h4>
-            {["School fees", "Books & stationery", "School meals", "Uniform", "Exam fees"].map((item) => (
+            <h4 className="font-[600] text-[var(--dark)] mb-4 text-[14px]">{cms.covers_heading}</h4>
+            {covers.map((item: string) => (
               <div key={item} className="flex items-center gap-2.5 mb-3">
                 <CheckCircle size={16} className="text-[var(--purple)] flex-shrink-0" />
                 <span className="text-[13px] text-[var(--mid)]">{item}</span>
