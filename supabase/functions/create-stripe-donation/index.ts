@@ -1,6 +1,7 @@
 // Creates a Stripe Checkout session for donations or GoldenAge registration
-// Routes through the Lovable Stripe gateway — no Stripe SDK needed.
+// Uses the shared createStripeClient that routes through the Lovable gateway.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
+import { type StripeEnv, createStripeClient } from '../_shared/stripe.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,11 +9,9 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-const STRIPE_GATEWAY = 'https://connector-gateway.lovable.dev/stripe'
-
 interface DonationBody {
   cause: 'medical' | 'education' | 'goldenage'
-  amount: number // in major units (rupees)
+  amount: number
   donor_name: string
   donor_email: string
   donor_phone?: string
@@ -21,7 +20,6 @@ interface DonationBody {
   gift_recipient_email?: string
   gift_message?: string
   show_on_wall?: boolean
-  // GoldenAge-specific
   registrant_city?: string
   relation?: string
   parent_name?: string
@@ -32,18 +30,13 @@ interface DonationBody {
   medical_condition?: string
   success_url: string
   cancel_url: string
+  environment?: StripeEnv
 }
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-  }
-
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
-  const STRIPE_KEY = Deno.env.get('STRIPE_SANDBOX_API_KEY') || Deno.env.get('STRIPE_API_KEY')
-  if (!LOVABLE_API_KEY || !STRIPE_KEY) {
-    return new Response(JSON.stringify({ error: 'Payments not configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 
   try {
@@ -54,6 +47,9 @@ Deno.serve(async (req) => {
     if (body.amount < 1 || body.amount > 1000000) {
       return new Response(JSON.stringify({ error: 'Amount out of range' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
+
+    const env: StripeEnv = body.environment || 'sandbox'
+    const stripe = createStripeClient(env)
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
     const amountCents = Math.round(body.amount * 100)
@@ -94,52 +90,39 @@ Deno.serve(async (req) => {
       recordId = data.id
     }
 
-    // Build Stripe Checkout Session via gateway (form-encoded)
     const productName =
       body.cause === 'medical' ? 'AGSWS Medical Aid Donation' :
       body.cause === 'education' ? 'AGSWS Education Support Donation' :
       'AGSWS GoldenAge Care Registration'
 
-    const params = new URLSearchParams()
-    params.append('mode', 'payment')
-    params.append('success_url', `${body.success_url}?session_id={CHECKOUT_SESSION_ID}`)
-    params.append('cancel_url', body.cancel_url)
-    params.append('customer_email', body.donor_email)
-    params.append('line_items[0][price_data][currency]', 'inr')
-    params.append('line_items[0][price_data][unit_amount]', String(amountCents))
-    params.append('line_items[0][price_data][product_data][name]', productName)
-    params.append('line_items[0][quantity]', '1')
-    params.append('metadata[record_id]', recordId)
-    params.append('metadata[cause]', body.cause)
-    params.append('metadata[donor_name]', body.donor_name)
-    params.append('payment_intent_data[metadata][record_id]', recordId)
-    params.append('payment_intent_data[metadata][cause]', body.cause)
-
-    const stripeRes = await fetch(`${STRIPE_GATEWAY}/v1/checkout/sessions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'X-Connection-Api-Key': STRIPE_KEY,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString(),
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      success_url: `${body.success_url}${body.success_url.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: body.cancel_url,
+      customer_email: body.donor_email,
+      line_items: [{
+        price_data: {
+          currency: 'inr',
+          unit_amount: amountCents,
+          product_data: { name: productName },
+        },
+        quantity: 1,
+      }],
+      metadata: { record_id: recordId, cause: body.cause, donor_name: body.donor_name },
+      payment_intent_data: { metadata: { record_id: recordId, cause: body.cause } },
     })
 
-    const session = await stripeRes.json()
-    if (!stripeRes.ok) {
-      console.error('Stripe error:', session)
-      return new Response(JSON.stringify({ error: session.error?.message || 'Stripe session failed' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-    }
-
-    // Save session id back
     const targetTable = body.cause === 'goldenage' ? 'goldenage_registrations' : 'donations'
     await supabase.from(targetTable).update({ stripe_session_id: session.id }).eq('id', recordId)
 
     return new Response(JSON.stringify({ session_id: session.id, url: session.url }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
-  } catch (err) {
-    console.error('[create-stripe-donation]', err)
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+  } catch (err: any) {
+    console.error('[create-stripe-donation]', err?.message || err)
+    return new Response(JSON.stringify({ error: err?.message || 'Internal error' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   }
 })
