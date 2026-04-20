@@ -195,6 +195,7 @@ const sections = [
   { id: 'register_parent', label: 'GoldenAge Page', icon: Heart, table: '', fields: [], isCustom: true },
   { id: 'register_parent_docs', label: 'GoldenAge Docs', icon: FileText, table: '', fields: [], isCustom: true },
   { id: 'analytics_sidebar', label: 'Analytics — Sidebar', icon: BarChart3, table: '', fields: [], isCustom: true },
+  { id: 'footer', label: 'Footer Content', icon: PanelLeftClose, table: '', fields: [], isCustom: true },
   { id: 'divider2', label: '', icon: null as any, table: '', fields: [], isDivider: true },
   { id: 'payment', label: 'Payment Settings', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true },
   { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true },
