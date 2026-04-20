@@ -47,6 +47,9 @@ import TransparencyPage from "./pages/TransparencyPage";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
+import TermsOfUse from "./pages/legal/TermsOfUse";
+import RefundPolicy from "./pages/legal/RefundPolicy";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = localStorage.getItem("agsws_admin") === "true";
@@ -109,6 +112,9 @@ const AnimatedRoutes = () => {
           <Route path="/transparency" element={<TransparencyPage />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfUse />} />
+          <Route path="/refund" element={<RefundPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
