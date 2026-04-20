@@ -11,11 +11,11 @@ interface LegalLayoutProps {
 }
 
 const LegalLayout = ({ title, subtitle, updated, children }: LegalLayoutProps) => {
-  useSEO({ title: `${title} — AGSWS`, description: subtitle });
+  useSEO(title, subtitle);
 
   return (
     <>
-      <PageHero badge="Legal" title={title} subtitle={subtitle} />
+      <PageHero label="Legal" title={title} subtitle={subtitle} bgVariant="dark" />
       <section className="py-16 bg-[hsl(var(--background))]">
         <div className="max-w-[760px] mx-auto px-6">
           <motion.div

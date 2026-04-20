@@ -77,8 +77,7 @@ const Footer = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const { data: footerCMS } = useCMSSection<FooterContent>("footer", {});
-  const { data: settings } = useCMSData<any>("cms_site_settings");
-  const site = Array.isArray(settings) && settings[0] ? settings[0] : {};
+  const { data: site } = useCMSData<any>("cms_site_settings", {});
 
   // Merge CMS content with defaults
   const c: FooterContent = {
