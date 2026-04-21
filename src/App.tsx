@@ -16,6 +16,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import CookieConsent from "./components/ui/CookieConsent";
 import DonateChoiceOverlay from "./components/ui/DonateChoiceOverlay";
 import { useEffect } from "react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Initiatives from "./pages/Initiatives";
@@ -52,8 +54,50 @@ import TermsOfUse from "./pages/legal/TermsOfUse";
 import RefundPolicy from "./pages/legal/RefundPolicy";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = localStorage.getItem("agsws_admin") === "true";
-  if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
+  // Two-step check: a token must exist locally AND it must validate server-side.
+  // The localStorage flag alone is not trusted — server validation is required
+  // before rendering any admin UI. If validation fails, we wipe local state and
+  // redirect to login.
+  const [state, setState] = useState<"checking" | "ok" | "fail">("checking");
+
+  useEffect(() => {
+    const token = localStorage.getItem("agsws_admin_token") || "";
+    if (!token) {
+      setState("fail");
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await supabase.functions.invoke("cms-auth", {
+          body: { verify: true },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (cancelled) return;
+        if (res.data?.valid) {
+          setState("ok");
+        } else {
+          localStorage.removeItem("agsws_admin");
+          localStorage.removeItem("agsws_admin_token");
+          setState("fail");
+        }
+      } catch {
+        if (!cancelled) setState("fail");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (state === "checking") {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">
+        Verifying admin session…
+      </div>
+    );
+  }
+  if (state === "fail") return <Navigate to="/admin/login" replace />;
   return <>{children}</>;
 };
 
