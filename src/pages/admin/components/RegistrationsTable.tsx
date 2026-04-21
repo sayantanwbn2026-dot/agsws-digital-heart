@@ -82,16 +82,41 @@ const RegistrationsTable = () => {
     <>
       <div className="global-card">
         <div className="flex items-center justify-between p-5 border-b border-border">
-          <h3 className="font-semibold text-text-dark">Parent Registrations</h3>
-          <button className="border border-teal text-teal text-xs font-medium px-4 py-2 rounded-full hover:bg-teal-light transition-colors flex items-center gap-1.5">
-            <Download size={14} /> Export CSV
+          <div>
+            <h3 className="font-semibold text-text-dark">Parent Registrations</h3>
+            <p className="text-xs text-text-light mt-0.5">{loading ? "Loading…" : `${filtered.length} of ${registrations.length} shown`}</p>
+          </div>
+          <button
+            onClick={handleDownload}
+            className="bg-teal text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full hover:bg-teal/90 transition-colors flex items-center gap-1.5 shadow-sm"
+          >
+            <Download size={14} /> Download CSV ({filtered.length})
           </button>
         </div>
-        <div className="p-4 border-b border-border bg-background">
-          <div className="relative max-w-xs">
+        <div className="p-4 border-b border-border bg-background flex flex-col gap-3 lg:flex-row lg:items-center lg:flex-wrap">
+          <div className="relative flex-1 min-w-[200px] max-w-xs">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or ID" className="global-card w-full h-9 pl-9 pr-3 text-sm outline-none" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, parent, or ID" className="global-card w-full h-9 pl-9 pr-3 text-sm outline-none" />
           </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="global-card h-9 px-3 text-sm outline-none"
+          >
+            <option value="all">All statuses</option>
+            {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase text-text-light">From</span>
+            <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="global-card h-9 px-2 text-sm outline-none" />
+            <span className="text-[10px] font-bold uppercase text-text-light">To</span>
+            <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="global-card h-9 px-2 text-sm outline-none" />
+          </div>
+          {hasActiveFilters && (
+            <button onClick={clearFilters} className="flex items-center gap-1 h-9 px-3 rounded-full border border-border text-xs font-medium text-text-light hover:text-text-dark transition-colors">
+              <X size={12} /> Clear
+            </button>
+          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
