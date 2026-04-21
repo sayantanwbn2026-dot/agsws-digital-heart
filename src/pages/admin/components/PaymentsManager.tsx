@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CreditCard, Download, Loader2, Search, Calendar, X } from "lucide-react";
+import { CreditCard, Download, Loader2, Search, X } from "lucide-react";
 import { useCMSApi } from "@/hooks/useCMSApi";
 import { exportToCSV, filterByDateRange } from "@/lib/exportCSV";
 
@@ -221,27 +221,68 @@ const PaymentsManager = () => {
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-border flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="relative flex-1 max-w-md">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder={activeTab === "donations" ? "Search donor, cause, or Stripe ID" : "Search registrant, parent, or Stripe ID"}
-              className="no-float h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
+        <div className="px-6 py-4 border-b border-border flex flex-col gap-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:flex-wrap">
+            <div className="relative flex-1 min-w-[220px] max-w-md">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder={activeTab === "donations" ? "Search donor, cause, or Stripe ID" : "Search registrant, parent, or Stripe ID"}
+                className="no-float h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
 
-          <select
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-            className="no-float h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">All statuses</option>
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="no-float h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <option value="all">All statuses</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+
+            {activeTab === "donations" && (
+              <select
+                value={gatewayFilter}
+                onChange={(event) => setGatewayFilter(event.target.value)}
+                className="no-float h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">All causes</option>
+                {gatewayOptions.map((g) => (
+                  <option key={g} value={g} className="capitalize">{g}</option>
+                ))}
+              </select>
+            )}
+
+            <div className="flex items-center gap-2">
+              <label className="text-[10px] font-bold uppercase text-muted-foreground">From</label>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="no-float h-10 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <label className="text-[10px] font-bold uppercase text-muted-foreground">To</label>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="no-float h-10 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-1 h-10 px-3 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <X size={12} /> Clear
+              </button>
+            )}
+          </div>
         </div>
 
         {loading ? (
