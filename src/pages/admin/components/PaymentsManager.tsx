@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { CreditCard, Download, Loader2, Search } from "lucide-react";
+import { CreditCard, Download, Loader2, Search, X } from "lucide-react";
 import { useCMSApi } from "@/hooks/useCMSApi";
+import { exportToCSV, filterByDateRange } from "@/lib/exportCSV";
 
 type PaymentTab = "donations" | "goldenage";
 
@@ -48,29 +49,15 @@ const FAILED_STATUSES = new Set(["failed", "cancelled"]);
 
 const formatAmount = (amountCents: number) => `₹${Math.round((amountCents || 0) / 100).toLocaleString("en-IN")}`;
 
-const exportCSV = (rows: Record<string, unknown>[], filename: string) => {
-  if (!rows.length) return;
-  const headers = Object.keys(rows[0]);
-  const csv = [
-    headers.join(","),
-    ...rows.map((row) => headers.map((header) => `"${String(row[header] ?? "").replace(/"/g, '""')}"`).join(",")),
-  ].join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-};
-
 const PaymentsManager = () => {
   const { getAll } = useCMSApi();
   const [activeTab, setActiveTab] = useState<PaymentTab>("donations");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [gatewayFilter, setGatewayFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [donations, setDonations] = useState<DonationRecord[]>([]);
   const [registrations, setRegistrations] = useState<GoldenAgeRecord[]>([]);
 
@@ -93,26 +80,51 @@ const PaymentsManager = () => {
     fetchPayments();
   }, [getAll]);
 
-  const rows = activeTab === "donations" ? donations : registrations;
+  const rows: (DonationRecord | GoldenAgeRecord)[] =
+    activeTab === "donations" ? donations : registrations;
 
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase();
+    const dateFiltered = filterByDateRange(rows, dateFrom, dateTo);
 
-    return rows.filter((row) => {
+    return dateFiltered.filter((row) => {
       const haystack = isDonationRecord(row)
         ? [row.donor_name, row.donor_email, row.cause, row.stripe_payment_intent, row.stripe_session_id]
         : [row.registrant_name, row.registrant_email, row.parent_name, row.registration_ref, row.stripe_payment_intent, row.stripe_session_id];
 
       const matchesSearch = !query || haystack.some((value) => String(value ?? "").toLowerCase().includes(query));
       const matchesStatus = statusFilter === "all" || row.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      const matchesGateway =
+        gatewayFilter === "all" ||
+        !isDonationRecord(row) ||
+        (row.cause || "").toLowerCase() === gatewayFilter.toLowerCase();
+      return matchesSearch && matchesStatus && matchesGateway;
     });
-  }, [activeTab, rows, search, statusFilter]);
+  }, [activeTab, rows, search, statusFilter, gatewayFilter, dateFrom, dateTo]);
 
   const statusOptions = useMemo(
     () => Array.from(new Set(rows.map((row) => row.status).filter(Boolean))).sort(),
     [rows],
   );
+
+  const gatewayOptions = useMemo(
+    () =>
+      activeTab === "donations"
+        ? Array.from(new Set(donations.map((d) => d.cause).filter(Boolean))).sort()
+        : [],
+    [activeTab, donations],
+  );
+
+  const hasActiveFilters =
+    search || statusFilter !== "all" || gatewayFilter !== "all" || dateFrom || dateTo;
+
+  const clearFilters = () => {
+    setSearch("");
+    setStatusFilter("all");
+    setGatewayFilter("all");
+    setDateFrom("");
+    setDateTo("");
+  };
 
   const stats = useMemo(() => ({
     total: rows.length,
@@ -145,6 +157,12 @@ const PaymentsManager = () => {
         stripe_payment_intent: row.stripe_payment_intent ?? "",
         stripe_session_id: row.stripe_session_id ?? "",
       });
+
+  const handleDownload = () => {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const base = activeTab === "donations" ? "stripe-donations" : "goldenage-registrations";
+    exportToCSV(exportRows, `${base}-${stamp}.csv`);
+  };
 
   return (
     <div className="space-y-6">
@@ -180,10 +198,10 @@ const PaymentsManager = () => {
           </div>
 
           <button
-            onClick={() => exportCSV(exportRows, activeTab === "donations" ? "stripe-donations.csv" : "goldenage-registrations.csv")}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
+            onClick={handleDownload}
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm"
           >
-            <Download size={13} /> Export CSV
+            <Download size={13} /> Download CSV ({filteredRows.length})
           </button>
         </div>
       </div>
@@ -203,27 +221,68 @@ const PaymentsManager = () => {
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-border flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="relative flex-1 max-w-md">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder={activeTab === "donations" ? "Search donor, cause, or Stripe ID" : "Search registrant, parent, or Stripe ID"}
-              className="no-float h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
+        <div className="px-6 py-4 border-b border-border flex flex-col gap-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:flex-wrap">
+            <div className="relative flex-1 min-w-[220px] max-w-md">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder={activeTab === "donations" ? "Search donor, cause, or Stripe ID" : "Search registrant, parent, or Stripe ID"}
+                className="no-float h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
 
-          <select
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-            className="no-float h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">All statuses</option>
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="no-float h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <option value="all">All statuses</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+
+            {activeTab === "donations" && (
+              <select
+                value={gatewayFilter}
+                onChange={(event) => setGatewayFilter(event.target.value)}
+                className="no-float h-10 rounded-lg border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="all">All causes</option>
+                {gatewayOptions.map((g) => (
+                  <option key={g} value={g} className="capitalize">{g}</option>
+                ))}
+              </select>
+            )}
+
+            <div className="flex items-center gap-2">
+              <label className="text-[10px] font-bold uppercase text-muted-foreground">From</label>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="no-float h-10 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <label className="text-[10px] font-bold uppercase text-muted-foreground">To</label>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="no-float h-10 rounded-lg border border-border bg-background px-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-1 h-10 px-3 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <X size={12} /> Clear
+              </button>
+            )}
+          </div>
         </div>
 
         {loading ? (
