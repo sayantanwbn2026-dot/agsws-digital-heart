@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { CreditCard, Download, Loader2, Search } from "lucide-react";
+import { CreditCard, Download, Loader2, Search, Calendar, X } from "lucide-react";
 import { useCMSApi } from "@/hooks/useCMSApi";
+import { exportToCSV, filterByDateRange } from "@/lib/exportCSV";
 
 type PaymentTab = "donations" | "goldenage";
 
@@ -48,29 +49,15 @@ const FAILED_STATUSES = new Set(["failed", "cancelled"]);
 
 const formatAmount = (amountCents: number) => `₹${Math.round((amountCents || 0) / 100).toLocaleString("en-IN")}`;
 
-const exportCSV = (rows: Record<string, unknown>[], filename: string) => {
-  if (!rows.length) return;
-  const headers = Object.keys(rows[0]);
-  const csv = [
-    headers.join(","),
-    ...rows.map((row) => headers.map((header) => `"${String(row[header] ?? "").replace(/"/g, '""')}"`).join(",")),
-  ].join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-};
-
 const PaymentsManager = () => {
   const { getAll } = useCMSApi();
   const [activeTab, setActiveTab] = useState<PaymentTab>("donations");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [gatewayFilter, setGatewayFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [donations, setDonations] = useState<DonationRecord[]>([]);
   const [registrations, setRegistrations] = useState<GoldenAgeRecord[]>([]);
 
@@ -97,22 +84,46 @@ const PaymentsManager = () => {
 
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase();
+    const dateFiltered = filterByDateRange(rows, dateFrom, dateTo);
 
-    return rows.filter((row) => {
+    return dateFiltered.filter((row) => {
       const haystack = isDonationRecord(row)
         ? [row.donor_name, row.donor_email, row.cause, row.stripe_payment_intent, row.stripe_session_id]
         : [row.registrant_name, row.registrant_email, row.parent_name, row.registration_ref, row.stripe_payment_intent, row.stripe_session_id];
 
       const matchesSearch = !query || haystack.some((value) => String(value ?? "").toLowerCase().includes(query));
       const matchesStatus = statusFilter === "all" || row.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      const matchesGateway =
+        gatewayFilter === "all" ||
+        !isDonationRecord(row) ||
+        (row.cause || "").toLowerCase() === gatewayFilter.toLowerCase();
+      return matchesSearch && matchesStatus && matchesGateway;
     });
-  }, [activeTab, rows, search, statusFilter]);
+  }, [activeTab, rows, search, statusFilter, gatewayFilter, dateFrom, dateTo]);
 
   const statusOptions = useMemo(
     () => Array.from(new Set(rows.map((row) => row.status).filter(Boolean))).sort(),
     [rows],
   );
+
+  const gatewayOptions = useMemo(
+    () =>
+      activeTab === "donations"
+        ? Array.from(new Set(donations.map((d) => d.cause).filter(Boolean))).sort()
+        : [],
+    [activeTab, donations],
+  );
+
+  const hasActiveFilters =
+    search || statusFilter !== "all" || gatewayFilter !== "all" || dateFrom || dateTo;
+
+  const clearFilters = () => {
+    setSearch("");
+    setStatusFilter("all");
+    setGatewayFilter("all");
+    setDateFrom("");
+    setDateTo("");
+  };
 
   const stats = useMemo(() => ({
     total: rows.length,
@@ -145,6 +156,12 @@ const PaymentsManager = () => {
         stripe_payment_intent: row.stripe_payment_intent ?? "",
         stripe_session_id: row.stripe_session_id ?? "",
       });
+
+  const handleDownload = () => {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const base = activeTab === "donations" ? "stripe-donations" : "goldenage-registrations";
+    exportToCSV(exportRows, `${base}-${stamp}.csv`);
+  };
 
   return (
     <div className="space-y-6">
