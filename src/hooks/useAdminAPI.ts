@@ -5,15 +5,35 @@ function getToken() {
   return localStorage.getItem('agsws_admin_token') ?? '';
 }
 
-export function useAdminAPI() {
+/**
+ * Admin API client that maps legacy `/api/admin/*` paths to the
+ * Supabase Edge Function `data-api/admin-*` actions. This keeps
+ * existing call-sites unchanged while routing through Supabase
+ * (which is where the deployment actually lives).
+ */
+function rewriteUrl(input: string): string {
+  if (input.startsWith('http')) return input;
+  // Map admin paths to data-api edge function actions
+  if (input.startsWith('/api/admin/donations')) {
+    const qs = input.split('?')[1] ?? '';
+    return `${SUPABASE_URL}/functions/v1/data-api/admin-donations${qs ? `?${qs}` : ''}`;
+  }
+  if (input.startsWith('/api/admin/registrations')) {
+    const qs = input.split('?')[1] ?? '';
+    return `${SUPABASE_URL}/functions/v1/data-api/admin-registrations${qs ? `?${qs}` : ''}`;
+  }
+  // Default: assume same-origin Supabase function
+  return `${SUPABASE_URL}${input}`;
+}
 
+export function useAdminAPI() {
   const adminFetch = async (
     url: string,
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     body?: any
   ) => {
-    const token = getToken()
-    const targetUrl = url.startsWith('http') ? url : `${SUPABASE_URL}${url}`
+    const token = getToken();
+    const targetUrl = rewriteUrl(url);
     const res = await fetch(targetUrl, {
       method,
       headers: {
@@ -22,9 +42,9 @@ export function useAdminAPI() {
         'apikey': ANON_KEY,
       },
       body: body ? JSON.stringify(body) : undefined,
-    })
-    return res.json()
-  }
+    });
+    return res.json();
+  };
 
-  return { adminFetch }
+  return { adminFetch };
 }

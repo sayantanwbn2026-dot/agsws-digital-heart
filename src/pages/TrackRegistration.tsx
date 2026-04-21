@@ -40,7 +40,10 @@ const TrackRegistration = () => {
     setResult(null);
     setSearched(true);
     try {
-      const res = await fetch(`/api/track/registration?id=${encodeURIComponent(regId.trim())}`);
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-registration?id=${encodeURIComponent(regId.trim())}`;
+      const res = await fetch(url, {
+        headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+      });
       const data = await res.json();
       if (!res.ok || data.error) {
         setError("Registration ID not found. Please check the ID in your confirmation email.");

@@ -36,11 +36,18 @@ const DonorWall = () => {
 
   const loadWall = async (gw: string | null = null) => {
     setLoading(true);
-    const url = gw ? `/api/donor-wall?gateway=${encodeURIComponent(gw)}&limit=50` : "/api/donor-wall?limit=50";
     try {
-      const data = await fetch(url).then(r => r.json());
-      if (Array.isArray(data)) setEntries(data);
-    } catch { /* keep existing */ }
+      const params = new URLSearchParams({ limit: "50" });
+      if (gw) params.set("gateway", gw);
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/donor-wall?${params}`;
+      const res = await fetch(url, {
+        headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+      });
+      const json = await res.json();
+      if (Array.isArray(json)) setEntries(json);
+    } catch (e) {
+      console.error("[donor-wall]", e);
+    }
     setLoading(false);
   };
 
@@ -50,20 +57,23 @@ const DonorWall = () => {
     const channel = supabase
       .channel("donor-wall-live")
       .on("postgres_changes", {
-        event: "INSERT",
+        event: "UPDATE",
         schema: "public",
-        table: "medical_donations",
-        filter: "show_on_wall=eq.true",
-      }, payload => {
-        if (payload.new.status !== "captured") return;
+        table: "donations",
+        filter: "status=eq.succeeded",
+      }, (payload: any) => {
+        const row = payload.new;
+        if (!row?.show_on_wall) return;
+        const first = (row.donor_name ?? "").split(" ")[0] || "Anonymous";
         setEntries(prev => [{
-          donor_first_name: (payload.new.donor_name ?? "").split(" ")[0],
-          name: (payload.new.donor_name ?? "").split(" ")[0],
-          city: "India",
-          gateway: "medical",
-          amount: payload.new.amount,
+          id: row.id,
+          donor_first_name: first,
+          name: first,
+          city: row.metadata?.city || "India",
+          gateway: row.cause,
+          amount: Math.round((row.amount_cents || 0) / 100),
           time: "Just now",
-          created_at: payload.new.created_at,
+          created_at: row.created_at,
         }, ...prev]);
       })
       .subscribe();

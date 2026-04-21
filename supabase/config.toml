@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.cms-auth]
 verify_jwt = false
+
+[functions.data-api]
+verify_jwt = false
