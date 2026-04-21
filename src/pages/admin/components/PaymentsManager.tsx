@@ -80,7 +80,8 @@ const PaymentsManager = () => {
     fetchPayments();
   }, [getAll]);
 
-  const rows = activeTab === "donations" ? donations : registrations;
+  const rows: (DonationRecord | GoldenAgeRecord)[] =
+    activeTab === "donations" ? donations : registrations;
 
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -197,10 +198,10 @@ const PaymentsManager = () => {
           </div>
 
           <button
-            onClick={() => exportCSV(exportRows, activeTab === "donations" ? "stripe-donations.csv" : "goldenage-registrations.csv")}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
+            onClick={handleDownload}
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm"
           >
-            <Download size={13} /> Export CSV
+            <Download size={13} /> Download CSV ({filteredRows.length})
           </button>
         </div>
       </div>
