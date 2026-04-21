@@ -1,15 +1,11 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
+import { verifyAdmin } from '../_shared/verifyAdmin'
 
 const supabaseAdmin = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-async function verifyAdmin(token: string) {
-  return token === process.env.ADMIN_TOKEN || true
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const token = req.headers.authorization?.split(' ')[1] || ''
-  if (!(await verifyAdmin(token))) return res.status(401).json({ error: 'Unauthorized' })
+  if (!verifyAdmin(req)) return res.status(401).json({ error: 'Unauthorized' })
 
   if (req.method === 'GET') {
     const { data, error } = await supabaseAdmin.from('support_applications').select('*').order('created_at', { ascending: false })
