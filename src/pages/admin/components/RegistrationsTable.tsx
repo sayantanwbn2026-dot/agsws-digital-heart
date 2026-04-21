@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Search, Download, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAdminAPI } from "@/hooks/useAdminAPI";
+import { exportToCSV, filterByDateRange } from "@/lib/exportCSV";
 
 const statusColors: Record<string, string> = {
   active: "bg-teal-light text-teal",
@@ -19,6 +20,9 @@ const RegistrationsTable = () => {
   const [registrations, setRegistrations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [drawerItem, setDrawerItem] = useState<any | null>(null);
 
   useEffect(() => {
@@ -26,13 +30,53 @@ const RegistrationsTable = () => {
       .then(data => { if (Array.isArray(data)) setRegistrations(data); })
       .catch(() => {})
       .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const filtered = registrations.filter((r) => {
-    const name = r.registrant_name ?? r.registrant ?? "";
-    const id = r.registration_id ?? r.regId ?? "";
-    return name.toLowerCase().includes(search.toLowerCase()) || id.toLowerCase().includes(search.toLowerCase());
-  });
+  const filtered = useMemo(() => {
+    const dateScoped = filterByDateRange(registrations, dateFrom, dateTo);
+    const q = search.toLowerCase();
+    return dateScoped.filter((r) => {
+      const name = (r.registrant_name ?? r.registrant ?? "").toLowerCase();
+      const id = (r.registration_ref ?? r.registration_id ?? r.regId ?? "").toLowerCase();
+      const parent = (r.parent_name ?? r.parent ?? "").toLowerCase();
+      const status = (r.case_status ?? r.status ?? "").toLowerCase();
+      const matchesSearch = !q || name.includes(q) || id.includes(q) || parent.includes(q);
+      const matchesStatus = statusFilter === "all" || status === statusFilter.toLowerCase();
+      return matchesSearch && matchesStatus;
+    });
+  }, [registrations, search, statusFilter, dateFrom, dateTo]);
+
+  const statusOptions = useMemo(
+    () => Array.from(new Set(registrations.map((r) => r.case_status ?? r.status).filter(Boolean))).sort(),
+    [registrations],
+  );
+
+  const hasActiveFilters = search || statusFilter !== "all" || dateFrom || dateTo;
+  const clearFilters = () => {
+    setSearch(""); setStatusFilter("all"); setDateFrom(""); setDateTo("");
+  };
+
+  const handleDownload = () => {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const exportRows = filtered.map((r) => ({
+      registration_ref: r.registration_ref ?? r.regId ?? "",
+      registrant_name: r.registrant_name ?? r.registrant ?? "",
+      registrant_email: r.registrant_email ?? "",
+      registrant_phone: r.registrant_phone ?? "",
+      parent_name: r.parent_name ?? r.parent ?? "",
+      parent_age: r.parent_age ?? "",
+      city: r.registrant_city ?? r.city ?? "",
+      relation: r.relation ?? "",
+      emergency_contact_name: r.emergency_contact_name ?? "",
+      emergency_contact_phone: r.emergency_contact_phone ?? "",
+      medical_condition: r.medical_condition ?? "",
+      amount: r.amount_cents ? `₹${Math.round(r.amount_cents / 100)}` : "",
+      status: r.case_status ?? r.status ?? "",
+      created_at: r.created_at ? new Date(r.created_at).toLocaleString("en-IN") : "",
+    }));
+    exportToCSV(exportRows, `parent-registrations-${stamp}.csv`);
+  };
 
   return (
     <>
