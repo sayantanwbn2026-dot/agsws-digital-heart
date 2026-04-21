@@ -57,20 +57,23 @@ const DonorWall = () => {
     const channel = supabase
       .channel("donor-wall-live")
       .on("postgres_changes", {
-        event: "INSERT",
+        event: "UPDATE",
         schema: "public",
-        table: "medical_donations",
-        filter: "show_on_wall=eq.true",
-      }, payload => {
-        if (payload.new.status !== "captured") return;
+        table: "donations",
+        filter: "status=eq.succeeded",
+      }, (payload: any) => {
+        const row = payload.new;
+        if (!row?.show_on_wall) return;
+        const first = (row.donor_name ?? "").split(" ")[0] || "Anonymous";
         setEntries(prev => [{
-          donor_first_name: (payload.new.donor_name ?? "").split(" ")[0],
-          name: (payload.new.donor_name ?? "").split(" ")[0],
-          city: "India",
-          gateway: "medical",
-          amount: payload.new.amount,
+          id: row.id,
+          donor_first_name: first,
+          name: first,
+          city: row.metadata?.city || "India",
+          gateway: row.cause,
+          amount: Math.round((row.amount_cents || 0) / 100),
           time: "Just now",
-          created_at: payload.new.created_at,
+          created_at: row.created_at,
         }, ...prev]);
       })
       .subscribe();
