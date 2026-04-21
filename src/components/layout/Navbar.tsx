@@ -98,10 +98,10 @@ const Navbar = () => {
   return (
     <>
       {/* Announcement Bar */}
-      <div className="h-[36px] bg-[var(--teal-dark)] text-white flex items-center justify-center sm:justify-between px-4 fixed top-0 w-full z-[60]">
-        <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap">
+      <div className="h-[36px] bg-[var(--teal-dark)] text-white flex items-center justify-center sm:justify-between px-3 sm:px-4 fixed top-0 w-full z-[60]">
+        <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap min-w-0">
           <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse flex-shrink-0" />
-          <span className="text-[12px] font-normal min-w-[280px]">
+          <span className="text-[11px] sm:text-[12px] font-normal truncate">
             <AnimatePresence mode="wait">
               <motion.span key={msgIndex} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.3 }} className="inline-block">
                 {messages[msgIndex]}
@@ -109,7 +109,7 @@ const Navbar = () => {
             </AnimatePresence>
           </span>
         </div>
-        <Link to="/register-parent" className="hidden sm:inline-block text-[var(--yellow)] text-[11px] font-semibold hover:underline tracking-wide">GoldenAge Care →</Link>
+        <Link to="/register-parent" className="hidden md:inline-block text-[var(--yellow)] text-[11px] font-semibold hover:underline tracking-wide flex-shrink-0 ml-3">GoldenAge Care →</Link>
       </div>
 
       <motion.nav
@@ -122,22 +122,22 @@ const Navbar = () => {
           WebkitBackdropFilter: isHome ? headerBlur : "blur(12px)",
         }}
       >
-        <div className="max-w-[1200px] mx-auto px-4 md:px-[32px] w-full flex items-center justify-between h-[64px]">
+        <div className="max-w-[1280px] mx-auto px-4 md:px-6 xl:px-8 w-full flex items-center justify-between h-[64px] gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 h-full" aria-label="AGSWS Home">
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0" aria-label="AGSWS Home">
             <span className={`w-2 h-2 rounded-full inline-block flex-shrink-0 transition-colors duration-300 ${scrolled || !isHome ? 'bg-[var(--teal)]' : 'bg-white'}`} />
-            <div className="flex flex-col gap-[1px] justify-center mt-1">
-              <span className={`font-bold text-[18px] leading-none transition-colors duration-300 ${logoText}`} style={{ fontFamily: 'var(--font)' }}>AGSWS</span>
-              <span className={`font-medium text-[9px] tracking-[0.12em] uppercase leading-none transition-colors duration-300 ${logoSub}`} style={{ fontFamily: 'var(--font)' }}>Social Welfare Society</span>
+            <div className="flex flex-col justify-center leading-none">
+              <span className={`font-bold text-[17px] sm:text-[18px] leading-none transition-colors duration-300 ${logoText}`} style={{ fontFamily: 'var(--font)' }}>AGSWS</span>
+              <span className={`font-medium text-[9px] tracking-[0.12em] uppercase leading-none mt-[3px] transition-colors duration-300 ${logoSub} hidden sm:inline`} style={{ fontFamily: 'var(--font)' }}>Social Welfare Society</span>
             </div>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-[36px] h-full">
+          <div className="hidden lg:flex items-center gap-5 xl:gap-8 h-full flex-1 justify-center min-w-0">
             {navLinks.map((link) =>
               link.children ? (
                 <div key={link.label} className="relative h-full flex items-center" onMouseEnter={() => setDropdownOpen(true)} onMouseLeave={() => setDropdownOpen(false)}>
-                  <button className={`flex items-center gap-[4px] text-[13px] font-medium transition-colors duration-180 hover:text-[var(--teal)] outline-none ${textColor}`}>
+                  <button className={`flex items-center gap-1 text-[12.5px] xl:text-[13px] font-medium whitespace-nowrap transition-colors duration-180 hover:text-[var(--teal)] outline-none ${textColor}`}>
                     {link.label}
                     <motion.div animate={{ rotate: dropdownOpen ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronDown size={14} /></motion.div>
                   </button>
@@ -176,10 +176,10 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div key={link.path} className="relative h-full flex items-center">
-                  <Link to={link.path} className={`relative text-[13px] font-medium transition-colors duration-180 hover:text-[var(--teal)] outline-none ${location.pathname === link.path ? "text-[var(--teal)]" : textColor}`}>
+                  <Link to={link.path} className={`relative text-[12.5px] xl:text-[13px] font-medium whitespace-nowrap transition-colors duration-180 hover:text-[var(--teal)] outline-none ${location.pathname === link.path ? "text-[var(--teal)]" : textColor}`}>
                     {link.label}
                     {location.pathname === link.path && (
-                      <motion.div layoutId="activeNavIndicator" className="absolute -bottom-[20px] left-0 right-0 h-[2px] bg-[var(--teal)] rounded-full" transition={{ type: "spring", stiffness: 300, damping: 30 }} />
+                      <motion.div layoutId="activeNavIndicator" className="absolute -bottom-[18px] left-0 right-0 h-[2px] bg-[var(--teal)] rounded-full" transition={{ type: "spring", stiffness: 300, damping: 30 }} />
                     )}
                   </Link>
                 </div>
@@ -188,11 +188,11 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Right */}
-          <div className="hidden lg:flex items-center gap-[24px]">
-            <button onClick={() => setSearchOpen(!searchOpen)} className="transition-transform hover:scale-110 outline-none" aria-label="Search">
+          <div className="hidden lg:flex items-center gap-3 xl:gap-5 flex-shrink-0">
+            <button onClick={() => setSearchOpen(!searchOpen)} className="transition-transform hover:scale-110 outline-none p-1" aria-label="Search">
               <Search size={18} color={iconColor} className="transition-colors duration-300" />
             </button>
-            <motion.button onClick={openOverlay} whileHover={{ scale: 1.03, boxShadow: "var(--shadow-yellow)" }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 400, damping: 25 }} className="bg-[var(--yellow)] text-[var(--dark)] font-semibold text-[13px] h-[38px] px-[20px] rounded-full border-none flex items-center justify-center whitespace-nowrap cursor-pointer">
+            <motion.button onClick={openOverlay} whileHover={{ scale: 1.03, boxShadow: "var(--shadow-yellow)" }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 400, damping: 25 }} className="bg-[var(--yellow)] text-[var(--dark)] font-semibold text-[12.5px] xl:text-[13px] h-[36px] xl:h-[38px] px-4 xl:px-5 rounded-full border-none flex items-center justify-center whitespace-nowrap cursor-pointer">
               {t("nav.donate")}
             </motion.button>
           </div>
