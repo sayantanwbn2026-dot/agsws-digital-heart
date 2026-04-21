@@ -20,7 +20,10 @@ const TrackDonation = () => {
     setResult(null);
     setSearched(true);
     try {
-      const res = await fetch(`/api/track/donation?payment_id=${encodeURIComponent(paymentId.trim())}`);
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-donation?payment_id=${encodeURIComponent(paymentId.trim())}`;
+      const res = await fetch(url, {
+        headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+      });
       const data = await res.json();
       if (!res.ok || data.error) {
         setError(true);
