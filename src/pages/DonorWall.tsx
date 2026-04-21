@@ -36,11 +36,25 @@ const DonorWall = () => {
 
   const loadWall = async (gw: string | null = null) => {
     setLoading(true);
-    const url = gw ? `/api/donor-wall?gateway=${encodeURIComponent(gw)}&limit=50` : "/api/donor-wall?limit=50";
     try {
-      const data = await fetch(url).then(r => r.json());
-      if (Array.isArray(data)) setEntries(data);
-    } catch { /* keep existing */ }
+      const { data } = await supabase.functions.invoke("data-api/donor-wall", {
+        method: "GET" as any,
+        body: undefined,
+        headers: gw ? { "x-gateway": gw } : undefined,
+      } as any);
+      // Fallback to direct fetch for query-string params (functions.invoke doesn't pass them cleanly)
+      const params = new URLSearchParams({ limit: "50" });
+      if (gw) params.set("gateway", gw);
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/donor-wall?${params}`;
+      const res = await fetch(url, {
+        headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+      });
+      const json = await res.json();
+      if (Array.isArray(json)) setEntries(json);
+      else if (Array.isArray(data)) setEntries(data);
+    } catch (e) {
+      console.error("[donor-wall]", e);
+    }
     setLoading(false);
   };
 
