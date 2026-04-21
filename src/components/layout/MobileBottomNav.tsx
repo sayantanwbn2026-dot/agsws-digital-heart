@@ -15,7 +15,7 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-[64px] z-[996] flex items-center justify-around md:hidden bg-white border-t border-[var(--border-color)] shadow-[0_-2px_12px_rgba(0,0,0,0.06)] px-2">
+    <nav className="fixed bottom-0 left-0 right-0 h-[64px] z-[996] flex items-center justify-around lg:hidden bg-white border-t border-[var(--border-color)] shadow-[0_-2px_12px_rgba(0,0,0,0.06)] px-2 pb-[env(safe-area-inset-bottom)]">
       {items.map((item) => {
         const isActive = item.path ? pathname === item.path : false;
         if (item.center) {
