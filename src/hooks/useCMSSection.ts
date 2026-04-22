@@ -11,9 +11,12 @@ export function useCMSSection<T>(sectionKey: string, fallback: T): { data: T; lo
       .select('content')
       .eq('section_key', sectionKey)
       .limit(1)
-      .single()
+      .maybeSingle()
       .then(({ data: row }: any) => {
-        if (row?.content) setData(row.content as T)
+        if (row?.content && typeof row.content === 'object') {
+          // Merge fetched content over fallback so missing keys keep defaults
+          setData({ ...(fallback as any), ...row.content } as T)
+        }
         setLoading(false)
       })
   }, [sectionKey])
@@ -27,9 +30,16 @@ export function useCMSSection<T>(sectionKey: string, fallback: T): { data: T; lo
       if (e.key === 'agsws_cms_last_updated') handler()
     }
     window.addEventListener('storage', storageHandler)
+    // Re-fetch when tab regains focus (covers admin → home tab switch)
+    const focusHandler = () => fetchData()
+    const visibilityHandler = () => { if (document.visibilityState === 'visible') fetchData() }
+    window.addEventListener('focus', focusHandler)
+    document.addEventListener('visibilitychange', visibilityHandler)
     return () => {
       window.removeEventListener(CMS_UPDATE_EVENT, handler)
       window.removeEventListener('storage', storageHandler)
+      window.removeEventListener('focus', focusHandler)
+      document.removeEventListener('visibilitychange', visibilityHandler)
     }
   }, [fetchData])
 
