@@ -62,17 +62,25 @@ const SectionEditor = ({ sectionKey, title, description, fields, listKey, listFi
       const row = Array.isArray(data) ? data.find((r: any) => r.section_key === sectionKey) : null;
 
       if (row) {
-        await fetch(`${SUPABASE_URL}/functions/v1/cms-api?table=cms_sections&id=${row.id}`, {
+        const upd = await fetch(`${SUPABASE_URL}/functions/v1/cms-api?table=cms_sections&id=${row.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'apikey': ANON_KEY },
           body: JSON.stringify({ content }),
         });
+        if (!upd.ok) {
+          const err = await upd.json().catch(() => ({}));
+          throw new Error(err.error || `Update failed (${upd.status})`);
+        }
       } else {
-        await fetch(`${SUPABASE_URL}/functions/v1/cms-api?table=cms_sections`, {
+        const ins = await fetch(`${SUPABASE_URL}/functions/v1/cms-api?table=cms_sections`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'apikey': ANON_KEY },
           body: JSON.stringify({ section_key: sectionKey, content }),
         });
+        if (!ins.ok) {
+          const err = await ins.json().catch(() => ({}));
+          throw new Error(err.error || `Create failed (${ins.status})`);
+        }
       }
       toast.success('Section saved');
       notifyCMSContentUpdated();
