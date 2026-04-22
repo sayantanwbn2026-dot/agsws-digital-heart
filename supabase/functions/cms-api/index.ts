@@ -13,7 +13,7 @@ const supabaseAdmin = createClient(
 )
 
 // Tables that don't have sort_order column
-const NO_SORT_ORDER = ['cms_site_settings', 'cms_hero', 'cms_payment_config', 'newsletter_subscriptions', 'support_applications', 'donations', 'goldenage_registrations']
+const NO_SORT_ORDER = ['cms_site_settings', 'cms_hero', 'cms_payment_config', 'cms_sections', 'newsletter_subscriptions', 'support_applications', 'donations', 'goldenage_registrations']
 const DIRECT_TABLES = new Set(['donations', 'goldenage_registrations'])
 
 Deno.serve(async (req) => {
