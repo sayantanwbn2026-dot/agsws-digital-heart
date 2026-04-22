@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -58,6 +58,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // before rendering any admin UI. If validation fails, we wipe local state and
   // redirect to login.
   const [state, setState] = useState<"checking" | "ok" | "fail">("checking");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("agsws_admin_token") || "";
@@ -89,6 +90,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (state === "fail") {
+      navigate("/admin/login", { replace: true });
+    }
+  }, [state, navigate]);
+
   if (state === "checking") {
     return (
       <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">
@@ -96,7 +103,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  if (state === "fail") return <Navigate to="/admin/login" replace />;
+  if (state === "fail") return null;
   return <>{children}</>;
 };
 
