@@ -20,6 +20,8 @@ const Contact = () => {
   useSEO("Contact", "Get in touch with AGSWS — contact us or volunteer.");
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm();
   const [volunteerModal, setVolunteerModal] = useState<string | null>(null);
+  const [vol, setVol] = useState({ name: "", email: "", phone: "", message: "" });
+  const [volSubmitting, setVolSubmitting] = useState(false);
 
   const onContactSubmit = async (formData: any) => {
     if (!formData?.name || !formData?.email || !formData?.message) {
@@ -155,13 +157,36 @@ const Contact = () => {
             <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full sm:max-w-md sm:rounded-[24px] rounded-t-[24px] p-8 shadow-[var(--shadow-lg)]">
               <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-6">Volunteer as {volunteerModal}</h3>
               <div className="space-y-5">
-                <PremiumInput label="Name" placeholder="Your name" />
-                <PremiumInput label="Email" placeholder="Email address" type="email" />
-                <PremiumInput label="Phone" placeholder="Phone number" type="tel" />
-                <PremiumTextarea label="Message" placeholder="Brief message" rows={3} />
+                <PremiumInput label="Name" placeholder="Your name" value={vol.name} onChange={(e: any) => setVol(v => ({ ...v, name: e.target.value }))} />
+                <PremiumInput label="Email" placeholder="Email address" type="email" value={vol.email} onChange={(e: any) => setVol(v => ({ ...v, email: e.target.value }))} />
+                <PremiumInput label="Phone" placeholder="Phone number" type="tel" value={vol.phone} onChange={(e: any) => setVol(v => ({ ...v, phone: e.target.value }))} />
+                <PremiumTextarea label="Message" placeholder="Brief message" rows={3} value={vol.message} onChange={(e: any) => setVol(v => ({ ...v, message: e.target.value }))} />
                 <div className="flex gap-3 pt-2">
                   <PremiumButton variant="secondary" onClick={() => setVolunteerModal(null)} className="flex-1">Cancel</PremiumButton>
-                  <PremiumButton onClick={() => { setVolunteerModal(null); toast.success("Interest submitted!"); }} className="flex-1">Submit</PremiumButton>
+                  <PremiumButton
+                    loading={volSubmitting}
+                    disabled={volSubmitting}
+                    onClick={async () => {
+                      if (!vol.name || !vol.email || !vol.phone) {
+                        toast.error("Please fill name, email and phone.");
+                        return;
+                      }
+                      setVolSubmitting(true);
+                      const { error } = await (supabase.from("support_applications" as any) as any).insert({
+                        type: "volunteer",
+                        applicant_name: vol.name,
+                        email: vol.email,
+                        phone: vol.phone,
+                        form_data: { role_interest: volunteerModal, message: vol.message, source: "contact_volunteer_modal" },
+                      });
+                      setVolSubmitting(false);
+                      if (error) { toast.error("Submission failed. Please try again."); return; }
+                      setVolunteerModal(null);
+                      setVol({ name: "", email: "", phone: "", message: "" });
+                      toast.success("Interest submitted! We'll be in touch.");
+                    }}
+                    className="flex-1"
+                  >Submit</PremiumButton>
                 </div>
               </div>
             </motion.div>
