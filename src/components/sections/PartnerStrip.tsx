@@ -2,7 +2,7 @@ import { useCMSList } from "@/hooks/useCMSList";
 
 const staticPartners = [
   "Kolkata Medical Trust", "Bengal Education Foundation", "City Hospital Network",
-  "Razorpay", "Rotary Club Kolkata", "Bengal Chamber of Commerce",
+  "Stripe", "Rotary Club Kolkata", "Bengal Chamber of Commerce",
   "Kolkata Municipal Corp.", "UNICEF India",
 ];
 
