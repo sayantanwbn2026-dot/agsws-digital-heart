@@ -237,12 +237,40 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
   const statusColors: Record<string, string> = {
     pending: 'bg-amber-100 text-amber-700', reviewing: 'bg-blue-100 text-blue-700',
     approved: 'bg-emerald-100 text-emerald-700', rejected: 'bg-red-100 text-red-700',
+    waitlisted: 'bg-orange-100 text-orange-700',
   };
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [eventFilter, setEventFilter] = useState('all');
+  const [search, setSearch] = useState('');
   const [notesEdit, setNotesEdit] = useState<Record<string, string>>({});
 
-  const filtered = filter === 'all' ? items : items.filter(i => i.status === filter);
+  const types = Array.from(new Set(items.map(i => i.type).filter(Boolean)));
+  const eventOptions = Array.from(new Set(
+    items
+      .filter(i => i.type === 'event_registration')
+      .map(i => i?.form_data?.event_title)
+      .filter(Boolean)
+  ));
+
+  const q = search.trim().toLowerCase();
+  const filtered = items.filter(i => {
+    if (filter !== 'all' && i.status !== filter) return false;
+    if (typeFilter !== 'all' && i.type !== typeFilter) return false;
+    if (eventFilter !== 'all') {
+      if (i.type !== 'event_registration') return false;
+      if ((i?.form_data?.event_title || '') !== eventFilter) return false;
+    }
+    if (q) {
+      const hay = [
+        i.applicant_name, i.email, i.phone, i.application_ref,
+        i?.form_data?.event_title,
+      ].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
   const statusCounts = items.reduce((acc: Record<string, number>, i) => { acc[i.status] = (acc[i.status] || 0) + 1; return acc; }, {});
   const pieData = Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
 
@@ -260,7 +288,7 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
         {[
           { label: 'Total', count: items.length, color: 'bg-primary/10 text-primary', filterVal: 'all' },
           { label: 'Pending', count: statusCounts.pending || 0, color: 'bg-amber-100 text-amber-700', filterVal: 'pending' },
-          { label: 'Reviewing', count: statusCounts.reviewing || 0, color: 'bg-blue-100 text-blue-700', filterVal: 'reviewing' },
+          { label: 'Waitlisted', count: statusCounts.waitlisted || 0, color: 'bg-orange-100 text-orange-700', filterVal: 'waitlisted' },
           { label: 'Approved', count: statusCounts.approved || 0, color: 'bg-emerald-100 text-emerald-700', filterVal: 'approved' },
           { label: 'Rejected', count: statusCounts.rejected || 0, color: 'bg-red-100 text-red-700', filterVal: 'rejected' },
         ].map(s => (
@@ -271,7 +299,47 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
         ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2 items-center">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search by name, email, ref, event…"
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+        <select
+          value={typeFilter}
+          onChange={e => setTypeFilter(e.target.value)}
+          className="px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+        >
+          <option value="all">All types</option>
+          {types.map(t => (
+            <option key={t} value={t}>{String(t).replace(/_/g, ' ')}</option>
+          ))}
+        </select>
+        {(typeFilter === 'event_registration' || typeFilter === 'all') && eventOptions.length > 0 && (
+          <select
+            value={eventFilter}
+            onChange={e => setEventFilter(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 max-w-[220px]"
+          >
+            <option value="all">All events</option>
+            {eventOptions.map(ev => (
+              <option key={ev} value={ev}>{ev}</option>
+            ))}
+          </select>
+        )}
+        {(search || filter !== 'all' || typeFilter !== 'all' || eventFilter !== 'all') && (
+          <button
+            onClick={() => { setSearch(''); setFilter('all'); setTypeFilter('all'); setEventFilter('all'); }}
+            className="px-3 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground"
+          >
+            Clear
+          </button>
+        )}
         <button onClick={() => exportToCSV(items, 'applications')} className="flex items-center gap-1.5 px-3 py-2 bg-muted rounded-lg text-xs font-medium text-foreground hover:bg-muted/80 transition-colors">
           <FileDown size={13} /> Export CSV
         </button>
@@ -329,7 +397,7 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
                     <button onClick={() => handleNoteSave(app.id)} className="mt-1 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-md">Save Notes</button>
                   </div>
                   <div className="flex gap-2">
-                    {['pending', 'reviewing', 'approved', 'rejected'].map(s => (
+                    {['pending', 'reviewing', 'waitlisted', 'approved', 'rejected'].map(s => (
                       <button key={s} onClick={() => handleStatusChange(app.id, s)} className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors ${app.status === s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>{s}</button>
                     ))}
                   </div>
