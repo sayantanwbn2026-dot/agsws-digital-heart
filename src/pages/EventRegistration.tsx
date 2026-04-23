@@ -2,17 +2,70 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Clock, Check, ArrowLeft, Share2, Download } from "lucide-react";
-import { events } from "@/data/events";
+import { events as fallbackEvents, type AGSWSEvent } from "@/data/events";
+import { useCMSList } from "@/hooks/useCMSList";
 import { PremiumInput, PremiumSelect, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import FadeInUp from "@/components/ui/FadeInUp";
 import toast from "react-hot-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const EventRegistration = () => {
   const [params] = useSearchParams();
-  const eventId = params.get("event");
-  const event = events.find(e => e.title.toLowerCase().replace(/\s+/g, '-') === eventId);
+  const eventId = params.get("event") || "";
+  const { data: cmsEvents } = useCMSList<any>("cms_events", [], { orderBy: { column: "sort_order", ascending: true } });
+
+  const event: AGSWSEvent | undefined = useMemo(() => {
+    // Try CMS by id first
+    const cms = cmsEvents.find((e: any) => e.id === eventId);
+    if (cms) {
+      return {
+        id: cms.id,
+        title: cms.title,
+        type: "medical",
+        date: cms.event_date || cms.created_at,
+        time: cms.event_date ? new Date(cms.event_date).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "",
+        venue: cms.location || "",
+        location: cms.location || "",
+        description: cms.description || "",
+        capacity: cms.capacity || 100,
+        registered: 0,
+        isPast: cms.event_date ? new Date(cms.event_date) < new Date() : false,
+      };
+    }
+    // Fallback: match by id OR by slugified title for legacy links
+    return fallbackEvents.find(e => e.id === eventId || e.title.toLowerCase().replace(/\s+/g, "-") === eventId);
+  }, [cmsEvents, eventId]);
+
   const [registered, setRegistered] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", phone: "", attendees: "1", source: "" });
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!event) return;
+    setSubmitting(true);
+    const { error } = await (supabase.from("support_applications" as any) as any).insert({
+      type: "event_registration",
+      applicant_name: form.name,
+      email: form.email,
+      phone: form.phone,
+      form_data: {
+        event_id: event.id,
+        event_title: event.title,
+        event_date: event.date,
+        attendees: Number(form.attendees) || 1,
+        source: form.source,
+      },
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Could not register. Please try again.");
+      return;
+    }
+    setRegistered(true);
+    toast.success("Registration complete!");
+  }
 
   useSEO("Event Registration", event ? `Register for ${event.title}` : "Register for AGSWS events.");
 
@@ -65,21 +118,21 @@ const EventRegistration = () => {
             <PremiumCard>
               <h2 className="text-[24px] font-[800] text-[var(--dark)] mb-2">Register for Event</h2>
               <p className="text-[14px] text-[var(--mid)] mb-8">{event.title}</p>
-              <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setRegistered(true); toast.success("Registration complete!"); }}>
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <PremiumInput label="Full Name" required placeholder="Your name" />
-                  <PremiumInput label="Email" required type="email" placeholder="your@email.com" />
+                  <PremiumInput label="Full Name" required placeholder="Your name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+                  <PremiumInput label="Email" required type="email" placeholder="your@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <PremiumInput label="Phone" required type="tel" placeholder="+91 98765 43210" />
-                  <PremiumSelect label="Attendees" required>
+                  <PremiumInput label="Phone" required type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+                  <PremiumSelect label="Attendees" required value={form.attendees} onChange={e => setForm({ ...form, attendees: e.target.value })}>
                     <option value="1">1 Person</option>
                     <option value="2">2 People</option>
                     <option value="3">3 People</option>
                     <option value="4">4+ People</option>
                   </PremiumSelect>
                 </div>
-                <PremiumSelect label="How did you hear about us?">
+                <PremiumSelect label="How did you hear about us?" value={form.source} onChange={e => setForm({ ...form, source: e.target.value })}>
                   <option value="">Select</option>
                   <option>Social Media</option>
                   <option>Friend / Family</option>
@@ -87,7 +140,7 @@ const EventRegistration = () => {
                   <option>WhatsApp</option>
                   <option>Other</option>
                 </PremiumSelect>
-                <PremiumButton type="submit" className="w-full">Register Now →</PremiumButton>
+                <PremiumButton type="submit" className="w-full" disabled={submitting}>{submitting ? "Registering…" : "Register Now →"}</PremiumButton>
               </form>
             </PremiumCard>
           </FadeInUp>
