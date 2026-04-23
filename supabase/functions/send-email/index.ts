@@ -94,6 +94,38 @@ function newsletterHTML(d: any) {
   return `<div style="font-family:-apple-system,Arial,sans-serif;background:#F7F5F2;padding:32px"><div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;padding:36px"><h1 style="color:${TEAL};margin:0 0 12px">Welcome to AGSWS</h1><p style="color:#475569">Thanks for subscribing${d.name ? ', ' + d.name : ''}. You'll receive our impact updates and stories from the field.</p></div></div>`
 }
 
+function eventConfirmationHTML(d: any) {
+  const isWait = d.status === 'waitlisted'
+  const headerBg = isWait ? `linear-gradient(135deg,${YELLOW},#D89F04)` : `linear-gradient(135deg,${TEAL},#176B75)`
+  const headerColor = isWait ? '#1a1a1a' : '#fff'
+  const headerLabel = isWait ? 'You\'re on the waitlist' : 'Registration Confirmed'
+  const dateLine = d.event_date ? new Date(d.event_date).toLocaleString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'
+  return `
+    <div style="font-family:-apple-system,Segoe UI,Arial,sans-serif;background:#F7F5F2;padding:32px 0">
+      <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.06)">
+        <div style="background:${headerBg};padding:36px;text-align:center">
+          <div style="display:inline-block;background:rgba(255,255,255,.15);padding:8px 16px;border-radius:99px;color:${headerColor};font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase">${headerLabel}</div>
+          <h1 style="color:${headerColor};margin:16px 0 0;font-size:26px;font-weight:800">${d.event_title}</h1>
+        </div>
+        <div style="padding:36px">
+          <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 16px">Hi ${d.applicant_name},</p>
+          <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 24px">${isWait
+            ? 'This event is currently full, so we\'ve added you to the waitlist. We\'ll notify you immediately if a seat opens up.'
+            : 'Your spot is confirmed. We look forward to seeing you at the event!'}</p>
+          <div style="background:#F7F5F2;border-radius:12px;padding:24px;margin-bottom:24px">
+            <table style="width:100%;border-collapse:collapse;font-size:14px">
+              <tr><td style="color:#64748b;padding:6px 0">When</td><td style="text-align:right;font-weight:600">${dateLine}</td></tr>
+              ${d.location ? `<tr><td style="color:#64748b;padding:6px 0">Where</td><td style="text-align:right;font-weight:600">${d.location}</td></tr>` : ''}
+              <tr><td style="color:#64748b;padding:6px 0">Attendees</td><td style="text-align:right;font-weight:600">${d.attendees || 1}</td></tr>
+              <tr><td style="color:#64748b;padding:6px 0">Reference</td><td style="text-align:right;font-family:monospace;font-size:12px">${d.application_ref || '—'}</td></tr>
+            </table>
+          </div>
+          <p style="color:#94a3b8;font-size:12px;margin:24px 0 0">AGSWS — The Ascension Group Social Welfare Society<br/>Kolkata, West Bengal, India</p>
+        </div>
+      </div>
+    </div>`
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders })
@@ -134,6 +166,12 @@ Deno.serve(async (req) => {
       case 'newsletter-welcome':
         subject = 'Welcome to AGSWS updates'
         html = newsletterHTML(data)
+        break
+      case 'event-confirmation':
+        subject = data.status === 'waitlisted'
+          ? `You're on the waitlist — ${data.event_title}`
+          : `Registration confirmed — ${data.event_title}`
+        html = eventConfirmationHTML(data)
         break
       default:
         return new Response(JSON.stringify({ error: 'Unknown email type' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

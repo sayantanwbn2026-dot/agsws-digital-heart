@@ -38,6 +38,7 @@ const EventRegistration = () => {
   }, [cmsEvents, eventId]);
 
   const [registered, setRegistered] = useState(false);
+  const [waitlisted, setWaitlisted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", attendees: "1", source: "" });
 
@@ -45,26 +46,72 @@ const EventRegistration = () => {
     e.preventDefault();
     if (!event) return;
     setSubmitting(true);
-    const { error } = await (supabase.from("support_applications" as any) as any).insert({
+    const requestedSeats = Number(form.attendees) || 1;
+
+    // Capacity check: count seats already taken (confirmed only) for this event
+    let confirmedSeats = 0;
+    try {
+      const { data: existing } = await (supabase.from("support_applications" as any) as any)
+        .select("form_data,status")
+        .eq("type", "event_registration")
+        .neq("status", "rejected");
+      const sameEvent = (existing || []).filter((r: any) => r?.form_data?.event_id === event.id && r?.status !== "waitlisted");
+      confirmedSeats = sameEvent.reduce((sum: number, r: any) => sum + (Number(r?.form_data?.attendees) || 1), 0);
+    } catch {
+      // If the read is blocked by RLS, fall back to confirmed status
+    }
+    const remaining = Math.max(0, (event.capacity || 0) - confirmedSeats);
+    const willWaitlist = requestedSeats > remaining;
+    const finalStatus = willWaitlist ? "waitlisted" : "pending";
+
+    const { data: inserted, error } = await (supabase.from("support_applications" as any) as any).insert({
       type: "event_registration",
       applicant_name: form.name,
       email: form.email,
       phone: form.phone,
+      status: finalStatus,
       form_data: {
         event_id: event.id,
         event_title: event.title,
         event_date: event.date,
-        attendees: Number(form.attendees) || 1,
+        event_location: event.location,
+        attendees: requestedSeats,
         source: form.source,
+        waitlisted: willWaitlist,
       },
-    });
-    setSubmitting(false);
+    }).select("application_ref").maybeSingle();
+
     if (error) {
+      setSubmitting(false);
       toast.error("Could not register. Please try again.");
       return;
     }
+
+    // Fire-and-forget confirmation email
+    try {
+      await supabase.functions.invoke("send-email", {
+        body: {
+          type: "event-confirmation",
+          to: form.email,
+          data: {
+            applicant_name: form.name,
+            event_title: event.title,
+            event_date: event.date,
+            location: event.location,
+            attendees: requestedSeats,
+            status: finalStatus,
+            application_ref: inserted?.application_ref,
+          },
+        },
+      });
+    } catch {
+      // Email failure should not block confirmation UI
+    }
+
+    setSubmitting(false);
+    setWaitlisted(willWaitlist);
     setRegistered(true);
-    toast.success("Registration complete!");
+    toast.success(willWaitlist ? "Added to waitlist" : "Registration complete!");
   }
 
   useSEO("Event Registration", event ? `Register for ${event.title}` : "Register for AGSWS events.");
@@ -73,11 +120,17 @@ const EventRegistration = () => {
     return (
       <main id="main-content" className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
         <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }} className="text-center max-w-lg mx-auto px-6 py-16">
-          <div className="w-20 h-20 bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-[var(--shadow-lg)]">
+          <div className={`w-20 h-20 ${waitlisted ? "bg-gradient-to-br from-[var(--yellow)] to-[#D89F04]" : "bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)]"} rounded-full flex items-center justify-center mx-auto mb-6 shadow-[var(--shadow-lg)]`}>
             <Check size={40} className="text-white" />
           </div>
-          <h2 className="text-[28px] font-[800] text-[var(--teal)] mb-2">You're Registered!</h2>
-          <p className="text-[16px] text-[var(--mid)] mb-6">Confirmation sent to your email. See you at {event.title}.</p>
+          <h2 className={`text-[28px] font-[800] mb-2 ${waitlisted ? "text-[#B8860B]" : "text-[var(--teal)]"}`}>
+            {waitlisted ? "You're on the Waitlist" : "You're Registered!"}
+          </h2>
+          <p className="text-[16px] text-[var(--mid)] mb-6">
+            {waitlisted
+              ? `This event is full. We'll email you the moment a seat opens for ${event.title}.`
+              : `Confirmation sent to your email. See you at ${event.title}.`}
+          </p>
           <PremiumCard className="text-left !p-6 mb-6">
             <div className="space-y-3">
               <div className="flex items-center gap-3"><Calendar size={16} className="text-[var(--teal)]" /><span className="text-[14px] text-[var(--dark)]">{new Date(event.date).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span></div>
