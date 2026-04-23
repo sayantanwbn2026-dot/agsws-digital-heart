@@ -6,7 +6,7 @@ import { MapPin, Phone, Mail, Clock, Heart, BookOpen, Users, Wrench, Send, Arrow
 import { motion, AnimatePresence } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumSelect, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import toast from "react-hot-toast";
 
 const volunteerRoles = [
@@ -22,11 +22,25 @@ const Contact = () => {
   const [volunteerModal, setVolunteerModal] = useState<string | null>(null);
 
   const onContactSubmit = async (formData: any) => {
-    const { error } = await supabase.from("volunteers").insert({
-      name: formData.name, email: formData.email, message: formData.message,
-      role_interest: "other", status: "new",
+    if (!formData?.name || !formData?.email || !formData?.message) {
+      toast.error("Please fill in name, email and message.");
+      return;
+    }
+    const { error } = await (supabase.from("support_applications" as any) as any).insert({
+      type: "contact",
+      applicant_name: formData.name,
+      email: formData.email,
+      phone: formData.phone || "N/A",
+      form_data: {
+        subject: formData.subject || "General",
+        message: formData.message,
+        source: "contact_form",
+      },
     });
-    if (error) { toast.error("Failed to send message. Please try again."); return; }
+    if (error) {
+      toast.error("Failed to send message. Please try again.");
+      return;
+    }
     toast.success("Message sent! We'll reply within 24 hours.");
     reset();
   };
