@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { events as fallbackEvents, eventTypeLabels, eventTypeColors, type AGSWSEvent } from "@/data/events";
 import { useCMSList } from "@/hooks/useCMSList";
@@ -68,7 +69,7 @@ const EventCard = ({ event, onClick, index }: { event: AGSWSEvent; onClick: () =
         )}
         <div className="flex items-center gap-3 mt-5">
           {!event.isPast ? (
-            <button className="flex items-center gap-1.5 text-[13px] font-[700] text-white bg-gradient-to-r from-[var(--teal)] to-[var(--teal-dark)] px-5 py-2.5 rounded-full hover:shadow-[0_8px_20px_rgba(31,154,168,0.25)] transition-shadow">Register Free <ArrowRight size={14} /></button>
+            <Link to={`/events/register?event=${encodeURIComponent(event.id)}`} className="flex items-center gap-1.5 text-[13px] font-[700] text-white bg-gradient-to-r from-[var(--teal)] to-[var(--teal-dark)] px-5 py-2.5 rounded-full hover:shadow-[0_8px_20px_rgba(31,154,168,0.25)] transition-shadow">Register Free <ArrowRight size={14} /></Link>
           ) : (
             <span className="text-[12px] font-[600] text-[var(--light)] bg-[var(--bg)] px-4 py-2 rounded-full">Completed</span>
           )}
