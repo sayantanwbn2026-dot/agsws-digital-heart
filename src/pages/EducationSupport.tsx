@@ -7,6 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
 import { useCMSSection } from "@/hooks/useCMSSection";
+import { supabase } from "@/integrations/supabase/client";
+import toast from "react-hot-toast";
 
 const iconMap: Record<string, any> = { GraduationCap, Library, BookOpen, Monitor };
 
@@ -30,9 +32,44 @@ const defaultEducation = {
 const EducationSupport = () => {
   useSEO("Education Support", "AGSWS Education — scholarships, libraries, and tutoring for underprivileged children.");
   const [showApply, setShowApply] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    child_name: "", child_age: "", grade: "", school: "", guardian_name: "", phone: "", email: "", reason: "",
+  });
   const { data: cms } = useCMSSection<typeof defaultEducation>('education_page', defaultEducation);
   const benefits = cms.benefits ?? defaultEducation.benefits;
   const covers = cms.covers ?? defaultEducation.covers;
+
+  async function submitEducationApply(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.child_name || !form.guardian_name || !form.phone || !form.email) {
+      toast.error("Please fill child name, guardian name, phone and email.");
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await (supabase.from("support_applications" as any) as any).insert({
+      type: "education",
+      applicant_name: form.guardian_name,
+      email: form.email,
+      phone: form.phone,
+      form_data: {
+        child_name: form.child_name,
+        child_age: form.child_age,
+        grade: form.grade,
+        school: form.school,
+        reason: form.reason,
+        source: "education_support_page",
+      },
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Submission failed. Please try again.");
+      return;
+    }
+    toast.success("Application submitted. We'll respond within 3 working days.");
+    setForm({ child_name: "", child_age: "", grade: "", school: "", guardian_name: "", phone: "", email: "", reason: "" });
+    setShowApply(false);
+  }
 
   return (
     <main id="main-content">
@@ -109,22 +146,22 @@ const EducationSupport = () => {
                 </div>
                 <h3 className="text-[20px] font-[700] text-[var(--dark)]">Apply for Education Support</h3>
               </div>
-              <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); setShowApply(false); }}>
-                <PremiumInput label="Child's Full Name" required placeholder="Full name" />
+              <form className="space-y-5" onSubmit={submitEducationApply}>
+                <PremiumInput label="Child's Full Name" required placeholder="Full name" value={form.child_name} onChange={(e: any) => setForm({ ...form, child_name: e.target.value })} />
                 <div className="grid grid-cols-2 gap-5">
-                  <PremiumInput label="Child's Age" required type="number" placeholder="Age" />
-                  <PremiumInput label="Class / Grade" required placeholder="e.g. Class 5" />
+                  <PremiumInput label="Child's Age" required type="number" placeholder="Age" value={form.child_age} onChange={(e: any) => setForm({ ...form, child_age: e.target.value })} />
+                  <PremiumInput label="Class / Grade" required placeholder="e.g. Class 5" value={form.grade} onChange={(e: any) => setForm({ ...form, grade: e.target.value })} />
                 </div>
-                <PremiumInput label="School Name & Address" required placeholder="School details" />
-                <PremiumInput label="Parent/Guardian Name" required placeholder="Guardian name" />
+                <PremiumInput label="School Name & Address" required placeholder="School details" value={form.school} onChange={(e: any) => setForm({ ...form, school: e.target.value })} />
+                <PremiumInput label="Parent/Guardian Name" required placeholder="Guardian name" value={form.guardian_name} onChange={(e: any) => setForm({ ...form, guardian_name: e.target.value })} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <PremiumInput label="Phone" required type="tel" placeholder="Phone number" />
-                  <PremiumInput label="Email" required type="email" placeholder="Email address" />
+                  <PremiumInput label="Phone" required type="tel" placeholder="Phone number" value={form.phone} onChange={(e: any) => setForm({ ...form, phone: e.target.value })} />
+                  <PremiumInput label="Email" required type="email" placeholder="Email address" value={form.email} onChange={(e: any) => setForm({ ...form, email: e.target.value })} />
                 </div>
-                <PremiumTextarea label="Reason for Applying" rows={3} placeholder="Brief reason" />
+                <PremiumTextarea label="Reason for Applying" rows={3} placeholder="Brief reason" value={form.reason} onChange={(e: any) => setForm({ ...form, reason: e.target.value })} />
                 <div className="flex gap-3 pt-2">
                   <PremiumButton variant="secondary" type="button" onClick={() => setShowApply(false)} className="flex-1">Cancel</PremiumButton>
-                  <PremiumButton type="submit" className="flex-1 !bg-[var(--purple)]">Submit Application</PremiumButton>
+                  <PremiumButton type="submit" loading={submitting} disabled={submitting} className="flex-1 !bg-[var(--purple)]">{submitting ? "Submitting..." : "Submit Application"}</PremiumButton>
                 </div>
               </form>
             </motion.div>

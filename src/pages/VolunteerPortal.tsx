@@ -4,27 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Award, AlertCircle, ArrowRight, User } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
 
-const mockVolunteers: Record<string, any> = {
-  "VOL-2025-0042": {
-    name: "Arjun", role: "Medical Volunteer", since: "2024", totalHours: 124,
-    categories: { field: 60, medical: 40, education: 16, admin: 8 },
-    activities: [
-      { date: "12 Mar 2025", desc: "North Kolkata Medical Camp — patient intake", hours: 6 },
-      { date: "28 Feb 2025", desc: "Medicine distribution drive — Shyambazar", hours: 4 },
-      { date: "14 Feb 2025", desc: "Registration camp coordination — Howrah", hours: 8 },
-      { date: "20 Jan 2025", desc: "Volunteer orientation — new batch training", hours: 3 },
-    ],
-  },
-  "VOL-2024-0018": {
-    name: "Meera", role: "Education Volunteer", since: "2023", totalHours: 256,
-    categories: { field: 40, medical: 10, education: 180, admin: 26 },
-    activities: [
-      { date: "8 Mar 2025", desc: "After-school tutoring — Math class", hours: 3 },
-      { date: "1 Mar 2025", desc: "Book distribution — Behala school", hours: 5 },
-    ],
-  },
-};
-
 const VolunteerPortal = () => {
   useSEO("Volunteer Portal", "Track your AGSWS volunteer hours and request certificates.");
   const [volId, setVolId] = useState("");
@@ -32,11 +11,26 @@ const VolunteerPortal = () => {
   const [error, setError] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSearch = async () => {
+    if (!volId.trim()) return;
     setSearched(true);
-    const d = mockVolunteers[volId.trim().toUpperCase()];
-    if (d) { setResult(d); setError(false); }
-    else { setResult(null); setError(true); }
+    setLoading(true);
+    setError(false);
+    setResult(null);
+    try {
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-volunteer?id=${encodeURIComponent(volId.trim().toUpperCase())}`;
+      const res = await fetch(url, {
+        headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+      });
+      const data = await res.json();
+      if (!res.ok || data?.error) setError(true);
+      else setResult(data);
+    } catch {
+      setError(true);
+    }
+    setLoading(false);
   };
 
   return (

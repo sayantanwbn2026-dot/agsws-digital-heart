@@ -157,6 +157,30 @@ Deno.serve(async (req) => {
       })
     }
 
+    if (action === 'track-volunteer' && req.method === 'GET') {
+      const ref = (url.searchParams.get('id') || '').trim()
+      if (!ref) return json({ error: 'Missing id' }, 400)
+      const { data, error } = await supabase
+        .from('support_applications')
+        .select('application_ref, applicant_name, email, phone, status, form_data, created_at')
+        .eq('type', 'volunteer')
+        .eq('application_ref', ref)
+        .maybeSingle()
+      if (error) return json({ error: error.message }, 500)
+      if (!data) return json({ error: 'Not found' }, 404)
+      const fd = (data.form_data || {}) as any
+      return json({
+        ref: data.application_ref,
+        name: data.applicant_name,
+        role: fd.role_interest || 'Volunteer',
+        since: new Date(data.created_at).getFullYear().toString(),
+        status: data.status,
+        totalHours: Number(fd.total_hours || 0),
+        categories: fd.categories || { field: 0, medical: 0, education: 0, admin: 0 },
+        activities: Array.isArray(fd.activities) ? fd.activities : [],
+      })
+    }
+
     // ====== ADMIN ======
     if (action === 'admin-donations' && req.method === 'GET') {
       if (!requireAdmin(req)) return json({ error: 'Unauthorized' }, 401)
