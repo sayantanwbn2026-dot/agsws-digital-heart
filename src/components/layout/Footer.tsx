@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import toast from "react-hot-toast";
 import { useCMSSection } from "@/hooks/useCMSSection";
 import { useCMSData } from "@/hooks/useCMSData";
+import { isValidEmail, normalizeEmail } from "@/lib/validation";
 
 const SOCIAL_ICONS: Record<string, typeof Facebook> = {
   facebook: Facebook, twitter: Twitter, instagram: Instagram, linkedin: Linkedin, youtube: Youtube,
@@ -106,15 +107,22 @@ const Footer = () => {
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || submitting) return;
+    const cleanEmail = normalizeEmail(email);
+    if (!isValidEmail(cleanEmail)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
     setSubmitting(true);
     try {
       const { error } = await (supabase.from('newsletter_subscriptions' as any) as any)
-        .insert({ email, source: 'footer' });
+        .insert({ email: cleanEmail, source: 'footer' });
+      // 23505 = unique_violation → already subscribed; treat as success.
       if (error && (error as any).code !== '23505') throw error;
+      const alreadySubscribed = !!error && (error as any).code === '23505';
       supabase.functions.invoke('send-email', {
-        body: { type: 'newsletter-welcome', to: email, data: {} },
+        body: { type: 'newsletter-welcome', to: cleanEmail, data: {} },
       }).catch(err => console.error('[newsletter welcome]', err));
-      toast.success("Subscribed! Check your inbox.");
+      toast.success(alreadySubscribed ? "You're already subscribed — thanks!" : "Subscribed! Check your inbox.");
       setEmail("");
     } catch (err: any) {
       toast.error(err?.message || "Subscription failed. Try again.");

@@ -15,6 +15,7 @@ import BackToTop from "./components/ui/BackToTop";
 import { AnimatePresence, motion } from "framer-motion";
 import CookieConsent from "./components/ui/CookieConsent";
 import DonateChoiceOverlay from "./components/ui/DonateChoiceOverlay";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Home from "./pages/Home";
@@ -235,7 +236,9 @@ const App = () => (
     <TooltipProvider>
       <LanguageProvider>
         <DonateOverlayProvider>
-          <AppInner />
+          <ErrorBoundary>
+            <AppInner />
+          </ErrorBoundary>
         </DonateOverlayProvider>
       </LanguageProvider>
     </TooltipProvider>

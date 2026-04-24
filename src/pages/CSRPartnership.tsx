@@ -10,6 +10,7 @@ import { Heart, BookOpen, Users, ShieldCheck, FileText, CheckCircle, Building } 
 import { PremiumInput, PremiumSelect, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
 import { supabase } from "@/integrations/supabase/client";
 import toast from "react-hot-toast";
+import { isValidEmail, isValidIndianPhone } from "@/lib/validation";
 
 const csrSchema = z.object({
   companyName: z.string().min(2, "Required"),
@@ -39,11 +40,34 @@ const CSRPartnership = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [applicationRef, setApplicationRef] = useState<string | null>(null);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<z.infer<typeof csrSchema>>({
+  const { register, handleSubmit, watch, trigger, formState: { errors } } = useForm<z.infer<typeof csrSchema>>({
     resolver: zodResolver(csrSchema),
+    mode: "onTouched",
     defaultValues: { focusMedical: false, focusEducation: false, focusElderly: false, focusVolunteering: false, consent: false },
   });
   const data = watch();
+
+  // Validate just the fields visible on the current step before letting the
+  // user advance. Prevents "next-next-submit" speed-runs that bypass step 1
+  // entirely and hit the schema only at the end.
+  const goToStep = async (target: 2 | 3) => {
+    const currentFields: Array<keyof z.infer<typeof csrSchema>> =
+      target === 2
+        ? ["companyName", "contactName", "contactEmail", "contactPhone", "industry"]
+        : ["budgetRange", "timeline"];
+    const ok = await trigger(currentFields as any);
+    if (!ok) {
+      toast.error("Please complete the highlighted fields.");
+      return;
+    }
+    if (target === 2) {
+      // Cross-check email and phone format with friendlier messages.
+      const email = (data.contactEmail || "").trim();
+      if (!isValidEmail(email)) { toast.error("Please enter a valid email address."); return; }
+      if (!isValidIndianPhone(data.contactPhone)) { toast.error("Please enter a valid 10-digit phone number."); return; }
+    }
+    setStep(target);
+  };
 
   const onSubmit = async (values: z.infer<typeof csrSchema>) => {
     if (submitting) return;
@@ -162,7 +186,7 @@ const CSRPartnership = () => {
                             <option value="">Select</option>
                             {["Technology", "Finance", "Manufacturing", "Healthcare", "FMCG", "Real Estate", "Other"].map(o => <option key={o} value={o}>{o}</option>)}
                           </PremiumSelect>
-                          <PremiumButton type="button" onClick={() => setStep(2)}>Next →</PremiumButton>
+                          <PremiumButton type="button" onClick={() => goToStep(2)}>Next →</PremiumButton>
                         </div>
                       </PremiumCard>
                     </motion.div>
@@ -199,7 +223,7 @@ const CSRPartnership = () => {
                           </PremiumSelect>
                           <div className="flex gap-3 mt-2">
                             <PremiumButton variant="secondary" type="button" onClick={() => setStep(1)}>← Back</PremiumButton>
-                            <PremiumButton type="button" onClick={() => setStep(3)}>Next →</PremiumButton>
+                            <PremiumButton type="button" onClick={() => goToStep(3)}>Next →</PremiumButton>
                           </div>
                         </div>
                       </PremiumCard>

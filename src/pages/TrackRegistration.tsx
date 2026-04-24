@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, CheckCircle, User, Heart, Shield, Phone, AlertCircle, Loader2 } from "lucide-react";
@@ -27,20 +28,23 @@ function buildStepsFromStatus(result: any) {
 
 const TrackRegistration = () => {
   useSEO("Track Registration", "Track your parent's AGSWS registration status.");
-  const [regId, setRegId] = useState("");
+  const [params, setParams] = useSearchParams();
+  const initialId = (params.get("id") || localStorage.getItem("agsws_last_reg_ref") || "").toUpperCase();
+  const [regId, setRegId] = useState(initialId);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = async () => {
-    if (!regId.trim()) return;
+  const handleSearch = async (overrideId?: string) => {
+    const id = (overrideId ?? regId).trim().toUpperCase();
+    if (!id) { setError("Please enter your Registration ID."); setSearched(true); return; }
     setLoading(true);
     setError("");
     setResult(null);
     setSearched(true);
     try {
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-registration?id=${encodeURIComponent(regId.trim())}`;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-registration?id=${encodeURIComponent(id)}`;
       const res = await fetch(url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
       });
@@ -49,12 +53,25 @@ const TrackRegistration = () => {
         setError("Registration ID not found. Please check the ID in your confirmation email.");
       } else {
         setResult(data);
+        // Cache last successful lookup so the user doesn't have to retype it.
+        localStorage.setItem("agsws_last_reg_ref", id);
+        if (params.get("id") !== id) {
+          setParams({ id }, { replace: true });
+        }
       }
     } catch {
       setError("Connection error. Please try again.");
     }
     setLoading(false);
   };
+
+  // Auto-trigger lookup when arriving with a deep-link or cached ref.
+  useEffect(() => {
+    if (initialId) {
+      handleSearch(initialId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const statusColor = result?.status === "Active" ? "bg-green-500" : result?.status === "Emergency" ? "bg-red-500" : "bg-yellow";
 
@@ -71,9 +88,9 @@ const TrackRegistration = () => {
       <section className="bg-background py-16">
         <div className="max-w-[480px] mx-auto px-6">
           <div className="flex gap-2">
-            <input value={regId} onChange={(e) => setRegId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. REG-2025-0001" className="global-card flex-1 h-[52px] px-4 text-base font-medium focus:ring-2 focus:ring-teal/15 outline-none" />
-            <button onClick={handleSearch} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2 hover:bg-teal-dark transition-colors">
-              <Search size={18} /> Track
+            <input value={regId} onChange={(e) => setRegId(e.target.value.toUpperCase())} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. REG-2025-0001" className="global-card flex-1 h-[52px] px-4 text-base font-medium focus:ring-2 focus:ring-teal/15 outline-none uppercase" />
+            <button onClick={() => handleSearch()} disabled={loading} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2 hover:bg-teal-dark transition-colors disabled:opacity-60">
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />} {loading ? "Tracking…" : "Track"}
             </button>
           </div>
           <p className="text-xs text-text-light mt-2">Try: REG-2025-0001 or REG-2025-0042</p>
