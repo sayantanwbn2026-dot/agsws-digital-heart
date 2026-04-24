@@ -7,6 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
 import { useCMSSection } from "@/hooks/useCMSSection";
+import { supabase } from "@/integrations/supabase/client";
+import toast from "react-hot-toast";
 
 const iconMap: Record<string, any> = { Stethoscope, Pill, Users, Heart };
 
@@ -30,9 +32,42 @@ const defaultMedical = {
 const MedicalAid = () => {
   useSEO("Medical Aid", "AGSWS Medical Aid — emergency care, hospital support, and treatment funding in Kolkata.");
   const [showApply, setShowApply] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    patient_name: "", patient_age: "", condition: "", hospital: "", phone: "", email: "",
+  });
   const { data: cms } = useCMSSection<typeof defaultMedical>('medical_page', defaultMedical);
   const benefits = cms.benefits ?? defaultMedical.benefits;
   const covers = cms.covers ?? defaultMedical.covers;
+
+  async function submitMedicalApply(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.patient_name || !form.condition || !form.phone || !form.email) {
+      toast.error("Please fill patient name, condition, phone and email.");
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await (supabase.from("support_applications" as any) as any).insert({
+      type: "medical",
+      applicant_name: form.patient_name,
+      email: form.email,
+      phone: form.phone,
+      form_data: {
+        patient_age: form.patient_age,
+        medical_condition: form.condition,
+        hospital: form.hospital,
+        source: "medical_aid_page",
+      },
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Submission failed. Please try again.");
+      return;
+    }
+    toast.success("Application submitted. Our team will reach out within 24 hours.");
+    setForm({ patient_name: "", patient_age: "", condition: "", hospital: "", phone: "", email: "" });
+    setShowApply(false);
+  }
 
   return (
     <main id="main-content">
@@ -109,18 +144,18 @@ const MedicalAid = () => {
                 </div>
                 <h3 className="text-[20px] font-[700] text-[var(--dark)]">Apply for Medical Support</h3>
               </div>
-              <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); setShowApply(false); }}>
-                <PremiumInput label="Patient Full Name" required placeholder="Full name" />
-                <PremiumInput label="Patient Age" required type="number" placeholder="Age" />
-                <PremiumTextarea label="Medical Condition" required rows={3} placeholder="Describe the condition or diagnosis" />
-                <PremiumInput label="Hospital Name" placeholder="If admitted" />
+              <form className="space-y-5" onSubmit={submitMedicalApply}>
+                <PremiumInput label="Patient Full Name" required placeholder="Full name" value={form.patient_name} onChange={(e: any) => setForm({ ...form, patient_name: e.target.value })} />
+                <PremiumInput label="Patient Age" required type="number" placeholder="Age" value={form.patient_age} onChange={(e: any) => setForm({ ...form, patient_age: e.target.value })} />
+                <PremiumTextarea label="Medical Condition" required rows={3} placeholder="Describe the condition or diagnosis" value={form.condition} onChange={(e: any) => setForm({ ...form, condition: e.target.value })} />
+                <PremiumInput label="Hospital Name" placeholder="If admitted" value={form.hospital} onChange={(e: any) => setForm({ ...form, hospital: e.target.value })} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <PremiumInput label="Phone" required type="tel" placeholder="Phone number" />
-                  <PremiumInput label="Email" required type="email" placeholder="Email address" />
+                  <PremiumInput label="Phone" required type="tel" placeholder="Phone number" value={form.phone} onChange={(e: any) => setForm({ ...form, phone: e.target.value })} />
+                  <PremiumInput label="Email" required type="email" placeholder="Email address" value={form.email} onChange={(e: any) => setForm({ ...form, email: e.target.value })} />
                 </div>
                 <div className="flex gap-3 pt-2">
                   <PremiumButton variant="secondary" type="button" onClick={() => setShowApply(false)} className="flex-1">Cancel</PremiumButton>
-                  <PremiumButton type="submit" className="flex-1">Submit Application</PremiumButton>
+                  <PremiumButton type="submit" loading={submitting} disabled={submitting} className="flex-1">{submitting ? "Submitting..." : "Submit Application"}</PremiumButton>
                 </div>
               </form>
             </motion.div>
