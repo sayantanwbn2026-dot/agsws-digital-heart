@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, CheckCircle, User, Heart, Shield, Phone, AlertCircle, Loader2 } from "lucide-react";
@@ -27,20 +28,23 @@ function buildStepsFromStatus(result: any) {
 
 const TrackRegistration = () => {
   useSEO("Track Registration", "Track your parent's AGSWS registration status.");
-  const [regId, setRegId] = useState("");
+  const [params, setParams] = useSearchParams();
+  const initialId = (params.get("id") || localStorage.getItem("agsws_last_reg_ref") || "").toUpperCase();
+  const [regId, setRegId] = useState(initialId);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = async () => {
-    if (!regId.trim()) return;
+  const handleSearch = async (overrideId?: string) => {
+    const id = (overrideId ?? regId).trim().toUpperCase();
+    if (!id) { setError("Please enter your Registration ID."); setSearched(true); return; }
     setLoading(true);
     setError("");
     setResult(null);
     setSearched(true);
     try {
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-registration?id=${encodeURIComponent(regId.trim())}`;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-registration?id=${encodeURIComponent(id)}`;
       const res = await fetch(url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
       });
@@ -49,12 +53,25 @@ const TrackRegistration = () => {
         setError("Registration ID not found. Please check the ID in your confirmation email.");
       } else {
         setResult(data);
+        // Cache last successful lookup so the user doesn't have to retype it.
+        localStorage.setItem("agsws_last_reg_ref", id);
+        if (params.get("id") !== id) {
+          setParams({ id }, { replace: true });
+        }
       }
     } catch {
       setError("Connection error. Please try again.");
     }
     setLoading(false);
   };
+
+  // Auto-trigger lookup when arriving with a deep-link or cached ref.
+  useEffect(() => {
+    if (initialId) {
+      handleSearch(initialId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const statusColor = result?.status === "Active" ? "bg-green-500" : result?.status === "Emergency" ? "bg-red-500" : "bg-yellow";
 
