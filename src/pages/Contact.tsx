@@ -8,6 +8,7 @@ import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumSelect, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
 import { supabase } from "@/integrations/supabase/client";
 import toast from "react-hot-toast";
+import { isValidEmail, normalizeEmail, isValidIndianPhone } from "@/lib/validation";
 
 const volunteerRoles = [
   { icon: Heart, title: "Medical Volunteer", desc: "Assist with health camps and hospital coordination.", color: "var(--teal)" },
@@ -24,26 +25,33 @@ const Contact = () => {
   const [volSubmitting, setVolSubmitting] = useState(false);
 
   const onContactSubmit = async (formData: any) => {
-    if (!formData?.name || !formData?.email || !formData?.message) {
-      toast.error("Please fill in name, email and message.");
-      return;
-    }
-    const { error } = await (supabase.from("support_applications" as any) as any).insert({
+    const name = (formData?.name || "").trim();
+    const email = normalizeEmail(formData?.email);
+    const message = (formData?.message || "").trim();
+    if (name.length < 2) { toast.error("Please enter your full name."); return; }
+    if (!isValidEmail(email)) { toast.error("Please enter a valid email address."); return; }
+    if (message.length < 5) { toast.error("Please write a short message (min 5 characters)."); return; }
+
+    const { data: row, error } = await (supabase.from("support_applications" as any) as any).insert({
       type: "contact",
-      applicant_name: formData.name,
-      email: formData.email,
+      applicant_name: name,
+      email,
       phone: formData.phone || "N/A",
       form_data: {
         subject: formData.subject || "General",
-        message: formData.message,
+        message,
         source: "contact_form",
       },
-    });
+    }).select("application_ref").maybeSingle();
     if (error) {
       toast.error("Failed to send message. Please try again.");
       return;
     }
-    toast.success("Message sent! We'll reply within 24 hours.");
+    toast.success(
+      row?.application_ref
+        ? `Message sent! Reference: ${row.application_ref}`
+        : "Message sent! We'll reply within 24 hours."
+    );
     reset();
   };
 
