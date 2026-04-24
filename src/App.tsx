@@ -45,6 +45,7 @@ import ImpactReport from "./pages/ImpactReport";
 import Updates from "./pages/Updates";
 import SearchPage from "./pages/Search";
 import TransparencyPage from "./pages/TransparencyPage";
+import SystemHealth from "./pages/SystemHealth";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -160,6 +161,7 @@ const AnimatedRoutes = () => {
           <Route path="/updates" element={<Updates />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/transparency" element={<TransparencyPage />} />
+          <Route path="/system/health" element={<SystemHealth />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
