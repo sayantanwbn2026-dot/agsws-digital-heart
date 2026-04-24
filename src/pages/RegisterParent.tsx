@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createStripeCheckoutRedirect } from "@/lib/stripeCheckout";
 import { useCMSSection } from "@/hooks/useCMSSection";
 import toast from "react-hot-toast";
+import { isValidEmail, isValidIndianPhone } from "@/lib/validation";
 
 const iconMap: Record<string, any> = { User, Heart, FileText, CreditCard, Shield };
 
@@ -57,7 +58,38 @@ const RegisterParent = () => {
   const steps = (cms.steps?.length ? cms.steps : defaultData.steps);
   const documents = (cms.documents?.length ? cms.documents : defaultData.documents);
 
-  const nextStep = () => { if (currentStep < 3) setCurrentStep(currentStep + 1); };
+  // Validate the fields visible in the current step before allowing progression.
+  // Without this, a user could click Next 3 times and only discover missing
+  // fields at the payment step, losing all context.
+  const validateCurrentStep = (): string | null => {
+    const v = getValues();
+    if (currentStep === 0) {
+      if (!v.yourName || String(v.yourName).trim().length < 2) return "Please enter your full name.";
+      if (!v.yourCity) return "Please enter your city.";
+      if (!isValidIndianPhone(v.yourPhone)) return "Please enter a valid 10-digit phone number.";
+      if (!isValidEmail(v.yourEmail)) return "Please enter a valid email address.";
+      if (!v.relation) return "Please select your relation to the parent.";
+      return null;
+    }
+    if (currentStep === 1) {
+      if (!v.parentName || String(v.parentName).trim().length < 2) return "Please enter your parent's name.";
+      const age = Number(v.parentAge);
+      if (!age || age < 30 || age > 120) return "Please enter a valid age (30–120).";
+      if (!v.emergencyName) return "Please enter an emergency contact name.";
+      if (!isValidIndianPhone(v.emergencyPhone)) return "Please enter a valid emergency contact phone.";
+      if (!v.parentAddress || String(v.parentAddress).trim().length < 5) return "Please enter the parent's address.";
+      if (!v.medicalCondition) return "Please select a primary medical condition.";
+      return null;
+    }
+    return null;
+  };
+
+  const nextStep = () => {
+    if (currentStep >= 3) return;
+    const err = validateCurrentStep();
+    if (err) { toast.error(err); return; }
+    setCurrentStep(currentStep + 1);
+  };
   const prevStep = () => { if (currentStep > 0) setCurrentStep(currentStep - 1); };
 
   const handlePay = async () => {
