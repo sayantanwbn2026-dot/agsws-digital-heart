@@ -144,6 +144,11 @@ const EventRegistration = () => {
               ? `This event is full. We'll email you the moment a seat opens for ${event.title}.`
               : `Confirmation sent to your email. See you at ${event.title}.`}
           </p>
+          {applicationRef && (
+            <p className="text-[11px] text-[var(--light)] uppercase tracking-[0.12em] mb-4">
+              Reference: <span className="font-mono text-[var(--dark)]">{applicationRef}</span>
+            </p>
+          )}
           <PremiumCard className="text-left !p-6 mb-6">
             <div className="space-y-3">
               <div className="flex items-center gap-3"><Calendar size={16} className="text-[var(--teal)]" /><span className="text-[14px] text-[var(--dark)]">{new Date(event.date).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span></div>
