@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,21 +6,23 @@ import { Search, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 const TrackDonation = () => {
   useSEO("Track Donation", "Track where your AGSWS donation goes.");
-  const [params] = useSearchParams();
-  const [paymentId, setPaymentId] = useState(params.get("payment_id") || "");
+  const [params, setParams] = useSearchParams();
+  const initialId = params.get("payment_id") || localStorage.getItem("agsws_last_donation_ref") || "";
+  const [paymentId, setPaymentId] = useState(initialId);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = async () => {
-    if (!paymentId.trim()) return;
+  const handleSearch = async (overrideId?: string) => {
+    const id = (overrideId ?? paymentId).trim();
+    if (!id) return;
     setLoading(true);
     setError(false);
     setResult(null);
     setSearched(true);
     try {
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-donation?payment_id=${encodeURIComponent(paymentId.trim())}`;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-donation?payment_id=${encodeURIComponent(id)}`;
       const res = await fetch(url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
       });
@@ -30,6 +32,10 @@ const TrackDonation = () => {
       } else {
         const stages = data.journey_stages ?? data.stages ?? [];
         setResult({ ...data, stages });
+        localStorage.setItem("agsws_last_donation_ref", id);
+        if (params.get("payment_id") !== id) {
+          setParams({ payment_id: id }, { replace: true });
+        }
         // Fire confetti if all stages complete
         if (stages.length > 0 && stages.every((s: any) => s.completed)) {
           import("canvas-confetti").then(({ default: confetti }) => {
@@ -42,6 +48,12 @@ const TrackDonation = () => {
     }
     setLoading(false);
   };
+
+  // Auto-lookup when arriving via deep-link or from cached ref.
+  useEffect(() => {
+    if (initialId) handleSearch(initialId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const completedCount = result?.stages.filter((s: any) => s.completed).length || 0;
   const allComplete = completedCount === 4;
@@ -60,8 +72,8 @@ const TrackDonation = () => {
         <div className="max-w-[480px] mx-auto px-6">
           <div className="flex gap-2">
             <input value={paymentId} onChange={(e) => setPaymentId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. pay_XXXXXXXXXX" className="global-card flex-1 h-[52px] px-4 text-base font-medium focus:ring-2 focus:ring-teal/15 outline-none" />
-            <button onClick={handleSearch} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2">
-              <Search size={18} /> Track
+            <button onClick={() => handleSearch()} disabled={loading} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2 disabled:opacity-60">
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />} {loading ? "Tracking…" : "Track"}
             </button>
           </div>
           <p className="text-xs text-text-light mt-2">Try: pay_ABC123XYZ or pay_DEF456UVW</p>
