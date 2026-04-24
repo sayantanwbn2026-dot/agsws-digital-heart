@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import FadeInUp from "@/components/ui/FadeInUp";
 import toast from "react-hot-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { isValidEmail, normalizeEmail, isValidIndianPhone } from "@/lib/validation";
 
 const EventRegistration = () => {
   const [params] = useSearchParams();
@@ -40,11 +41,22 @@ const EventRegistration = () => {
   const [registered, setRegistered] = useState(false);
   const [waitlisted, setWaitlisted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [applicationRef, setApplicationRef] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", email: "", phone: "", attendees: "1", source: "" });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!event) return;
+    if (submitting) return;
+
+    // Client-side validation — surface specific errors instead of letting
+    // an opaque DB rejection bubble up.
+    const name = form.name.trim();
+    const email = normalizeEmail(form.email);
+    if (name.length < 2) { toast.error("Please enter your full name."); return; }
+    if (!isValidEmail(email)) { toast.error("Please enter a valid email address."); return; }
+    if (!isValidIndianPhone(form.phone)) { toast.error("Please enter a valid 10-digit phone number."); return; }
+
     setSubmitting(true);
     const requestedSeats = Number(form.attendees) || 1;
 
@@ -66,9 +78,9 @@ const EventRegistration = () => {
 
     const { data: inserted, error } = await (supabase.from("support_applications" as any) as any).insert({
       type: "event_registration",
-      applicant_name: form.name,
-      email: form.email,
-      phone: form.phone,
+      applicant_name: name,
+      email,
+      phone: form.phone.trim(),
       status: finalStatus,
       form_data: {
         event_id: event.id,
@@ -92,9 +104,9 @@ const EventRegistration = () => {
       await supabase.functions.invoke("send-email", {
         body: {
           type: "event-confirmation",
-          to: form.email,
+          to: email,
           data: {
-            applicant_name: form.name,
+            applicant_name: name,
             event_title: event.title,
             event_date: event.date,
             location: event.location,
@@ -109,6 +121,7 @@ const EventRegistration = () => {
     }
 
     setSubmitting(false);
+    setApplicationRef(inserted?.application_ref || null);
     setWaitlisted(willWaitlist);
     setRegistered(true);
     toast.success(willWaitlist ? "Added to waitlist" : "Registration complete!");
