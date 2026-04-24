@@ -175,23 +175,29 @@ const Contact = () => {
                     loading={volSubmitting}
                     disabled={volSubmitting}
                     onClick={async () => {
-                      if (!vol.name || !vol.email || !vol.phone) {
-                        toast.error("Please fill name, email and phone.");
-                        return;
-                      }
+                      if (volSubmitting) return;
+                      const name = vol.name.trim();
+                      const email = normalizeEmail(vol.email);
+                      if (name.length < 2) { toast.error("Please enter your full name."); return; }
+                      if (!isValidEmail(email)) { toast.error("Please enter a valid email address."); return; }
+                      if (!isValidIndianPhone(vol.phone)) { toast.error("Please enter a valid 10-digit phone number."); return; }
                       setVolSubmitting(true);
-                      const { error } = await (supabase.from("support_applications" as any) as any).insert({
+                      const { data: row, error } = await (supabase.from("support_applications" as any) as any).insert({
                         type: "volunteer",
-                        applicant_name: vol.name,
-                        email: vol.email,
-                        phone: vol.phone,
+                        applicant_name: name,
+                        email,
+                        phone: vol.phone.trim(),
                         form_data: { role_interest: volunteerModal, message: vol.message, source: "contact_volunteer_modal" },
-                      });
+                      }).select("application_ref").maybeSingle();
                       setVolSubmitting(false);
                       if (error) { toast.error("Submission failed. Please try again."); return; }
                       setVolunteerModal(null);
                       setVol({ name: "", email: "", phone: "", message: "" });
-                      toast.success("Interest submitted! We'll be in touch.");
+                      toast.success(
+                        row?.application_ref
+                          ? `Interest submitted! Ref: ${row.application_ref}`
+                          : "Interest submitted! We'll be in touch."
+                      );
                     }}
                     className="flex-1"
                   >Submit</PremiumButton>
