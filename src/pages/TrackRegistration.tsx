@@ -88,9 +88,9 @@ const TrackRegistration = () => {
       <section className="bg-background py-16">
         <div className="max-w-[480px] mx-auto px-6">
           <div className="flex gap-2">
-            <input value={regId} onChange={(e) => setRegId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. REG-2025-0001" className="global-card flex-1 h-[52px] px-4 text-base font-medium focus:ring-2 focus:ring-teal/15 outline-none" />
-            <button onClick={handleSearch} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2 hover:bg-teal-dark transition-colors">
-              <Search size={18} /> Track
+            <input value={regId} onChange={(e) => setRegId(e.target.value.toUpperCase())} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. REG-2025-0001" className="global-card flex-1 h-[52px] px-4 text-base font-medium focus:ring-2 focus:ring-teal/15 outline-none uppercase" />
+            <button onClick={() => handleSearch()} disabled={loading} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2 hover:bg-teal-dark transition-colors disabled:opacity-60">
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />} {loading ? "Tracking…" : "Track"}
             </button>
           </div>
           <p className="text-xs text-text-light mt-2">Try: REG-2025-0001 or REG-2025-0042</p>
