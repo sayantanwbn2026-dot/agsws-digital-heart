@@ -99,6 +99,10 @@ Deno.serve(async (req) => {
       if (table === 'cms_blog_posts') {
         query = query.order('created_at', { ascending: false })
       }
+      if (table === 'cms_events') {
+        // Show most-recent / upcoming events at the top in the CMS list.
+        query = query.order('event_date', { ascending: false, nullsFirst: false })
+      }
       const { data, error } = await query
       if (error) throw error
       return new Response(JSON.stringify(data), {

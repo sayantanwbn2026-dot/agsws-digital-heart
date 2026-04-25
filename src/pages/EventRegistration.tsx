@@ -14,7 +14,7 @@ import { isValidEmail, normalizeEmail, isValidIndianPhone } from "@/lib/validati
 const EventRegistration = () => {
   const [params] = useSearchParams();
   const eventId = params.get("event") || "";
-  const { data: cmsEvents } = useCMSList<any>("cms_events", [], { orderBy: { column: "sort_order", ascending: true } });
+  const { data: cmsEvents } = useCMSList<any>("cms_events", [], { orderBy: { column: "event_date", ascending: false } });
 
   const event: AGSWSEvent | undefined = useMemo(() => {
     // Try CMS by id first

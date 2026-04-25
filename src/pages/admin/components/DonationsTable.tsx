@@ -87,7 +87,7 @@ const DonationsTable = ({ gateway, color, showTier }: DonationsTableProps) => {
           </thead>
           <tbody>
             {filtered.map((d, i) => (
-              <tr key={d.razorpay_payment_id ?? i} className={`border-b border-border last:border-0 ${i % 2 ? "bg-background" : ""} hover:bg-teal-light/30 transition-colors`}>
+              <tr key={d.stripe_payment_intent ?? d.id ?? i} className={`border-b border-border last:border-0 ${i % 2 ? "bg-background" : ""} hover:bg-teal-light/30 transition-colors`}>
                 <td className="px-4 py-3 text-text-light text-xs">{d.created_at ? new Date(d.created_at).toLocaleDateString("en-IN") : d.date ?? ""}</td>
                 <td className="px-4 py-3 font-medium text-text-dark">{d.donor_name ?? d.name ?? ""}</td>
                 <td className="px-4 py-3 text-text-mid">{d.donor_email ?? d.email ?? ""}</td>

@@ -4,7 +4,7 @@ import { CMS_UPDATE_EVENT } from '@/lib/cms-sync'
 
 interface Options {
   filter?: { column: string; value: any }
-  orderBy?: { column: string; ascending?: boolean }
+  orderBy?: { column: string; ascending?: boolean; nullsFirst?: boolean }
   limit?: number
 }
 
@@ -24,7 +24,8 @@ export function useCMSList<T>(
     }
     if (options?.orderBy) {
       query = query.order(options.orderBy.column, {
-        ascending: options.orderBy.ascending ?? true
+        ascending: options.orderBy.ascending ?? true,
+        nullsFirst: options.orderBy.nullsFirst ?? false,
       })
     }
     if (options?.limit) {
