@@ -991,7 +991,7 @@ const ContentTrendChart = ({ allData }: { allData: Record<string, any[]> }) => {
 
 /* ─── Overview Dashboard ──────────────────────────── */
 const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<string, number>; allData: Record<string, any[]>; onNavigate: (id: string) => void }) => {
-  const contentSections = sections.filter(s => !s.isOverview && !s.singleRow && !s.isCustom && !s.isDivider);
+  const contentSections = sections.filter(s => !(s as any).isOverview && !(s as any).singleRow && !(s as any).isCustom);
   const totalItems = contentSections.reduce((sum, s) => sum + (counts[s.id] || 0), 0);
   const pieData = contentSections.filter(s => counts[s.id]).map(s => ({ name: s.label, value: counts[s.id] || 0 }));
 
@@ -1152,7 +1152,7 @@ const AdminDashboard = () => {
 
   const fetchAllCounts = useCallback(() => {
     sections.forEach(async (s) => {
-      if (s.singleRow || s.isOverview || s.isDivider || !s.table) return;
+      if ((s as any).singleRow || (s as any).isOverview || !s.table) return;
       try {
         const data = await getAll(s.table);
         const arr = Array.isArray(data) ? data : [data];
@@ -1168,7 +1168,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'r') { e.preventDefault(); fetchAllCounts(); }
-      const sectionKeys = sections.filter(s => !s.isDivider);
+      const sectionKeys = sections;
       const num = parseInt(e.key);
       if (!isNaN(num) && num >= 1 && num <= 9 && !e.ctrlKey && !e.metaKey && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
         const idx = num - 1;
@@ -1186,7 +1186,7 @@ const AdminDashboard = () => {
   };
 
   const filteredSections = sidebarSearch
-    ? sections.filter(s => !s.isDivider && s.label.toLowerCase().includes(sidebarSearch.toLowerCase()))
+    ? sections.filter(s => s.label.toLowerCase().includes(sidebarSearch.toLowerCase()))
     : sections;
 
   const renderCustomSection = () => {
