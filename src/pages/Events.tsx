@@ -131,25 +131,39 @@ const MiniCalendar = ({ month, year, events: evts, onChangeMonth }: {
 
 const Events = () => {
   useSEO("Events & Campaigns", "Medical camps, school programmes, and community drives in Kolkata by AGSWS.");
-  const { data: cmsEvents } = useCMSList<any>('cms_events', [], { orderBy: { column: 'sort_order', ascending: true } });
+  // Pull events ordered by event_date descending (newest first). Past vs upcoming
+  // is then derived from the date locally so the same query feeds both sections.
+  const { data: cmsEvents } = useCMSList<any>('cms_events', [], { orderBy: { column: 'event_date', ascending: false } });
 
   const events: AGSWSEvent[] = useMemo(() => {
-    if (cmsEvents.length > 0) {
-      return cmsEvents.map((e: any) => ({
-        id: e.id,
-        title: e.title,
-        type: 'medical' as const,
-        date: e.event_date || e.created_at,
-        time: e.event_date ? new Date(e.event_date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '',
-        venue: e.location || '',
-        location: e.location || '',
-        description: e.description || '',
-        capacity: e.capacity || 100,
-        registered: 0,
-        isPast: e.event_date ? new Date(e.event_date) < new Date() : false,
-      }));
-    }
-    return fallbackEvents;
+    if (cmsEvents.length === 0) return fallbackEvents;
+    // Defensive de-duplication: if the same title + event_date appears twice,
+    // keep the earliest-created copy. Prevents the UI from listing duplicate
+    // cards if the data is ever re-imported.
+    const seen = new Set<string>();
+    const cleaned = cmsEvents
+      .filter((e: any) => e.is_published !== false)
+      .filter((e: any) => {
+        const key = `${(e.title || '').trim().toLowerCase()}|${e.event_date || ''}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    return cleaned.map((e: any) => ({
+      id: e.id,
+      title: e.title,
+      type: 'medical' as const,
+      date: e.event_date || e.created_at,
+      time: e.event_date
+        ? new Date(e.event_date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        : '',
+      venue: e.location || '',
+      location: e.location || '',
+      description: e.description || '',
+      capacity: e.capacity || 100,
+      registered: 0,
+      isPast: e.event_date ? new Date(e.event_date) < new Date() : false,
+    }));
   }, [cmsEvents]);
 
   const [filter, setFilter] = useState<string>("all");
@@ -158,8 +172,15 @@ const Events = () => {
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
   const [calYear, setCalYear] = useState(new Date().getFullYear());
 
-  const upcoming = useMemo(() => events.filter(e => !e.isPast && (filter === "all" || e.type === filter)), [filter, events]);
-  const past = useMemo(() => events.filter(e => e.isPast && (filter === "all" || e.type === filter)), [filter, events]);
+  // Upcoming: soonest first (ascending). Past: most-recent first (descending).
+  const upcoming = useMemo(() => events
+    .filter(e => !e.isPast && (filter === "all" || e.type === filter))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+    [filter, events]);
+  const past = useMemo(() => events
+    .filter(e => e.isPast && (filter === "all" || e.type === filter))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [filter, events]);
 
   const changeMonth = (dir: number) => {
     let m = calMonth + dir;
