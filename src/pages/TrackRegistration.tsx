@@ -44,7 +44,7 @@ const TrackRegistration = () => {
     setResult(null);
     setSearched(true);
     try {
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-registration?id=${encodeURIComponent(id)}`;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=track-registration&id=${encodeURIComponent(id)}`;
       const res = await fetch(url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
       });

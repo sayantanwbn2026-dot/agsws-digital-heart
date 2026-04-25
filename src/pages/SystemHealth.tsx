@@ -62,9 +62,9 @@ const SystemHealth = () => {
     const updates = await Promise.all([
       ...TABLES.map(async (t) => ({ id: `tbl:${t}`, label: t, group: "Database" as const, ...(await pingTable(t)) })),
       pingFn("/cms-api?table=cms_hero").then((r) => ({ id: "fn:cms-api", label: "cms-api (CMS read)", group: "Edge Functions" as const, ...r })),
-      pingFn("/data-api/donor-wall?limit=1").then((r) => ({ id: "fn:data-api/donor-wall", label: "data-api · donor-wall", group: "Edge Functions" as const, ...r })),
-      pingFn("/data-api/track-donation?payment_id=__health__").then((r) => ({ id: "fn:data-api/track-donation", label: "data-api · track-donation", group: "Edge Functions" as const, ...r })),
-      pingFn("/data-api/track-registration?id=__health__").then((r) => ({ id: "fn:data-api/track-registration", label: "data-api · track-registration", group: "Edge Functions" as const, ...r })),
+      pingFn("/data-api?action=donor-wall&limit=1").then((r) => ({ id: "fn:data-api/donor-wall", label: "data-api · donor-wall", group: "Edge Functions" as const, ...r })),
+      pingFn("/data-api?action=track-donation&payment_id=__health__").then((r) => ({ id: "fn:data-api/track-donation", label: "data-api · track-donation", group: "Edge Functions" as const, ...r })),
+      pingFn("/data-api?action=track-registration&id=__health__").then((r) => ({ id: "fn:data-api/track-registration", label: "data-api · track-registration", group: "Edge Functions" as const, ...r })),
       pingFn("/send-email").then((r) => ({ id: "fn:send-email", label: "send-email", group: "Edge Functions" as const, ...r })),
       pingFn("/create-stripe-donation").then((r) => ({ id: "fn:create-stripe-donation", label: "create-stripe-donation", group: "Edge Functions" as const, ...r })),
     ]);

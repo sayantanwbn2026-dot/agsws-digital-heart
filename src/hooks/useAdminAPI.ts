@@ -16,11 +16,11 @@ function rewriteUrl(input: string): string {
   // Map admin paths to data-api edge function actions
   if (input.startsWith('/api/admin/donations')) {
     const qs = input.split('?')[1] ?? '';
-    return `${SUPABASE_URL}/functions/v1/data-api/admin-donations${qs ? `?${qs}` : ''}`;
+    return `${SUPABASE_URL}/functions/v1/data-api?action=admin-donations${qs ? `&${qs}` : ''}`;
   }
   if (input.startsWith('/api/admin/registrations')) {
     const qs = input.split('?')[1] ?? '';
-    return `${SUPABASE_URL}/functions/v1/data-api/admin-registrations${qs ? `?${qs}` : ''}`;
+    return `${SUPABASE_URL}/functions/v1/data-api?action=admin-registrations${qs ? `&${qs}` : ''}`;
   }
   // Default: assume same-origin Supabase function
   return `${SUPABASE_URL}${input}`;

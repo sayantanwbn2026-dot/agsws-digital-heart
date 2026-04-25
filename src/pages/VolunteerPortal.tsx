@@ -20,7 +20,7 @@ const VolunteerPortal = () => {
     setError(false);
     setResult(null);
     try {
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/track-volunteer?id=${encodeURIComponent(volId.trim().toUpperCase())}`;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=track-volunteer&id=${encodeURIComponent(volId.trim().toUpperCase())}`;
       const res = await fetch(url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
       });
