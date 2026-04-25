@@ -567,3 +567,112 @@ body::before {
   .heading-3 { font-size: 20px; }
   .stat-number { font-size: 40px; }
 }
+
+/* =========================================
+   PART 15 — CMS SHELL (Linear / Notion style)
+   Scoped to .cms-shell on the admin pages.
+========================================= */
+.cms-shell {
+  /* Neutral, low-contrast palette inspired by Linear & Notion. We reuse
+     the public-site shadcn tokens but flatten accents to graphite so the
+     admin stops feeling like a marketing page. */
+  --cms-bg:        #FAFAFA;
+  --cms-surface:   #FFFFFF;
+  --cms-surface-2: #F5F5F4;
+  --cms-border:    #E7E5E4;
+  --cms-border-strong: #D6D3D1;
+  --cms-text:      #1C1917;
+  --cms-text-mid:  #57534E;
+  --cms-text-dim:  #A8A29E;
+  --cms-accent:    #18181B;          /* near-black accent like Linear */
+  --cms-accent-soft: rgba(24,24,27,0.06);
+  --cms-focus:     rgba(24,24,27,0.18);
+  --cms-success:   #15803D;
+  --cms-warn:      #B45309;
+  --cms-danger:    #B91C1C;
+
+  background: var(--cms-bg);
+  color: var(--cms-text);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01", "ss03";
+}
+
+/* Dense, flat surface */
+.cms-shell .cms-surface { background: var(--cms-surface); border: 1px solid var(--cms-border); border-radius: 10px; }
+.cms-shell .cms-surface-flat { background: var(--cms-surface); border-bottom: 1px solid var(--cms-border); }
+
+/* Typography overrides — tighter headings inside CMS only */
+.cms-shell h1, .cms-shell h2, .cms-shell h3, .cms-shell h4 { color: var(--cms-text); max-width: none; letter-spacing: -0.012em; }
+.cms-shell p, .cms-shell li, .cms-shell span { line-height: 1.5; max-width: none; }
+.cms-shell .text-foreground { color: var(--cms-text) !important; }
+.cms-shell .text-muted-foreground { color: var(--cms-text-mid) !important; }
+
+/* Override shadcn primary inside the CMS so the admin feels neutral */
+.cms-shell .text-primary { color: var(--cms-accent) !important; }
+.cms-shell .bg-primary { background: var(--cms-accent) !important; color: #fff !important; }
+.cms-shell .bg-primary\/10 { background: var(--cms-accent-soft) !important; }
+.cms-shell .bg-primary\/5 { background: rgba(24,24,27,0.035) !important; }
+.cms-shell .border-primary\/20 { border-color: rgba(24,24,27,0.14) !important; }
+.cms-shell .border-primary\/30 { border-color: rgba(24,24,27,0.2) !important; }
+.cms-shell .ring-primary\/20 { --tw-ring-color: rgba(24,24,27,0.18) !important; }
+.cms-shell .focus\:ring-primary\/20:focus { --tw-ring-color: rgba(24,24,27,0.18) !important; }
+.cms-shell .text-primary-foreground { color: #fff !important; }
+.cms-shell .hover\:text-primary:hover { color: var(--cms-accent) !important; }
+.cms-shell .hover\:border-primary\/30:hover { border-color: rgba(24,24,27,0.2) !important; }
+
+/* Borders & cards — flatter */
+.cms-shell .border-border { border-color: var(--cms-border) !important; }
+.cms-shell .bg-card { background: var(--cms-surface) !important; }
+.cms-shell .bg-background { background: var(--cms-bg) !important; }
+.cms-shell .bg-muted { background: var(--cms-surface-2) !important; }
+.cms-shell .bg-muted\/30 { background: rgba(245,245,244,0.45) !important; }
+.cms-shell .bg-muted\/50 { background: rgba(245,245,244,0.65) !important; }
+.cms-shell .bg-muted\/60 { background: rgba(245,245,244,0.75) !important; }
+.cms-shell .bg-muted\/80 { background: rgba(245,245,244,0.92) !important; }
+
+/* Subtle button hover */
+.cms-shell button { transition: background-color 100ms ease, color 100ms ease, border-color 100ms ease; }
+
+/* Sidebar specific */
+.cms-sidebar { background: var(--cms-surface); border-right: 1px solid var(--cms-border); }
+.cms-sidebar nav button { font-weight: 500; }
+.cms-sidebar .cms-nav-active { background: var(--cms-accent-soft); color: var(--cms-text); }
+.cms-sidebar .cms-nav-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cms-text-dim);
+  padding: 12px 12px 6px;
+}
+
+/* Top bar */
+.cms-topbar { background: var(--cms-surface); border-bottom: 1px solid var(--cms-border); height: 48px; }
+
+/* Tables/rows hover */
+.cms-shell .row-hover:hover { background: var(--cms-surface-2); }
+
+/* Inputs */
+.cms-shell input, .cms-shell select, .cms-shell textarea {
+  background: var(--cms-surface);
+  border: 1px solid var(--cms-border);
+  color: var(--cms-text);
+  border-radius: 8px;
+}
+.cms-shell input:focus, .cms-shell select:focus, .cms-shell textarea:focus {
+  outline: none;
+  border-color: var(--cms-border-strong);
+  box-shadow: 0 0 0 3px var(--cms-focus);
+}
+
+/* Kbd-like chip */
+.cms-shell .cms-kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--cms-surface-2);
+  border: 1px solid var(--cms-border);
+  color: var(--cms-text-mid);
+}
