@@ -39,7 +39,7 @@ const DonorWall = () => {
     try {
       const params = new URLSearchParams({ limit: "50" });
       if (gw) params.set("gateway", gw);
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api/donor-wall?${params}`;
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=donor-wall&${params}`;
       const res = await fetch(url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
       });
