@@ -64,7 +64,13 @@ Deno.serve(async (req) => {
     const url = new URL(req.url)
     // Path style: /data-api/<action>
     const segments = url.pathname.split('/').filter(Boolean)
-    const action = segments[segments.length - 1] || ''
+    // Support both /data-api/<action> and /data-api?action=<action>
+    let action = url.searchParams.get('action') || ''
+    if (!action) {
+      const last = segments[segments.length - 1] || ''
+      // If the last segment is the function name itself, there's no action
+      action = last === 'data-api' ? '' : last
+    }
 
     // ====== PUBLIC ======
     if (action === 'donor-wall' && req.method === 'GET') {
