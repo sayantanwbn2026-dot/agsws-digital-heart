@@ -676,3 +676,46 @@ body::before {
   border: 1px solid var(--cms-border);
   color: var(--cms-text-mid);
 }
+
+/* ─── Editor surface polish (modals, rows, toolbars) ─── */
+
+/* Cards/containers inside the CMS feel flatter: thin border, no chunky shadow */
+.cms-shell .shadow-sm,
+.cms-shell .shadow,
+.cms-shell .shadow-md { box-shadow: none !important; }
+.cms-shell .shadow-2xl { box-shadow: 0 12px 32px -12px rgba(24,24,27,0.18), 0 2px 6px rgba(24,24,27,0.06) !important; }
+
+/* Rounded corners — Linear/Notion uses slightly tighter radii */
+.cms-shell .rounded-xl { border-radius: 10px !important; }
+.cms-shell .rounded-2xl { border-radius: 12px !important; }
+
+/* Modal backdrop lighter, less blur */
+.cms-shell .fixed.inset-0.bg-black\/50 { background: rgba(24,24,27,0.32) !important; }
+.cms-shell .backdrop-blur-sm { backdrop-filter: blur(2px) !important; }
+
+/* Row hover — subtle stone tint */
+.cms-shell .hover\:bg-muted\/30:hover { background: rgba(245,245,244,0.6) !important; }
+.cms-shell .hover\:bg-muted:hover { background: var(--cms-surface-2) !important; }
+
+/* Status pills — desaturate emerald to match neutral palette */
+.cms-shell .bg-emerald-500\/10 { background: rgba(21,128,61,0.08) !important; }
+.cms-shell .text-emerald-600 { color: var(--cms-success) !important; }
+
+/* Destructive — softer red */
+.cms-shell .text-destructive { color: var(--cms-danger) !important; }
+.cms-shell .bg-destructive { background: var(--cms-danger) !important; }
+.cms-shell .hover\:bg-destructive\/10:hover { background: rgba(185,28,28,0.08) !important; }
+
+/* Inputs in the renderer — match neutral focus ring */
+.cms-shell .focus\:border-primary:focus { border-color: var(--cms-border-strong) !important; }
+
+/* Primary action buttons — Linear-style solid graphite, subtle hover */
+.cms-shell button.bg-primary:hover { background: #27272A !important; }
+
+/* Drag handle alignment */
+.cms-shell [aria-label="Drag to reorder"] { color: var(--cms-text-dim); }
+.cms-shell [aria-label="Drag to reorder"]:hover { color: var(--cms-text-mid); }
+
+/* Image upload dropzone — tighter, less colorful */
+.cms-shell .border-dashed { border-color: var(--cms-border-strong) !important; }
+.cms-shell .border-dashed:hover { border-color: var(--cms-text-dim) !important; }
