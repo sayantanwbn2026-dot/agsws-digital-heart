@@ -160,45 +160,50 @@ const paymentFields: FieldConfig[] = [
   { key: 'bank_branch', label: 'Bank Branch', type: 'text' },
 ];
 
-// ─── Sidebar Sections ────────────────────────────────────────────
+// ─── Sidebar Sections (with grouped navigation) ────────────────────────
+// `group` is purely presentational — it lets the sidebar render
+// Notion/Linear style group labels without changing routing logic.
 const sections = [
-  { id: 'overview', label: 'Overview', icon: TrendingUp, table: '', fields: [], isOverview: true },
-  { id: 'landing', label: 'Landing Page', icon: Home, table: '', fields: [], isCustom: true },
-  { id: 'hero', label: 'Hero Section', icon: Type, table: 'cms_hero', fields: heroFields, singleRow: true },
-  { id: 'stats', label: 'Impact Stats', icon: LayoutDashboard, table: 'cms_stats', fields: statsFields },
-  { id: 'initiatives', label: 'Initiatives', icon: Heart, table: 'cms_initiatives', fields: initiativeFields },
-  { id: 'testimonials', label: 'Testimonials', icon: Star, table: 'cms_testimonials', fields: testimonialFields },
-  { id: 'stories', label: 'Impact Stories', icon: BookOpen, table: 'cms_stories', fields: storyFields },
-  { id: 'events', label: 'Events', icon: Calendar, table: 'cms_events', fields: eventFields },
-  { id: 'team', label: 'Team Members', icon: Users, table: 'cms_team', fields: teamFields },
-  { id: 'faqs', label: 'FAQs', icon: HelpCircle, table: 'cms_faqs', fields: faqFields },
-  { id: 'gallery', label: 'Gallery', icon: ImageIcon, table: 'cms_gallery', fields: galleryFields },
-  { id: 'partners', label: 'Partners', icon: Handshake, table: 'cms_partners', fields: partnerFields },
-  { id: 'blog', label: 'Blog Posts', icon: FileText, table: 'cms_blog_posts', fields: blogFields },
-  { id: 'resources', label: 'Resources', icon: FolderOpen, table: 'cms_resources', fields: resourceFields },
-  { id: 'divider1', label: '', icon: null as any, table: '', fields: [], isDivider: true },
-  { id: 'applications', label: 'Applications', icon: ClipboardList, table: 'support_applications', fields: [], isCustom: true },
-  { id: 'newsletter', label: 'Newsletter', icon: Mail, table: 'newsletter_subscriptions', fields: [], isCustom: true },
-  { id: 'payments', label: 'Stripe Payments', icon: CreditCard, table: '', fields: [], isCustom: true },
-  { id: 'seo', label: 'SEO Checker', icon: FileSearch, table: '', fields: [], isCustom: true },
-  { id: 'scheduler', label: 'Scheduler', icon: CalendarClock, table: '', fields: [], isCustom: true },
-  { id: 'import', label: 'Bulk Import', icon: Upload, table: '', fields: [], isCustom: true },
-  { id: 'divider_pages', label: '', icon: null as any, table: '', fields: [], isDivider: true },
-  { id: 'about_mission', label: 'About — Mission', icon: BookOpen, table: '', fields: [], isCustom: true },
-  { id: 'about_values', label: 'About — Values', icon: Heart, table: '', fields: [], isCustom: true },
-  { id: 'about_counters', label: 'About — Counters', icon: LayoutDashboard, table: '', fields: [], isCustom: true },
-  { id: 'about_timeline', label: 'About — Timeline', icon: CalendarClock, table: '', fields: [], isCustom: true },
-  { id: 'about_docs', label: 'About — Docs', icon: Shield, table: '', fields: [], isCustom: true },
-  { id: 'about_cta', label: 'About — CTA', icon: Type, table: '', fields: [], isCustom: true },
-  { id: 'medical_page', label: 'Medical Aid Page', icon: Heart, table: '', fields: [], isCustom: true },
-  { id: 'education_page', label: 'Education Page', icon: BookOpen, table: '', fields: [], isCustom: true },
-  { id: 'register_parent', label: 'GoldenAge Page', icon: Heart, table: '', fields: [], isCustom: true },
-  { id: 'register_parent_docs', label: 'GoldenAge Docs', icon: FileText, table: '', fields: [], isCustom: true },
-  { id: 'analytics_sidebar', label: 'Analytics — Sidebar', icon: BarChart3, table: '', fields: [], isCustom: true },
-  { id: 'footer', label: 'Footer Content', icon: PanelLeftClose, table: '', fields: [], isCustom: true },
-  { id: 'divider2', label: '', icon: null as any, table: '', fields: [], isDivider: true },
-  { id: 'payment', label: 'Payment Settings', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true },
-  { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true },
+  { id: 'overview', label: 'Overview', icon: TrendingUp, table: '', fields: [], isOverview: true, group: 'Workspace' },
+  { id: 'landing', label: 'Landing Page', icon: Home, table: '', fields: [], isCustom: true, group: 'Workspace' },
+
+  { id: 'hero', label: 'Hero Section', icon: Type, table: 'cms_hero', fields: heroFields, singleRow: true, group: 'Homepage' },
+  { id: 'stats', label: 'Impact Stats', icon: LayoutDashboard, table: 'cms_stats', fields: statsFields, group: 'Homepage' },
+  { id: 'initiatives', label: 'Initiatives', icon: Heart, table: 'cms_initiatives', fields: initiativeFields, group: 'Homepage' },
+  { id: 'testimonials', label: 'Testimonials', icon: Star, table: 'cms_testimonials', fields: testimonialFields, group: 'Homepage' },
+
+  { id: 'stories', label: 'Impact Stories', icon: BookOpen, table: 'cms_stories', fields: storyFields, group: 'Content' },
+  { id: 'events', label: 'Events', icon: Calendar, table: 'cms_events', fields: eventFields, group: 'Content' },
+  { id: 'blog', label: 'Blog Posts', icon: FileText, table: 'cms_blog_posts', fields: blogFields, group: 'Content' },
+  { id: 'gallery', label: 'Gallery', icon: ImageIcon, table: 'cms_gallery', fields: galleryFields, group: 'Content' },
+  { id: 'resources', label: 'Resources', icon: FolderOpen, table: 'cms_resources', fields: resourceFields, group: 'Content' },
+  { id: 'faqs', label: 'FAQs', icon: HelpCircle, table: 'cms_faqs', fields: faqFields, group: 'Content' },
+
+  { id: 'team', label: 'Team Members', icon: Users, table: 'cms_team', fields: teamFields, group: 'Organisation' },
+  { id: 'partners', label: 'Partners', icon: Handshake, table: 'cms_partners', fields: partnerFields, group: 'Organisation' },
+
+  { id: 'applications', label: 'Applications', icon: ClipboardList, table: 'support_applications', fields: [], isCustom: true, group: 'Operations' },
+  { id: 'newsletter', label: 'Newsletter', icon: Mail, table: 'newsletter_subscriptions', fields: [], isCustom: true, group: 'Operations' },
+  { id: 'payments', label: 'Stripe Payments', icon: CreditCard, table: '', fields: [], isCustom: true, group: 'Operations' },
+  { id: 'seo', label: 'SEO Checker', icon: FileSearch, table: '', fields: [], isCustom: true, group: 'Operations' },
+  { id: 'scheduler', label: 'Scheduler', icon: CalendarClock, table: '', fields: [], isCustom: true, group: 'Operations' },
+  { id: 'import', label: 'Bulk Import', icon: Upload, table: '', fields: [], isCustom: true, group: 'Operations' },
+
+  { id: 'about_mission', label: 'About — Mission', icon: BookOpen, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'about_values', label: 'About — Values', icon: Heart, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'about_counters', label: 'About — Counters', icon: LayoutDashboard, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'about_timeline', label: 'About — Timeline', icon: CalendarClock, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'about_docs', label: 'About — Docs', icon: Shield, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'about_cta', label: 'About — CTA', icon: Type, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'medical_page', label: 'Medical Aid Page', icon: Heart, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'education_page', label: 'Education Page', icon: BookOpen, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'register_parent', label: 'GoldenAge Page', icon: Heart, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'register_parent_docs', label: 'GoldenAge Docs', icon: FileText, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'analytics_sidebar', label: 'Analytics — Sidebar', icon: BarChart3, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'footer', label: 'Footer Content', icon: PanelLeftClose, table: '', fields: [], isCustom: true, group: 'Pages' },
+
+  { id: 'payment', label: 'Payment Settings', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true, group: 'Settings' },
+  { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true, group: 'Settings' },
 ];
 
 const previewUrls: Record<string, string> = {
