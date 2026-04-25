@@ -1219,84 +1219,109 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="cms-shell min-h-screen flex">
       {/* Sidebar */}
       <motion.aside
         animate={{ width: collapsed ? 68 : 260 }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
-        className="bg-card border-r border-border flex flex-col shrink-0 sticky top-0 h-screen overflow-hidden z-20"
+        className="cms-sidebar flex flex-col shrink-0 sticky top-0 h-screen overflow-hidden z-20"
       >
-        <div className="h-14 flex items-center justify-between px-4 border-b border-border">
+        <div className="h-12 flex items-center justify-between px-3 border-b border-border">
           {!collapsed && (
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center"><Database size={14} className="text-primary-foreground" /></div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-bold text-sm text-foreground tracking-tight">AGSWS</span>
-                <span className="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold">CMS</span>
-              </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center"><Database size={12} className="text-primary-foreground" /></div>
+              <span className="font-semibold text-[13px] text-foreground tracking-tight">AGSWS</span>
+              <span className="cms-kbd">CMS</span>
             </div>
           )}
-          {collapsed && <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center mx-auto"><Database size={14} className="text-primary-foreground" /></div>}
-          <button onClick={() => setCollapsed(!collapsed)} className={`p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground ${collapsed ? 'mx-auto mt-2' : ''}`}>
-            {collapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+          {collapsed && <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center mx-auto"><Database size={12} className="text-primary-foreground" /></div>}
+          <button onClick={() => setCollapsed(!collapsed)} className={`p-1 rounded-md hover:bg-muted transition-colors text-muted-foreground ${collapsed ? 'mx-auto mt-2' : ''}`}>
+            {collapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}
           </button>
         </div>
 
         {/* Sidebar search */}
         {!collapsed && (
-          <div className="px-3 py-2 border-b border-border">
+          <div className="px-3 py-2.5 border-b border-border">
             <div className="relative">
-              <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={sidebarSearch}
                 onChange={(e) => setSidebarSearch(e.target.value)}
-                placeholder="Search sections…"
-                className="no-float w-full h-8 pl-7 pr-3 rounded-md border border-border bg-background text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+                placeholder="Search…"
+                className="no-float w-full h-7 pl-6 pr-12 rounded-md border border-border bg-background text-[12px] focus:outline-none"
               />
+              <span className="cms-kbd absolute right-2 top-1/2 -translate-y-1/2 hidden sm:inline">⌘K</span>
             </div>
           </div>
         )}
 
-        <nav className="flex-1 min-h-0 py-2 overflow-y-auto px-2 space-y-0.5">
-          {filteredSections.map((section) => {
-            if (section.isDivider) return <div key={section.id} className="h-px bg-border mx-2 my-3" />;
-            const isActive = activeSection === section.id;
-            return (
-              <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 ${isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'}`}
-                title={collapsed ? section.label : undefined}
-              >
-                {section.icon && <section.icon size={16} className="shrink-0" />}
-                {!collapsed && (
-                  <>
-                    <span className="truncate flex-1 text-left">{section.label}</span>
-                    {!section.singleRow && !section.isOverview && !section.isCustom && counts[section.id] !== undefined && (
-                      <span className={`text-[10px] font-bold min-w-[20px] h-5 flex items-center justify-center rounded-md ${isActive ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                        {counts[section.id]}
-                      </span>
-                    )}
-                  </>
-                )}
-              </button>
-            );
-          })}
+        <nav className="flex-1 min-h-0 py-2 overflow-y-auto px-2">
+          {(() => {
+            // Render grouped (Linear/Notion style). When the user is searching
+            // we collapse to a flat list to keep matches scannable.
+            const renderItem = (section: any) => {
+              const isActive = activeSection === section.id;
+              const showBadge =
+                !section.singleRow && !section.isOverview && !section.isCustom &&
+                counts[section.id] !== undefined;
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[12.5px] font-medium transition-colors ${
+                    isActive
+                      ? 'cms-nav-active'
+                      : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                  }`}
+                  title={collapsed ? section.label : undefined}
+                >
+                  {section.icon && <section.icon size={14} className="shrink-0" strokeWidth={1.75} />}
+                  {!collapsed && (
+                    <>
+                      <span className="truncate flex-1 text-left">{section.label}</span>
+                      {showBadge && (
+                        <span className="text-[10px] font-medium tabular-nums text-muted-foreground">
+                          {counts[section.id]}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </button>
+              );
+            };
+
+            if (sidebarSearch || collapsed) {
+              return <div className="space-y-0.5">{filteredSections.map(renderItem)}</div>;
+            }
+
+            const groupOrder = ['Workspace', 'Homepage', 'Content', 'Organisation', 'Operations', 'Pages', 'Settings'];
+            return groupOrder.map((g) => {
+              const items = sections.filter((s: any) => s.group === g);
+              if (!items.length) return null;
+              return (
+                <div key={g} className="mb-1">
+                  <p className="cms-nav-group-label">{g}</p>
+                  <div className="space-y-0.5">{items.map(renderItem)}</div>
+                </div>
+              );
+            });
+          })()}
         </nav>
 
         <div className="p-3 border-t border-border space-y-1">
           {!collapsed && (
-            <p className="text-[9px] text-muted-foreground px-3 mb-1">
+            <p className="text-[10px] text-muted-foreground px-2 mb-1">
               Last sync: {lastRefresh.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
             </p>
           )}
-          <button onClick={fetchAllCounts} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted transition-colors ${collapsed ? 'justify-center' : ''}`}>
-            <RefreshCw size={14} />
+          <button onClick={fetchAllCounts} className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ${collapsed ? 'justify-center' : ''}`}>
+            <RefreshCw size={13} strokeWidth={1.75} />
             {!collapsed && 'Refresh Data'}
           </button>
-          <button onClick={handleSignOut} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-colors ${collapsed ? 'justify-center' : ''}`}>
-            <LogOut size={14} />
+          <button onClick={handleSignOut} className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] font-medium text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-colors ${collapsed ? 'justify-center' : ''}`}>
+            <LogOut size={13} strokeWidth={1.75} />
             {!collapsed && 'Sign Out'}
           </button>
         </div>
@@ -1304,31 +1329,34 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-card border-b border-border h-14 flex items-center justify-between px-6 sticky top-0 z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              {currentSection.icon && <currentSection.icon size={14} className="text-primary" />}
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-foreground">{currentSection.label}</h1>
-              {currentSection.table && <p className="text-[10px] text-muted-foreground">{currentSection.table}</p>}
-            </div>
+        <header className="cms-topbar flex items-center justify-between px-5 sticky top-0 z-10">
+          <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+            {(currentSection as any).group && (
+              <>
+                <span>{(currentSection as any).group}</span>
+                <span className="text-muted-foreground/60">/</span>
+              </>
+            )}
+            <span className="text-foreground font-medium">{currentSection.label}</span>
+            {currentSection.table && (
+              <span className="cms-kbd ml-2">{currentSection.table}</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {previewUrls[activeSection] && (
-              <a href={previewUrls[activeSection]} target="_blank" rel="noopener" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+              <a href={previewUrls[activeSection]} target="_blank" rel="noopener" className="flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[11.5px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
                 <Eye size={12} /> Preview
               </a>
             )}
             {!currentSection.isOverview && !currentSection.singleRow && !currentSection.isCustom && allData[activeSection]?.length > 0 && (
-              <button onClick={() => exportToCSV(allData[activeSection], activeSection)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+              <button onClick={() => exportToCSV(allData[activeSection], activeSection)} className="flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[11.5px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
                 <Download size={12} /> Export
               </button>
             )}
           </div>
         </header>
 
-        <main className="flex-1 p-6 lg:p-8 overflow-auto bg-background">
+        <main className="flex-1 p-5 lg:p-7 overflow-auto bg-background">
           <motion.div key={activeSection} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
             {currentSection.isOverview ? (
               <OverviewDashboard counts={counts} allData={allData} onNavigate={setActiveSection} />
