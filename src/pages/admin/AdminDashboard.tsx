@@ -1192,6 +1192,7 @@ const AdminDashboard = () => {
 
   const renderCustomSection = () => {
     if (activeSection === 'landing') return <LandingPageCMS onNavigate={setActiveSection} />;
+    if (activeSection === 'events') return <EventEditor />;
     if (activeSection === 'applications') return <ApplicationsManager items={allData.applications || []} onRefresh={fetchAllCounts} />;
     if (activeSection === 'newsletter') return <NewsletterManager items={allData.newsletter || []} />;
     if (activeSection === 'payments') return <PaymentsManager />;
