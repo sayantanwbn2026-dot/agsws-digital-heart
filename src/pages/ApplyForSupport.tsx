@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Heart, GraduationCap, CheckCircle, Phone, ArrowRight } from "lucide-react";
+import { Heart, GraduationCap, CheckCircle, Phone, ArrowRight, Upload, X, FileText, Mail, Clock } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +41,12 @@ const educationSchema = z.object({
 
 const incomeOptions = ["Below ₹5,000", "₹5,000–₹15,000", "₹15,000–₹30,000", "Above ₹30,000"];
 
+const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png", "image/webp"];
+const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_FILES = 5;
+
+const formatBytes = (b: number) => b < 1024 * 1024 ? `${(b / 1024).toFixed(0)} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`;
+
 const FormField = ({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) => (
   <div>
     <label className="text-[12px] font-[600] text-[var(--dark)] mb-2 block uppercase tracking-[0.06em]">{label}</label>
@@ -49,11 +55,97 @@ const FormField = ({ label, error, children }: { label: string; error?: string; 
   </div>
 );
 
+type Attachment = { file: File; id: string };
+
+const DocumentUploader = ({
+  files,
+  onChange,
+  accentColor,
+  helperText,
+}: {
+  files: Attachment[];
+  onChange: (files: Attachment[]) => void;
+  accentColor: string;
+  helperText: string;
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleAdd = (incoming: FileList | null) => {
+    if (!incoming) return;
+    const next: Attachment[] = [...files];
+    for (const f of Array.from(incoming)) {
+      if (next.length >= MAX_FILES) {
+        toast.error(`Maximum ${MAX_FILES} files allowed`);
+        break;
+      }
+      if (!ALLOWED_TYPES.includes(f.type)) {
+        toast.error(`${f.name}: only PDF, JPG, PNG, or WEBP allowed`);
+        continue;
+      }
+      if (f.size > MAX_FILE_BYTES) {
+        toast.error(`${f.name} is larger than 5 MB`);
+        continue;
+      }
+      if (next.some(a => a.file.name === f.name && a.file.size === f.size)) continue;
+      next.push({ file: f, id: `${f.name}-${f.size}-${Date.now()}` });
+    }
+    onChange(next);
+    if (inputRef.current) inputRef.current.value = '';
+  };
+
+  const remove = (id: string) => onChange(files.filter(a => a.id !== id));
+
+  return (
+    <div>
+      <label className="text-[12px] font-[600] text-[var(--dark)] mb-2 block uppercase tracking-[0.06em]">Supporting Documents <span className="text-[var(--light)] normal-case tracking-normal font-[400]">(optional)</span></label>
+      <div
+        onClick={() => inputRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); }}
+        onDrop={(e) => { e.preventDefault(); handleAdd(e.dataTransfer.files); }}
+        className="cursor-pointer rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--border-color)] hover:border-[var(--teal)]/40 transition-colors p-6 text-center bg-[var(--bg)]/40"
+        style={{ borderColor: files.length ? accentColor + '55' : undefined }}
+      >
+        <div className="w-10 h-10 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: `color-mix(in srgb, ${accentColor} 12%, white)` }}>
+          <Upload size={18} style={{ color: accentColor }} />
+        </div>
+        <p className="text-[13px] font-[600] text-[var(--dark)] mb-1">Click or drop files to upload</p>
+        <p className="text-[11px] text-[var(--light)]">{helperText}</p>
+        <p className="text-[11px] text-[var(--light)] mt-1">PDF, JPG, PNG, WEBP · max 5 MB each · up to {MAX_FILES} files</p>
+        <input
+          ref={inputRef}
+          type="file"
+          multiple
+          accept={ALLOWED_TYPES.join(',')}
+          className="hidden"
+          onChange={(e) => handleAdd(e.target.files)}
+        />
+      </div>
+      {files.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {files.map((a) => (
+            <li key={a.id} className="flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] bg-white border border-[var(--border-color)]">
+              <FileText size={16} style={{ color: accentColor }} />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-[500] text-[var(--dark)] truncate">{a.file.name}</p>
+                <p className="text-[11px] text-[var(--light)]">{formatBytes(a.file.size)}</p>
+              </div>
+              <button type="button" onClick={() => remove(a.id)} className="p-1 hover:bg-[var(--bg)] rounded-full transition-colors" aria-label={`Remove ${a.file.name}`}>
+                <X size={14} className="text-[var(--mid)]" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
 const ApplyForSupport = () => {
   useSEO("Apply for Support", "Apply for AGSWS medical or education support. Free and confidential.");
   const [activeForm, setActiveForm] = useState<"medical" | "education" | null>(null);
-  const [submitted, setSubmitted] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState<{ ref: string; type: 'medical' | 'education'; email: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [files, setFiles] = useState<Attachment[]>([]);
 
   const med = useForm({ resolver: zodResolver(medicalSchema) });
   const edu = useForm<z.infer<typeof educationSchema>>({
@@ -61,62 +153,149 @@ const ApplyForSupport = () => {
     defaultValues: { needFees: false, needBooks: false, needMeals: false, needUniform: false, needExamFees: false },
   });
 
-  const onMedicalSubmit = async (data: any) => {
+  const uploadFiles = async (refKey: string): Promise<{ name: string; url: string; size: number; type: string }[]> => {
+    if (!files.length) return [];
+    const uploaded: { name: string; url: string; size: number; type: string }[] = [];
+    for (const a of files) {
+      const safeName = a.file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `applications/${refKey}/${Date.now()}-${safeName}`;
+      const { error: upErr } = await supabase.storage.from('cms-uploads').upload(path, a.file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: a.file.type,
+      });
+      if (upErr) {
+        console.error('[upload]', upErr);
+        toast.error(`Failed to upload ${a.file.name}`);
+        continue;
+      }
+      const { data: pub } = supabase.storage.from('cms-uploads').getPublicUrl(path);
+      uploaded.push({ name: a.file.name, url: pub.publicUrl, size: a.file.size, type: a.file.type });
+    }
+    return uploaded;
+  };
+
+  const submitApplication = async (params: {
+    type: 'medical' | 'education';
+    applicant_name: string;
+    email: string;
+    phone: string;
+    form: any;
+  }) => {
     setSubmitting(true);
     try {
-      const { error } = await (supabase.from('support_applications' as any) as any).insert({
-        type: 'medical',
-        applicant_name: data.patientName,
-        email: data.email,
-        phone: data.phone,
-        form_data: data,
-      });
+      const refKey = `${params.type}-${Date.now()}`;
+      const documents = await uploadFiles(refKey);
+      const { data: inserted, error } = await (supabase.from('support_applications' as any) as any)
+        .insert({
+          type: params.type,
+          applicant_name: params.applicant_name,
+          email: params.email,
+          phone: params.phone,
+          form_data: { ...params.form, documents },
+        })
+        .select('application_ref')
+        .single();
       if (error) throw error;
-      const ref = `APP-MED-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-      setSubmitted(ref);
-      toast.success('Application submitted!');
+      const ref = inserted?.application_ref || `APP-${Date.now()}`;
+
+      // Fire-and-forget: applicant + admin notifications
+      supabase.functions.invoke('send-email', {
+        body: {
+          type: 'application-confirmation',
+          to: params.email,
+          data: {
+            application_ref: ref,
+            applicant_name: params.applicant_name,
+            type: params.type,
+            phone: params.phone,
+            documents,
+          },
+        },
+      }).catch((e) => console.error('[applicant email]', e));
+
+      supabase.functions.invoke('send-email', {
+        body: {
+          type: 'admin-application',
+          to: 'admin',
+          data: {
+            application_ref: ref,
+            applicant_name: params.applicant_name,
+            email: params.email,
+            phone: params.phone,
+            type: params.type,
+          },
+        },
+      }).catch((e) => console.error('[admin email]', e));
+
+      setSubmitted({ ref, type: params.type, email: params.email });
+      toast.success('Application submitted — check your email');
     } catch (err: any) {
-      toast.error(err.message || 'Submission failed');
+      console.error('[apply submit]', err);
+      toast.error(err.message || 'Submission failed. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const onEducationSubmit = async (data: any) => {
-    setSubmitting(true);
-    try {
-      const { error } = await (supabase.from('support_applications' as any) as any).insert({
-        type: 'education',
-        applicant_name: data.childName,
-        email: data.parentEmail,
-        phone: data.parentPhone,
-        form_data: data,
-      });
-      if (error) throw error;
-      const ref = `APP-EDU-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-      setSubmitted(ref);
-      toast.success('Application submitted!');
-    } catch (err: any) {
-      toast.error(err.message || 'Submission failed');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const onMedicalSubmit = (data: any) =>
+    submitApplication({ type: 'medical', applicant_name: data.patientName, email: data.email, phone: data.phone, form: data });
+
+  const onEducationSubmit = (data: any) =>
+    submitApplication({ type: 'education', applicant_name: data.childName, email: data.parentEmail, phone: data.parentPhone, form: data });
 
   if (submitted) {
     return (
       <main id="main-content" className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 18 }} className="text-center max-w-md mx-auto px-6 py-16">
-          <div className="w-20 h-20 bg-[var(--teal)] rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle size={40} className="text-white" />
+        <motion.div
+          initial={{ scale: 0.92, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 22 }}
+          className="max-w-[520px] w-full mx-auto px-6 py-16"
+        >
+          <div className="bg-white rounded-[var(--radius-2xl)] border border-[var(--border-color)] shadow-[var(--shadow-lg)] overflow-hidden">
+            <div className="bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] px-8 py-10 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 250, damping: 16, delay: 0.15 }}
+                className="w-20 h-20 bg-white/15 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-5 border border-white/25"
+              >
+                <CheckCircle size={42} className="text-white" />
+              </motion.div>
+              <p className="text-[10px] font-[700] text-white/70 uppercase tracking-[0.14em] mb-2">Application Received</p>
+              <h2 className="text-[26px] font-[800] text-white tracking-[-0.01em]">Thank you</h2>
+            </div>
+            <div className="p-8">
+              <div className="bg-[var(--teal)]/5 rounded-[var(--radius-xl)] p-5 mb-6 border border-[var(--teal)]/15 text-center">
+                <p className="text-[10px] text-[var(--light)] uppercase tracking-[0.1em] font-[600]">Reference</p>
+                <p className="text-[22px] font-[800] text-[var(--teal)] mt-1 font-mono tracking-tight">{submitted.ref}</p>
+              </div>
+              <ul className="space-y-3 mb-7">
+                <li className="flex gap-3 items-start">
+                  <Mail size={16} className="text-[var(--teal)] mt-0.5 shrink-0" />
+                  <span className="text-[13.5px] text-[var(--mid)] leading-[1.6]">A confirmation has been emailed to <strong className="text-[var(--dark)]">{submitted.email}</strong>.</span>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <Clock size={16} className="text-[var(--teal)] mt-0.5 shrink-0" />
+                  <span className="text-[13.5px] text-[var(--mid)] leading-[1.6]">Our team will review your application and respond within <strong className="text-[var(--dark)]">3 working days</strong>.</span>
+                </li>
+                <li className="flex gap-3 items-start">
+                  <Phone size={16} className="text-[var(--teal)] mt-0.5 shrink-0" />
+                  <span className="text-[13.5px] text-[var(--mid)] leading-[1.6]">For urgent help, call <strong className="text-[var(--dark)]">+91 98765 43210</strong>.</span>
+                </li>
+              </ul>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a href="/" className="flex-1 text-center px-5 py-3 rounded-full bg-[var(--teal)] text-white font-[600] text-[14px] hover:bg-[var(--teal-dark)] transition-colors">Back to Home</a>
+                <button
+                  onClick={() => { setSubmitted(null); setActiveForm(null); setFiles([]); med.reset(); edu.reset(); }}
+                  className="flex-1 px-5 py-3 rounded-full border border-[var(--border-color)] text-[var(--mid)] font-[600] text-[14px] hover:bg-[var(--bg)] transition-colors"
+                >
+                  Submit another
+                </button>
+              </div>
+            </div>
           </div>
-          <h2 className="text-[28px] font-[700] text-[var(--teal)] mb-3">Application Received</h2>
-          <p className="text-[var(--mid)] text-[14px] mb-6 leading-[1.7]">We will review and contact you within 3 working days.</p>
-          <div className="bg-[var(--teal)]/5 rounded-[var(--radius-xl)] p-5 mb-6 border border-[var(--teal)]/15">
-            <p className="text-[11px] text-[var(--light)] uppercase tracking-[0.08em]">Application Reference</p>
-            <p className="text-[22px] font-[800] text-[var(--teal)] mt-1">{submitted}</p>
-          </div>
-          <a href="/" className="text-[var(--teal)] font-[600] text-[14px] hover:underline">← Back to Home</a>
         </motion.div>
       </main>
     );
@@ -198,6 +377,12 @@ const ApplyForSupport = () => {
                         <input {...med.register("email")} type="email" placeholder="Email" className="no-float" />
                       </FormField>
                     </div>
+                    <DocumentUploader
+                      files={files}
+                      onChange={setFiles}
+                      accentColor="#1F9AA8"
+                      helperText="Attach medical reports, prescriptions, hospital bills, or any supporting documents."
+                    />
                     <motion.button type="submit" disabled={submitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[48px] bg-[var(--teal)] text-white font-[600] rounded-full text-[14px] hover:bg-[var(--teal-dark)] transition-colors mt-2 disabled:opacity-50">
                       {submitting ? 'Submitting...' : 'Submit Application'}
                     </motion.button>
@@ -270,6 +455,12 @@ const ApplyForSupport = () => {
                     <FormField label="Brief reason (optional)">
                       <textarea {...edu.register("reason")} placeholder="Why is support needed?" rows={2} maxLength={300} className="no-float" />
                     </FormField>
+                    <DocumentUploader
+                      files={files}
+                      onChange={setFiles}
+                      accentColor="#5C5AB8"
+                      helperText="Attach school ID, marksheets, fee receipts, or income proof."
+                    />
                     <motion.button type="submit" disabled={submitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[48px] bg-[var(--purple)] text-white font-[600] rounded-full text-[14px] hover:opacity-90 transition-opacity mt-2 disabled:opacity-50">
                       {submitting ? 'Submitting...' : 'Submit Application'}
                     </motion.button>
