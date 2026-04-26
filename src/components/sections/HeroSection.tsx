@@ -105,8 +105,8 @@ const HeroSection = () => {
           <motion.button onClick={openOverlay} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="px-9 py-4 text-[14px] font-[700] bg-[var(--yellow)] text-[var(--dark)] rounded-full shadow-[0_4px_16px_rgba(242,183,5,0.25)] hover:shadow-[0_8px_32px_rgba(242,183,5,0.4)] transition-shadow flex items-center justify-center gap-2">
             {hero.cta_text || defaultHero.cta_text} <ArrowRight size={16} />
           </motion.button>
-          <Link to="/initiatives" className="px-9 py-4 text-[14px] font-[600] text-white/90 border border-white/[0.15] rounded-full hover:bg-white/[0.06] hover:border-white/[0.25] transition-all text-center">
-            Our Initiatives
+          <Link to="/apply" className="px-9 py-4 text-[14px] font-[600] text-white/90 border border-white/[0.15] rounded-full hover:bg-white/[0.06] hover:border-white/[0.25] transition-all text-center">
+            Apply for Support
           </Link>
         </motion.div>
 
