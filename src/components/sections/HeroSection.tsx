@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useRef } from "react";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { useCMSData } from "@/hooks/useCMSData";
+import { useCMSList } from "@/hooks/useCMSList";
 
 const CompassionText = () => {
   const letters = "Compassion".split("");
@@ -25,6 +26,12 @@ const StatCard = ({ value, label, delay }: { value: string; label: string; delay
   </motion.div>
 );
 
+const fallbackHeroStats = [
+  { value: "2,400+", label: "Patients Aided" },
+  { value: "850+", label: "Students Sponsored" },
+  { value: "120+", label: "Families Registered" },
+];
+
 const defaultHero = {
   headline: 'Changing Lives, One Act of Compassion at a Time.',
   subtitle: 'Providing medical aid, education support, and emergency care for families across Kolkata. Every rupee reaches those who need it most.',
@@ -37,6 +44,8 @@ const HeroSection = () => {
   const sectionRef = useRef(null);
   const { openOverlay } = useDonateOverlay();
   const { data: hero } = useCMSData<typeof defaultHero>('cms_hero', defaultHero);
+  const { data: cmsStats } = useCMSList<any>('cms_stats', [], { orderBy: { column: 'sort_order' } });
+  const heroStats = (cmsStats.length ? cmsStats.slice(0, 3).map((s: any) => ({ value: s.value, label: s.label })) : fallbackHeroStats);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 180]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 60]);
@@ -112,9 +121,9 @@ const HeroSection = () => {
 
         {/* Stats - hidden on mobile */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.6 }} className="hidden sm:flex flex-wrap justify-center divide-x divide-white/[0.1] mb-8">
-          <StatCard value="2,400+" label="Patients Aided" delay={1.15} />
-          <StatCard value="850+" label="Students Sponsored" delay={1.25} />
-          <StatCard value="120+" label="Families Registered" delay={1.35} />
+          {heroStats.map((s, i) => (
+            <StatCard key={s.label} value={s.value} label={s.label} delay={1.15 + i * 0.1} />
+          ))}
         </motion.div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.5 }} className="hidden sm:flex flex-wrap justify-center gap-5 text-white/45">

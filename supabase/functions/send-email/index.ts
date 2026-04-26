@@ -90,6 +90,36 @@ function adminAppHTML(d: any) {
   return `<div style="font-family:Arial,sans-serif;padding:24px"><h2>New ${d.type} application</h2><p><strong>${d.applicant_name}</strong> (${d.email}, ${d.phone})</p><p>Ref: ${d.application_ref}</p></div>`
 }
 
+function applicationConfirmationHTML(d: any) {
+  const typeLabel = d.type === 'medical' ? 'Medical Aid' : d.type === 'education' ? 'Education Support' : 'Support'
+  const docCount = Array.isArray(d.documents) ? d.documents.length : 0
+  return `
+    <div style="font-family:-apple-system,Segoe UI,Arial,sans-serif;background:#F7F5F2;padding:32px 0">
+      <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.06)">
+        <div style="background:linear-gradient(135deg,${TEAL},#176B75);padding:36px;text-align:center">
+          <div style="display:inline-block;background:rgba(255,255,255,.15);padding:8px 16px;border-radius:99px;color:#fff;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase">Application Received</div>
+          <h1 style="color:#fff;margin:16px 0 0;font-size:26px;font-weight:800">Thank you, ${d.applicant_name}</h1>
+        </div>
+        <div style="padding:36px">
+          <p style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 20px">We've received your <strong>${typeLabel}</strong> application. Our team will review the details and contact you within <strong>3 working days</strong>.</p>
+          <div style="background:#E6F4F6;border-radius:12px;padding:20px;text-align:center;margin:20px 0">
+            <p style="margin:0;font-size:11px;color:#64748b;letter-spacing:.1em;text-transform:uppercase">Application Reference</p>
+            <h2 style="color:${TEAL};margin:6px 0 0;font-size:24px;font-weight:800">${d.application_ref}</h2>
+          </div>
+          ${docCount > 0 ? `<p style="color:#475569;font-size:14px;margin:0 0 12px">📎 <strong>${docCount}</strong> document${docCount > 1 ? 's' : ''} attached.</p>` : ''}
+          <p style="color:#475569;font-size:14px;line-height:1.7;margin:0 0 12px"><strong>What happens next?</strong></p>
+          <ol style="color:#475569;font-size:14px;line-height:1.7;padding-left:20px;margin:0 0 20px">
+            <li>Our team reviews your application.</li>
+            <li>We may call you on <strong>${d.phone}</strong> to verify details.</li>
+            <li>You'll receive a decision by email within 3 working days.</li>
+          </ol>
+          <p style="color:#475569;font-size:14px">For urgent help, call <a href="tel:+919876543210" style="color:${TEAL};font-weight:600;text-decoration:none">+91 98765 43210</a>.</p>
+          <p style="color:#94a3b8;font-size:12px;margin:24px 0 0">AGSWS — The Ascension Group Social Welfare Society<br/>Kolkata, West Bengal, India</p>
+        </div>
+      </div>
+    </div>`
+}
+
 function newsletterHTML(d: any) {
   return `<div style="font-family:-apple-system,Arial,sans-serif;background:#F7F5F2;padding:32px"><div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;padding:36px"><h1 style="color:${TEAL};margin:0 0 12px">Welcome to AGSWS</h1><p style="color:#475569">Thanks for subscribing${d.name ? ', ' + d.name : ''}. You'll receive our impact updates and stories from the field.</p></div></div>`
 }
@@ -162,6 +192,10 @@ Deno.serve(async (req) => {
       case 'admin-application':
         subject = `[AGSWS] New ${data.type} application — ${data.applicant_name}`
         html = adminAppHTML(data)
+        break
+      case 'application-confirmation':
+        subject = `Application received — ${data.application_ref}`
+        html = applicationConfirmationHTML(data)
         break
       case 'newsletter-welcome':
         subject = 'Welcome to AGSWS updates'
