@@ -14,6 +14,7 @@ import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar,
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
 import SectionEditor from "./components/SectionEditor";
 import PaymentsManager from "./components/PaymentsManager";
+import EventEditor from "./components/EventEditor";
 import { useCMSApi } from "@/hooks/useCMSApi";
 import toast from "react-hot-toast";
 
@@ -173,7 +174,7 @@ const sections = [
   { id: 'testimonials', label: 'Testimonials', icon: Star, table: 'cms_testimonials', fields: testimonialFields, group: 'Homepage' },
 
   { id: 'stories', label: 'Impact Stories', icon: BookOpen, table: 'cms_stories', fields: storyFields, group: 'Content' },
-  { id: 'events', label: 'Events', icon: Calendar, table: 'cms_events', fields: eventFields, group: 'Content' },
+  { id: 'events', label: 'Events', icon: Calendar, table: 'cms_events', fields: eventFields, isCustom: true, group: 'Content' },
   { id: 'blog', label: 'Blog Posts', icon: FileText, table: 'cms_blog_posts', fields: blogFields, group: 'Content' },
   { id: 'gallery', label: 'Gallery', icon: ImageIcon, table: 'cms_gallery', fields: galleryFields, group: 'Content' },
   { id: 'resources', label: 'Resources', icon: FolderOpen, table: 'cms_resources', fields: resourceFields, group: 'Content' },
@@ -1191,6 +1192,7 @@ const AdminDashboard = () => {
 
   const renderCustomSection = () => {
     if (activeSection === 'landing') return <LandingPageCMS onNavigate={setActiveSection} />;
+    if (activeSection === 'events') return <EventEditor />;
     if (activeSection === 'applications') return <ApplicationsManager items={allData.applications || []} onRefresh={fetchAllCounts} />;
     if (activeSection === 'newsletter') return <NewsletterManager items={allData.newsletter || []} />;
     if (activeSection === 'payments') return <PaymentsManager />;

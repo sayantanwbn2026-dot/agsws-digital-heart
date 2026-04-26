@@ -100,8 +100,16 @@ Deno.serve(async (req) => {
         query = query.order('created_at', { ascending: false })
       }
       if (table === 'cms_events') {
-        // Show most-recent / upcoming events at the top in the CMS list.
-        query = query.order('event_date', { ascending: false, nullsFirst: false })
+        // Events list ordering is critical — guarantee a deterministic sort:
+        //   1) primary: event_date DESC, NULLs last (so dated events always
+        //      win over undated ones)
+        //   2) tie-breaker: created_at DESC (newer record wins on identical
+        //      dates — useful when admins clone an event)
+        //   3) final tie-breaker: id ASC (stable across page loads)
+        query = query
+          .order('event_date', { ascending: false, nullsFirst: false })
+          .order('created_at', { ascending: false })
+          .order('id', { ascending: true })
       }
       const { data, error } = await query
       if (error) throw error

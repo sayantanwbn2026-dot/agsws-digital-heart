@@ -172,14 +172,27 @@ const Events = () => {
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
   const [calYear, setCalYear] = useState(new Date().getFullYear());
 
-  // Upcoming: soonest first (ascending). Past: most-recent first (descending).
+  // Sorting guarantees (frontend safety-net mirroring the backend rules):
+  //   • Upcoming  → soonest first (date ASC)
+  //   • Past      → most-recent first (date DESC)
+  //   • Tie-break → title alphabetical, then id (so list never re-shuffles)
+  const tieBreak = (a: AGSWSEvent, b: AGSWSEvent) =>
+    (a.title || '').localeCompare(b.title || '') ||
+    (a.id || '').localeCompare(b.id || '');
+
   const upcoming = useMemo(() => events
     .filter(e => !e.isPast && (filter === "all" || e.type === filter))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+    .sort((a, b) => {
+      const diff = new Date(a.date).getTime() - new Date(b.date).getTime();
+      return diff !== 0 ? diff : tieBreak(a, b);
+    }),
     [filter, events]);
   const past = useMemo(() => events
     .filter(e => e.isPast && (filter === "all" || e.type === filter))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    .sort((a, b) => {
+      const diff = new Date(b.date).getTime() - new Date(a.date).getTime();
+      return diff !== 0 ? diff : tieBreak(a, b);
+    }),
     [filter, events]);
 
   const changeMonth = (dir: number) => {
