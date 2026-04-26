@@ -337,7 +337,7 @@ const ApplyForSupport = () => {
           <AnimatePresence mode="wait">
             {activeForm === "medical" && (
               <motion.div key="med" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-                <button onClick={() => setActiveForm(null)} className="text-[var(--teal)] font-[600] text-[14px] mb-6 hover:underline">← Choose a different category</button>
+                <button onClick={() => { setActiveForm(null); setFiles([]); }} className="text-[var(--teal)] font-[600] text-[14px] mb-6 hover:underline">← Choose a different category</button>
                 <div className="bg-white rounded-[var(--radius-2xl)] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-full bg-[var(--teal)]/10 flex items-center justify-center">
@@ -393,7 +393,7 @@ const ApplyForSupport = () => {
 
             {activeForm === "education" && (
               <motion.div key="edu" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-                <button onClick={() => setActiveForm(null)} className="text-[var(--purple)] font-[600] text-[14px] mb-6 hover:underline">← Choose a different category</button>
+                <button onClick={() => { setActiveForm(null); setFiles([]); }} className="text-[var(--purple)] font-[600] text-[14px] mb-6 hover:underline">← Choose a different category</button>
                 <div className="bg-white rounded-[var(--radius-2xl)] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-full bg-[var(--purple)]/10 flex items-center justify-center">
