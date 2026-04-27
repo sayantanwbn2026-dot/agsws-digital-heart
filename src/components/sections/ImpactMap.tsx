@@ -1,15 +1,29 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
-import { MapPin, Activity, Users, BookOpen } from "lucide-react";
+import { MapPin, Activity, Users, BookOpen, Heart, GraduationCap, Stethoscope } from "lucide-react";
 import FadeInUp from "../ui/FadeInUp";
+import { useCMSList } from "@/hooks/useCMSList";
 
-const regions = [
-  { id: 1, name: "Salt Lake", type: "medical", x: 20, y: 30, desc: "Weekly Health Camps", icon: Activity, metric: "2,500+ Treated" },
-  { id: 2, name: "Park Street District", type: "education", x: 50, y: 45, desc: "Scholarship Hub", icon: BookOpen, metric: "450 Students" },
-  { id: 3, name: "Howrah", type: "community", x: 30, y: 70, desc: "Emergency Response", icon: Users, metric: "24/7 Support" },
-  { id: 4, name: "New Town", type: "medical", x: 75, y: 25, desc: "Elderly Care Unit", icon: Activity, metric: "120 Families" },
-  { id: 5, name: "Ballygunge", type: "education", x: 65, y: 65, desc: "Community Library", icon: BookOpen, metric: "New Facility" },
+type ImpactZone = {
+  id: string;
+  name: string;
+  type: string;
+  description?: string;
+  metric?: string;
+  icon?: string;
+  position_x: number;
+  position_y: number;
+};
+
+const fallbackZones: ImpactZone[] = [
+  { id: 'f1', name: "Salt Lake", type: "medical", description: "Weekly Health Camps", metric: "2,500+ Treated", icon: 'Activity', position_x: 20, position_y: 30 },
+  { id: 'f2', name: "Park Street District", type: "education", description: "Scholarship Hub", metric: "450 Students", icon: 'BookOpen', position_x: 50, position_y: 45 },
+  { id: 'f3', name: "Howrah", type: "community", description: "Emergency Response", metric: "24/7 Support", icon: 'Users', position_x: 30, position_y: 70 },
+  { id: 'f4', name: "New Town", type: "medical", description: "Elderly Care Unit", metric: "120 Families", icon: 'Activity', position_x: 75, position_y: 25 },
+  { id: 'f5', name: "Ballygunge", type: "education", description: "Community Library", metric: "New Facility", icon: 'BookOpen', position_x: 65, position_y: 65 },
 ];
+
+const ICONS: Record<string, any> = { MapPin, Activity, Users, BookOpen, Heart, GraduationCap, Stethoscope };
 
 const colorMap: Record<string, string> = {
   medical: "hsl(var(--primary))",
@@ -19,7 +33,10 @@ const colorMap: Record<string, string> = {
 
 const ImpactMap = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hoveredRegion, setHoveredRegion] = useState<number | null>(null);
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const { data: regions } = useCMSList<ImpactZone>('cms_impact_zones', fallbackZones, {
+    orderBy: { column: 'sort_order', ascending: true },
+  });
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
   const mapScale = useTransform(scrollYProgress, [0, 0.5], [0.92, 1]);
   const bgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
@@ -51,13 +68,14 @@ const ImpactMap = () => {
 
           {regions.map((region, i) => {
             const isHovered = hoveredRegion === region.id;
-            const color = colorMap[region.type];
+            const color = colorMap[region.type] || colorMap.medical;
+            const Icon = ICONS[region.icon || 'MapPin'] || MapPin;
 
             return (
               <motion.div
                 key={region.id}
                 className="absolute flex items-center justify-center pointer-events-auto"
-                style={{ left: `${region.x}%`, top: `${region.y}%`, x: "-50%", y: "-50%" }}
+                style={{ left: `${region.position_x}%`, top: `${region.position_y}%`, x: "-50%", y: "-50%" }}
                 initial={{ scale: 0, opacity: 0 }}
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: true }}
@@ -82,13 +100,17 @@ const ImpactMap = () => {
                     style={{ marginLeft: "-100px" }}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <region.icon size={14} style={{ color }} />
+                      <Icon size={14} style={{ color }} />
                       <span className="text-[11px] font-bold uppercase tracking-wider text-[hsl(var(--foreground))]">{region.name}</span>
                     </div>
-                    <p className="text-[12px] text-[hsl(var(--muted-foreground))] mb-2">{region.desc}</p>
-                    <div className="bg-[hsl(var(--background))] rounded-lg py-1.5 px-2.5 text-center">
-                      <span className="text-[11px] font-semibold" style={{ color }}>{region.metric}</span>
-                    </div>
+                    {region.description && (
+                      <p className="text-[12px] text-[hsl(var(--muted-foreground))] mb-2">{region.description}</p>
+                    )}
+                    {region.metric && (
+                      <div className="bg-[hsl(var(--background))] rounded-lg py-1.5 px-2.5 text-center">
+                        <span className="text-[11px] font-semibold" style={{ color }}>{region.metric}</span>
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </motion.div>
