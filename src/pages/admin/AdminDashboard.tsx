@@ -403,12 +403,46 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
                 <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 pl-4 border-l-2 border-primary/20 space-y-3">
                   <div className="bg-background rounded-lg p-4 text-xs space-y-2">
                     {app.form_data && Object.entries(app.form_data).map(([key, val]) => (
-                      <div key={key} className="flex gap-2">
+                      key === 'documents' ? null : <div key={key} className="flex gap-2">
                         <span className="font-semibold text-muted-foreground capitalize min-w-[120px]">{key.replace(/([A-Z])/g, ' $1')}:</span>
                         <span className="text-foreground">{String(val)}</span>
                       </div>
                     ))}
                   </div>
+                  {Array.isArray(app.form_data?.documents) && app.form_data.documents.length > 0 && (
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-2">Attached Documents</label>
+                      <ul className="space-y-1.5">
+                        {app.form_data.documents.map((d: any, i: number) => (
+                          <li key={i} className="flex items-center gap-2 px-2.5 py-1.5 bg-muted/50 rounded-md">
+                            <FileText size={12} className="text-muted-foreground shrink-0" />
+                            <span className="text-[11px] text-foreground flex-1 truncate">{d.name}</span>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const token = localStorage.getItem('agsws_admin_token') || '';
+                                  // Legacy uploads stored a public `url`; new uploads store a private `path`.
+                                  if (d.path) {
+                                    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=admin-application-doc-url&path=${encodeURIComponent(d.path)}`, {
+                                      headers: { Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+                                    });
+                                    const body = await res.json();
+                                    if (body.url) window.open(body.url, '_blank', 'noopener,noreferrer');
+                                    else toast.error(body.error || 'Could not open document');
+                                  } else if (d.url) {
+                                    window.open(d.url, '_blank', 'noopener,noreferrer');
+                                  }
+                                } catch (e: any) { toast.error(e.message || 'Failed'); }
+                              }}
+                              className="text-[10px] font-bold text-primary hover:underline"
+                            >
+                              Open
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <div>
                     <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Admin Notes</label>
                     <textarea
