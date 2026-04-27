@@ -18,7 +18,7 @@ const ScrollingStoriesStrip = () => {
   const pills = data.pills;
 
   return (
-    <section className="py-6 overflow-hidden relative bg-[hsl(var(--background))]">
+    <section className="py-8 lg:py-10 overflow-hidden relative bg-[hsl(var(--background))]">
       <div style={{ maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)" }}>
         <motion.div
           className="flex"

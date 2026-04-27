@@ -13,7 +13,7 @@ const PartnerStrip = () => {
   const partners = cmsPartners.length ? cmsPartners.map((p: any) => p.name) : staticPartners;
 
   return (
-    <section className="bg-white py-14 overflow-hidden">
+    <section className="bg-white section-sm overflow-hidden">
       <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] mb-8">
         <p className="label text-center mb-0">Trusted By & In Partnership With</p>
       </div>

@@ -18,7 +18,7 @@ const TrustBand = () => {
   const { data } = useCMSSection<typeof defaultData>('trust_band', defaultData);
 
   return (
-    <section className="relative bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] py-16 lg:py-20">
+    <section className="relative bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] section">
       <div className="absolute inset-0 opacity-[0.04]" style={{
         backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
         backgroundSize: '32px 32px'

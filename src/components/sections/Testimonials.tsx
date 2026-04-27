@@ -23,7 +23,7 @@ const Testimonials = () => {
     : staticTestimonials;
 
   return (
-    <section className="bg-white py-20 lg:py-24">
+    <section className="bg-white section">
       <div className="container">
         <FadeInUp className="text-center mb-14">
           <span className="label">Testimonials</span>

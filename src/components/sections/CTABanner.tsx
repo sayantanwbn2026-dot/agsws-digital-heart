@@ -33,7 +33,7 @@ const CTABanner = () => {
 
   return (
     <section ref={ref} className="relative overflow-hidden">
-      <div className="bg-gradient-to-br from-[var(--teal)] via-[var(--teal-dark)] to-[#0D1B1C] py-20 lg:py-28">
+      <div className="bg-gradient-to-br from-[var(--teal)] via-[var(--teal-dark)] to-[#0D1B1C] section">
         <motion.div style={{ y }} className="absolute inset-0 opacity-[0.04]">
           <div className="w-full h-full" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
         </motion.div>

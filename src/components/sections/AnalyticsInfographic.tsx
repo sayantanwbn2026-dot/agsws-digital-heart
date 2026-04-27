@@ -57,7 +57,7 @@ const AnalyticsInfographic = () => {
   const maxVal = Math.max(...chartData.flatMap(d => [d.medical, d.education]));
 
   return (
-    <section ref={sectionRef} className="relative bg-[var(--dark)] py-20 lg:py-28 overflow-hidden">
+    <section ref={sectionRef} className="relative bg-[var(--dark)] section overflow-hidden">
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none opacity-[0.03]">
         <div className="w-full h-full" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "40px 40px" }} />
       </motion.div>
