@@ -456,7 +456,7 @@ const ApplyForSupport = () => {
     <main id="main-content">
       <PageHero title="We're Here to Help" label="Apply for Support" subtitle="Applying for support is simple, private, and free. We respond within 3 working days." bgVariant="warm" size="md" breadcrumb={[{ label: "Home", href: "/" }, { label: "Apply for Support" }]} />
 
-      <section className="bg-[var(--bg)] py-[64px] lg:py-[96px]">
+      <section className="bg-[var(--bg)] section">
         <div className="max-w-[900px] mx-auto px-[var(--container-px)]">
           {!activeForm && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

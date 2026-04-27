@@ -44,7 +44,7 @@ const ImpactStats = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative bg-[hsl(var(--card))] py-14 border-y border-[hsl(var(--border))] overflow-hidden">
+    <section ref={sectionRef} className="relative bg-[hsl(var(--card))] section-sm border-y border-[hsl(var(--border))] overflow-hidden">
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(var(--primary))]/[0.02] rounded-full blur-[100px]" />
       </motion.div>

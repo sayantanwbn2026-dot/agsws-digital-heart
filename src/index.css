@@ -189,15 +189,19 @@
 ========================================= */
 
 /* LAW 5 — TEXT LINE LENGTH */
-p {
+/* Constrain only long-form prose paragraphs, not every <p> in the layout.
+   Components opt-in via .prose-measure or a parent .prose container. */
+.prose-measure, .prose p {
   max-width: 65ch;
 }
-h1, h2, h3, h4, h5, h6 {
-  max-width: 20ch; /* Mobile limit */
+/* Headings: only cap width on long-form / article contexts.
+   Avoid global caps that break centered hero & section headers. */
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  max-width: 32ch;
 }
 @media (min-width: 768px) {
-  h1, h2, h3, h4, h5, h6 {
-    max-width: 80ch; /* Never span more than 80ch */
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    max-width: 28ch;
   }
 }
 
@@ -403,6 +407,17 @@ body {
 @media (max-width: 640px) {
   .section { padding: var(--section-y-sm) 0; }
 }
+
+/* Section spacing modifiers — keep vertical rhythm across the site.
+   Use .section-sm for compact bands (stats, partner strips, scrolling tickers).
+   Use .section-lg for hero-tier statement sections.                       */
+.section-sm { padding: 56px 0; }
+@media (max-width: 1024px) { .section-sm { padding: 40px 0; } }
+@media (max-width: 640px)  { .section-sm { padding: 32px 0; } }
+
+.section-lg { padding: 120px 0; }
+@media (max-width: 1024px) { .section-lg { padding: 88px 0; } }
+@media (max-width: 640px)  { .section-lg { padding: 64px 0; } }
 
 /* Typography scale */
 h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }

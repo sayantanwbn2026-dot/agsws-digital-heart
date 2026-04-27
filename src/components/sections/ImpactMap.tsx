@@ -42,7 +42,7 @@ const ImpactMap = () => {
   const bgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
 
   return (
-    <section className="py-16 lg:py-24 bg-[hsl(187,68%,5%)] relative overflow-hidden" ref={containerRef}>
+    <section className="section bg-[hsl(187,68%,5%)] relative overflow-hidden" ref={containerRef}>
       {/* Parallax BG orbs */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[hsl(var(--primary))]/[0.06] rounded-full blur-[150px]" />

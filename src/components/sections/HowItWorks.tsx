@@ -23,7 +23,7 @@ const HowItWorks = () => {
   const bgY = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
   return (
-    <section ref={ref} className="bg-[hsl(var(--background))] py-16 lg:py-24 relative overflow-hidden">
+    <section ref={ref} className="bg-[hsl(var(--background))] section relative overflow-hidden">
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[hsl(var(--primary))]/[0.02] rounded-full blur-[120px]" />
       </motion.div>
