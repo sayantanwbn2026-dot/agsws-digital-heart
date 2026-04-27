@@ -225,6 +225,7 @@ const sections = [
 
 const previewUrls: Record<string, string> = {
   landing: '/', hero: '/', stats: '/', initiatives: '/initiatives', testimonials: '/',
+  impact_zones: '/',
   stories: '/', events: '/events', team: '/about', faqs: '/faq',
   gallery: '/gallery', partners: '/', blog: '/blog', resources: '/resources',
   how_it_works: '/', scrolling_stories: '/', impact_story: '/',
