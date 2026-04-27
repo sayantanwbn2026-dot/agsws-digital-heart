@@ -57,6 +57,26 @@ function buildDonationStages(row: any) {
   ]
 }
 
+function buildApplicationStages(row: any) {
+  const created = row.created_at ? new Date(row.created_at) : null
+  const updated = row.updated_at ? new Date(row.updated_at) : created
+  const fmt = (d: Date | null) =>
+    d ? d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : null
+  const status = String(row.status || 'pending').toLowerCase()
+  const isReceived = !!created
+  const isReviewing = ['reviewing', 'approved', 'rejected', 'waitlisted'].includes(status)
+  const isDecided = ['approved', 'rejected'].includes(status)
+  const decisionLabel =
+    status === 'approved' ? 'Approved' :
+    status === 'rejected' ? 'Rejected' :
+    status === 'waitlisted' ? 'Waitlisted' : 'Decision Pending'
+  return [
+    { label: 'Application Received', completed: isReceived, date: fmt(created), note: 'We have your application and reference number.' },
+    { label: 'Under Review', completed: isReviewing, date: isReviewing ? fmt(updated) : null, note: 'Our team is reviewing your details and any documents.' },
+    { label: decisionLabel, completed: isDecided, date: isDecided ? fmt(updated) : null, note: isDecided ? (status === 'approved' ? 'Your application has been approved. We will be in touch with next steps.' : 'Your application could not be approved at this time.') : 'You will receive an email once a decision is made.' },
+  ]
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
@@ -185,6 +205,64 @@ Deno.serve(async (req) => {
         categories: fd.categories || { field: 0, medical: 0, education: 0, admin: 0 },
         activities: Array.isArray(fd.activities) ? fd.activities : [],
       })
+    }
+
+    // Public application status tracker — exposes only non-sensitive info
+    if (action === 'track-application' && req.method === 'GET') {
+      const ref = (url.searchParams.get('id') || '').trim().toUpperCase()
+      if (!ref) return json({ error: 'Missing id' }, 400)
+      const { data, error } = await supabase
+        .from('support_applications')
+        .select('application_ref, applicant_name, type, status, created_at, updated_at, admin_notes')
+        .eq('application_ref', ref)
+        .maybeSingle()
+      if (error) return json({ error: error.message }, 500)
+      if (!data) return json({ error: 'Not found' }, 404)
+      return json({
+        ref: data.application_ref,
+        name: data.applicant_name,
+        type: data.type,
+        status: data.status,
+        admin_notes: data.admin_notes || '',
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        stages: buildApplicationStages(data),
+      })
+    }
+
+    // Direct upload to private application-docs bucket — used by the public
+    // apply form. We accept multipart uploads here (rather than handing out a
+    // signed URL) so the bucket can stay strictly private and the client
+    // never needs storage credentials. Validates type + size server-side.
+    if (action === 'upload-application-doc' && req.method === 'POST') {
+      const ALLOWED = new Set(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
+      const MAX_BYTES = 5 * 1024 * 1024
+      const form = await req.formData()
+      const file = form.get('file') as File | null
+      const refKey = String(form.get('ref') || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)
+      if (!file) return json({ error: 'No file provided' }, 400)
+      if (!ALLOWED.has(file.type)) return json({ error: 'Unsupported file type' }, 400)
+      if (file.size > MAX_BYTES) return json({ error: 'File exceeds 5 MB' }, 400)
+      if (!refKey) return json({ error: 'Missing ref' }, 400)
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80)
+      const path = `${refKey}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${safeName}`
+      const { error: upErr } = await supabase.storage
+        .from('application-docs')
+        .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type })
+      if (upErr) return json({ error: upErr.message }, 500)
+      return json({ path, name: file.name, size: file.size, type: file.type })
+    }
+
+    // Admin-only: returns a short-lived signed URL for an application doc
+    if (action === 'admin-application-doc-url' && req.method === 'GET') {
+      if (!requireAdmin(req)) return json({ error: 'Unauthorized' }, 401)
+      const path = url.searchParams.get('path') || ''
+      if (!path) return json({ error: 'Missing path' }, 400)
+      const { data, error } = await supabase.storage
+        .from('application-docs')
+        .createSignedUrl(path, 60 * 10)
+      if (error) return json({ error: error.message }, 500)
+      return json({ url: data.signedUrl, expires_in: 600 })
     }
 
     // ====== ADMIN ======
