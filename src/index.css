@@ -189,15 +189,19 @@
 ========================================= */
 
 /* LAW 5 — TEXT LINE LENGTH */
-p {
+/* Constrain only long-form prose paragraphs, not every <p> in the layout.
+   Components opt-in via .prose-measure or a parent .prose container. */
+.prose-measure, .prose p {
   max-width: 65ch;
 }
-h1, h2, h3, h4, h5, h6 {
-  max-width: 20ch; /* Mobile limit */
+/* Headings: only cap width on long-form / article contexts.
+   Avoid global caps that break centered hero & section headers. */
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  max-width: 32ch;
 }
 @media (min-width: 768px) {
-  h1, h2, h3, h4, h5, h6 {
-    max-width: 80ch; /* Never span more than 80ch */
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    max-width: 28ch;
   }
 }
 
