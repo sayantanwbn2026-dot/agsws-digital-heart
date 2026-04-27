@@ -533,6 +533,7 @@ const ApplyForSupport = () => {
                       onChange={setFiles}
                       accentColor="#1F9AA8"
                       helperText="Attach medical reports, prescriptions, hospital bills, or any supporting documents."
+                      onRetry={handleRetry}
                     />
                     <motion.button type="submit" disabled={submitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[48px] bg-[var(--teal)] text-white font-[600] rounded-full text-[14px] hover:bg-[var(--teal-dark)] transition-colors mt-2 disabled:opacity-50">
                       {submitting ? 'Submitting...' : 'Submit Application'}
@@ -611,6 +612,7 @@ const ApplyForSupport = () => {
                       onChange={setFiles}
                       accentColor="#5C5AB8"
                       helperText="Attach school ID, marksheets, fee receipts, or income proof."
+                      onRetry={handleRetry}
                     />
                     <motion.button type="submit" disabled={submitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full h-[48px] bg-[var(--purple)] text-white font-[600] rounded-full text-[14px] hover:opacity-90 transition-opacity mt-2 disabled:opacity-50">
                       {submitting ? 'Submitting...' : 'Submit Application'}
