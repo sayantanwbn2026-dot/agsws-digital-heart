@@ -111,7 +111,7 @@ const DonateMedical = () => {
         breadcrumb={[{label: "Home", href: "/"}, {label: "Initiatives", href: "/initiatives/medical"}, {label: "Donate"}]}
       />
 
-      <section className="bg-[var(--bg)] py-[64px] lg:py-[96px]">
+      <section className="bg-[var(--bg)] section">
         <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-[6fr_4fr] gap-[40px]">
           
           <div>

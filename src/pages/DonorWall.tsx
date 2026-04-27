@@ -88,7 +88,7 @@ const DonorWall = () => {
     <main id="main-content">
       <PageHero title="Our Donor Wall" label="Community" subtitle="Every name here represents a real act of kindness." size="md" bgVariant="teal-dark" breadcrumb={[{ label: "Home", href: "/" }, { label: "Donor Wall" }]} />
 
-      <section className="bg-[var(--bg)] py-[64px] lg:py-[96px]">
+      <section className="bg-[var(--bg)] section">
         <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)]">
           
           {/* Summary stats */}
