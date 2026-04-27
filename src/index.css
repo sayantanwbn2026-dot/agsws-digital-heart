@@ -408,6 +408,17 @@ body {
   .section { padding: var(--section-y-sm) 0; }
 }
 
+/* Section spacing modifiers — keep vertical rhythm across the site.
+   Use .section-sm for compact bands (stats, partner strips, scrolling tickers).
+   Use .section-lg for hero-tier statement sections.                       */
+.section-sm { padding: 56px 0; }
+@media (max-width: 1024px) { .section-sm { padding: 40px 0; } }
+@media (max-width: 640px)  { .section-sm { padding: 32px 0; } }
+
+.section-lg { padding: 120px 0; }
+@media (max-width: 1024px) { .section-lg { padding: 88px 0; } }
+@media (max-width: 640px)  { .section-lg { padding: 64px 0; } }
+
 /* Typography scale */
 h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
 h2 { font-size: clamp(26px, 3.5vw, 36px); font-weight: 700; letter-spacing: -0.015em; line-height: 1.2; }
