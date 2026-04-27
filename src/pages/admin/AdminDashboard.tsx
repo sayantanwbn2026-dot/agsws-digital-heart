@@ -8,7 +8,7 @@ import {
   TrendingUp, Eye, Mail, ClipboardList, CreditCard,
   BarChart3, PieChart, Activity, Download, ExternalLink,
   AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown,
-  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home
+  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home, MapPin
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
@@ -103,6 +103,21 @@ const partnerFields: FieldConfig[] = [
   { key: 'website', label: 'Website URL', type: 'text' },
 ];
 
+const impactZoneFields: FieldConfig[] = [
+  { key: 'name', label: 'Zone Name', type: 'text', required: true, placeholder: 'e.g. Salt Lake' },
+  { key: 'type', label: 'Type', type: 'select', options: [
+    { label: 'Medical', value: 'medical' },
+    { label: 'Education', value: 'education' },
+    { label: 'Community', value: 'community' },
+  ]},
+  { key: 'description', label: 'Short Description', type: 'text', placeholder: 'e.g. Weekly Health Camps' },
+  { key: 'metric', label: 'Headline Metric', type: 'text', placeholder: 'e.g. 2,500+ Treated' },
+  { key: 'icon', label: 'Icon Name', type: 'text', placeholder: 'Activity, BookOpen, Users, MapPin' },
+  { key: 'position_x', label: 'Map X (0–100)', type: 'number', placeholder: '0–100' },
+  { key: 'position_y', label: 'Map Y (0–100)', type: 'number', placeholder: '0–100' },
+  { key: 'is_published', label: 'Published', type: 'boolean' },
+];
+
 const blogFields: FieldConfig[] = [
   { key: 'title', label: 'Title', type: 'text', required: true },
   { key: 'slug', label: 'URL Slug', type: 'text', required: true, placeholder: 'my-blog-post' },
@@ -171,6 +186,7 @@ const sections = [
   { id: 'hero', label: 'Hero Section', icon: Type, table: 'cms_hero', fields: heroFields, singleRow: true, group: 'Homepage' },
   { id: 'stats', label: 'Impact Stats', icon: LayoutDashboard, table: 'cms_stats', fields: statsFields, group: 'Homepage' },
   { id: 'initiatives', label: 'Initiatives', icon: Heart, table: 'cms_initiatives', fields: initiativeFields, group: 'Homepage' },
+  { id: 'impact_zones', label: 'Active Impact Zones', icon: MapPin, table: 'cms_impact_zones', fields: impactZoneFields, group: 'Homepage' },
   { id: 'testimonials', label: 'Testimonials', icon: Star, table: 'cms_testimonials', fields: testimonialFields, group: 'Homepage' },
 
   { id: 'stories', label: 'Impact Stories', icon: BookOpen, table: 'cms_stories', fields: storyFields, group: 'Content' },
