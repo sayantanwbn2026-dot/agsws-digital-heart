@@ -78,8 +78,9 @@ Deno.serve(async (req) => {
   const table = url.searchParams.get('table')
   const id = url.searchParams.get('id')
 
-  // Allow cms_ tables, plus newsletter_subscriptions, support_applications
-  const allowedPrefixes = ['cms_', 'newsletter_', 'support_', 'cms_resources']
+  // Allow cms_ tables, plus newsletter_subscriptions, support_applications,
+  // donations, goldenage_registrations.
+  const allowedPrefixes = ['cms_', 'newsletter_', 'support_']
   if (!table || (!allowedPrefixes.some(p => table.startsWith(p)) && !DIRECT_TABLES.has(table))) {
     return new Response(JSON.stringify({ error: 'Invalid table' }), {
       status: 400,

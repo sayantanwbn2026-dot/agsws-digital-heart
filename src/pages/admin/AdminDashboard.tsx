@@ -8,7 +8,7 @@ import {
   TrendingUp, Eye, Mail, ClipboardList, CreditCard,
   BarChart3, PieChart, Activity, Download, ExternalLink,
   AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown,
-  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home
+  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home, MapPin
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
@@ -103,6 +103,21 @@ const partnerFields: FieldConfig[] = [
   { key: 'website', label: 'Website URL', type: 'text' },
 ];
 
+const impactZoneFields: FieldConfig[] = [
+  { key: 'name', label: 'Zone Name', type: 'text', required: true, placeholder: 'e.g. Salt Lake' },
+  { key: 'type', label: 'Type', type: 'select', options: [
+    { label: 'Medical', value: 'medical' },
+    { label: 'Education', value: 'education' },
+    { label: 'Community', value: 'community' },
+  ]},
+  { key: 'description', label: 'Short Description', type: 'text', placeholder: 'e.g. Weekly Health Camps' },
+  { key: 'metric', label: 'Headline Metric', type: 'text', placeholder: 'e.g. 2,500+ Treated' },
+  { key: 'icon', label: 'Icon Name', type: 'text', placeholder: 'Activity, BookOpen, Users, MapPin' },
+  { key: 'position_x', label: 'Map X (0–100)', type: 'number', placeholder: '0–100' },
+  { key: 'position_y', label: 'Map Y (0–100)', type: 'number', placeholder: '0–100' },
+  { key: 'is_published', label: 'Published', type: 'boolean' },
+];
+
 const blogFields: FieldConfig[] = [
   { key: 'title', label: 'Title', type: 'text', required: true },
   { key: 'slug', label: 'URL Slug', type: 'text', required: true, placeholder: 'my-blog-post' },
@@ -171,6 +186,7 @@ const sections = [
   { id: 'hero', label: 'Hero Section', icon: Type, table: 'cms_hero', fields: heroFields, singleRow: true, group: 'Homepage' },
   { id: 'stats', label: 'Impact Stats', icon: LayoutDashboard, table: 'cms_stats', fields: statsFields, group: 'Homepage' },
   { id: 'initiatives', label: 'Initiatives', icon: Heart, table: 'cms_initiatives', fields: initiativeFields, group: 'Homepage' },
+  { id: 'impact_zones', label: 'Active Impact Zones', icon: MapPin, table: 'cms_impact_zones', fields: impactZoneFields, group: 'Homepage' },
   { id: 'testimonials', label: 'Testimonials', icon: Star, table: 'cms_testimonials', fields: testimonialFields, group: 'Homepage' },
 
   { id: 'stories', label: 'Impact Stories', icon: BookOpen, table: 'cms_stories', fields: storyFields, group: 'Content' },
@@ -209,6 +225,7 @@ const sections = [
 
 const previewUrls: Record<string, string> = {
   landing: '/', hero: '/', stats: '/', initiatives: '/initiatives', testimonials: '/',
+  impact_zones: '/',
   stories: '/', events: '/events', team: '/about', faqs: '/faq',
   gallery: '/gallery', partners: '/', blog: '/blog', resources: '/resources',
   how_it_works: '/', scrolling_stories: '/', impact_story: '/',
@@ -386,12 +403,46 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
                 <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 pl-4 border-l-2 border-primary/20 space-y-3">
                   <div className="bg-background rounded-lg p-4 text-xs space-y-2">
                     {app.form_data && Object.entries(app.form_data).map(([key, val]) => (
-                      <div key={key} className="flex gap-2">
+                      key === 'documents' ? null : <div key={key} className="flex gap-2">
                         <span className="font-semibold text-muted-foreground capitalize min-w-[120px]">{key.replace(/([A-Z])/g, ' $1')}:</span>
                         <span className="text-foreground">{String(val)}</span>
                       </div>
                     ))}
                   </div>
+                  {Array.isArray(app.form_data?.documents) && app.form_data.documents.length > 0 && (
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-2">Attached Documents</label>
+                      <ul className="space-y-1.5">
+                        {app.form_data.documents.map((d: any, i: number) => (
+                          <li key={i} className="flex items-center gap-2 px-2.5 py-1.5 bg-muted/50 rounded-md">
+                            <FileText size={12} className="text-muted-foreground shrink-0" />
+                            <span className="text-[11px] text-foreground flex-1 truncate">{d.name}</span>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const token = localStorage.getItem('agsws_admin_token') || '';
+                                  // Legacy uploads stored a public `url`; new uploads store a private `path`.
+                                  if (d.path) {
+                                    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=admin-application-doc-url&path=${encodeURIComponent(d.path)}`, {
+                                      headers: { Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+                                    });
+                                    const body = await res.json();
+                                    if (body.url) window.open(body.url, '_blank', 'noopener,noreferrer');
+                                    else toast.error(body.error || 'Could not open document');
+                                  } else if (d.url) {
+                                    window.open(d.url, '_blank', 'noopener,noreferrer');
+                                  }
+                                } catch (e: any) { toast.error(e.message || 'Failed'); }
+                              }}
+                              className="text-[10px] font-bold text-primary hover:underline"
+                            >
+                              Open
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <div>
                     <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">Admin Notes</label>
                     <textarea

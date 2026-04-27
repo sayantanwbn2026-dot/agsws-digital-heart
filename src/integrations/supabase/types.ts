@@ -197,6 +197,51 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_impact_zones: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_published: boolean
+          metric: string | null
+          name: string
+          position_x: number
+          position_y: number
+          sort_order: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean
+          metric?: string | null
+          name: string
+          position_x?: number
+          position_y?: number
+          sort_order?: number
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean
+          metric?: string | null
+          name?: string
+          position_x?: number
+          position_y?: number
+          sort_order?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cms_initiatives: {
         Row: {
           created_at: string
