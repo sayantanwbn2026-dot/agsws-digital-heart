@@ -27,9 +27,9 @@ const bgGradients: Record<string, string> = {
 };
 
 const sizePadding: Record<string, string> = {
-  sm: "pt-[120px] pb-[48px]",
-  md: "pt-[140px] pb-[64px]",
-  lg: "pt-[160px] pb-[80px]",
+  sm: "pt-[96px] pb-[40px] md:pt-[120px] md:pb-[48px]",
+  md: "pt-[104px] pb-[48px] md:pt-[140px] md:pb-[64px]",
+  lg: "pt-[112px] pb-[56px] md:pt-[160px] md:pb-[80px]",
 };
 
 const PageHero = ({

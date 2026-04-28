@@ -397,6 +397,11 @@ body {
   padding: 0 var(--container-px);
 }
 
+/* Tighter container padding on phones for breathing room without edge crowding. */
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+}
+
 /* Section spacing */
 .section {
   padding: var(--section-y) 0;
