@@ -270,6 +270,15 @@ body {
   overflow-x: hidden; /* Guarantee no horizontal bleed at 375px bounds */
 }
 
+/* Mobile bottom nav clearance — the fixed PhonePe-style bottom nav is 64px
+   tall and lives on lg- viewports; pad the page so footer / page content
+   isn't obscured. Admin shell handles its own layout. */
+@media (max-width: 1023px) {
+  body:not(:has(.cms-shell)) {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+}
+
 @layer base {
   /* PART 6 - FORM INPUTS SYSTEM */
   input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], input[type="password"], textarea, select {
