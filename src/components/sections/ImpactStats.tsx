@@ -49,14 +49,22 @@ const ImpactStats = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(var(--primary))]/[0.02] rounded-full blur-[100px]" />
       </motion.div>
       <div ref={inViewRef} className="max-w-[var(--container)] mx-auto px-[var(--container-px)] relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-0">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-0 divide-y divide-[hsl(var(--border))] sm:divide-y-0">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: i * 0.08, duration: 0.5 }}
-              className={`text-center py-6 px-4 ${i < stats.length - 1 ? "border-r border-[hsl(var(--border))]" : ""}`}
+              className={[
+                "text-center py-5 sm:py-6 px-3 sm:px-4 relative",
+                // 2-col mobile separators: vertical on odd cells (left col), horizontal handled by parent divide-y
+                "[&:nth-child(odd)]:border-r border-[hsl(var(--border))] sm:border-r-0",
+                // md+ vertical separators except for last in row
+                "md:[&:not(:nth-child(3n))]:border-r md:[&:nth-child(3n)]:border-r-0",
+                // lg vertical separators except last in row of 5
+                "lg:[&:not(:nth-child(5n))]:border-r lg:[&:nth-child(5n)]:border-r-0",
+              ].join(" ")}
             >
               <motion.div
                 animate={flashIndex === i ? { scale: [1, 1.08, 1] } : {}}

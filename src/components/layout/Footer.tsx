@@ -141,7 +141,7 @@ const Footer = () => {
         initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6 }} className="relative z-10 border-b border-white/[0.06]"
       >
-        <div className="max-w-[1200px] mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-8 sm:py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6">
           <div>
             <h3 className="text-lg font-bold text-white">{c.newsletter_heading}</h3>
             <p className="text-sm text-white/50 mt-1">{c.newsletter_subtitle}</p>
@@ -161,8 +161,8 @@ const Footer = () => {
         </div>
       </motion.div>
 
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 pt-16 pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
+      <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-8 sm:pb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 sm:gap-12 lg:gap-8">
           {/* Brand */}
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -240,7 +240,7 @@ const Footer = () => {
       </div>
 
       <div className="relative z-10 border-t border-white/[0.06]">
-        <div className="max-w-[1200px] mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 text-center md:text-left">
           <p className="text-[11px] text-white/40 flex items-center gap-1.5">
             © {new Date().getFullYear()} {site.site_name || "AGSWS"}. {c.copyright_suffix} <Heart size={10} className="text-red-400" /> in Kolkata.
           </p>
