@@ -8,7 +8,7 @@ import {
   TrendingUp, Eye, Mail, ClipboardList, CreditCard,
   BarChart3, PieChart, Activity, Download, ExternalLink,
   AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown,
-  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home, MapPin
+  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home, MapPin, Film
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
@@ -193,7 +193,7 @@ const sections = [
   { id: 'events', label: 'Events', icon: Calendar, table: 'cms_events', fields: eventFields, isCustom: true, group: 'Content' },
   { id: 'blog', label: 'Blog Posts', icon: FileText, table: 'cms_blog_posts', fields: blogFields, group: 'Content' },
   { id: 'gallery', label: 'Gallery', icon: ImageIcon, table: 'cms_gallery', fields: galleryFields, group: 'Content' },
-  { id: 'videos', label: 'Gallery Videos', icon: Film, table: 'cms_videos', fields: [
+  { id: 'videos', label: 'Gallery Videos', icon: Film, table: 'cms_videos', fields: ([
     { key: 'title', label: 'Title', type: 'text', required: true },
     { key: 'duration', label: 'Duration (e.g. 2:14)', type: 'text' },
     { key: 'category', label: 'Category', type: 'select', options: [
@@ -203,8 +203,8 @@ const sections = [
     { key: 'thumbnail', label: 'Thumbnail Image', type: 'image', resolution: '1280×720px', imageFolder: 'videos' },
     { key: 'video_url', label: 'Video URL (YouTube/MP4)', type: 'text' },
     { key: 'is_published', label: 'Published', type: 'boolean' },
-  ], group: 'Content' },
-  { id: 'updates', label: 'Field Updates', icon: Activity, table: 'cms_updates', fields: [
+  ] as FieldConfig[]), group: 'Content' },
+  { id: 'updates', label: 'Field Updates', icon: Activity, table: 'cms_updates', fields: ([
     { key: 'title', label: 'Title', type: 'text', required: true },
     { key: 'excerpt', label: 'Excerpt', type: 'textarea' },
     { key: 'category', label: 'Category', type: 'select', options: [
@@ -213,7 +213,7 @@ const sections = [
     ]},
     { key: 'update_date', label: 'Date', type: 'date' },
     { key: 'is_published', label: 'Published', type: 'boolean' },
-  ], group: 'Content' },
+  ] as FieldConfig[]), group: 'Content' },
   { id: 'resources', label: 'Resources', icon: FolderOpen, table: 'cms_resources', fields: resourceFields, group: 'Content' },
   { id: 'faqs', label: 'FAQs', icon: HelpCircle, table: 'cms_faqs', fields: faqFields, group: 'Content' },
 
