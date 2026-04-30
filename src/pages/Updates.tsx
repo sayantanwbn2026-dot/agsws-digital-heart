@@ -6,12 +6,51 @@ import FadeInUp from "@/components/ui/FadeInUp";
 import { Mail, Phone, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import PageHero from "@/components/layout/PageHero";
+import { useCMSList } from "@/hooks/useCMSList";
+import { useCMSSection } from "@/hooks/useCMSSection";
+
+interface UpdatesPageContent {
+  email_heading: string;
+  email_subtitle: string;
+  email_perks: string[];
+  subscribers_label: string;
+  whatsapp_heading: string;
+  whatsapp_subtitle: string;
+  whatsapp_perks: string[];
+  whatsapp_phone: string;
+  recent_label: string;
+  recent_heading: string;
+}
+
+const updatesPageFallback: UpdatesPageContent = {
+  email_heading: "Monthly Impact Letter",
+  email_subtitle: "One email a month. Real stories. Real numbers. Zero spam.",
+  email_perks: ["Monthly impact summary","New campaign launches","Beneficiary success stories","Volunteer opportunities"],
+  subscribers_label: "500+ subscribers",
+  whatsapp_heading: "WhatsApp Field Updates",
+  whatsapp_subtitle: "Short, real updates from the field — 2–3 times a month. No spam, ever.",
+  whatsapp_perks: ["Field photos and stories","Emergency support alerts","Event announcements"],
+  whatsapp_phone: "+919876543210",
+  recent_label: "Recent Updates",
+  recent_heading: "From the Field",
+};
 
 const Updates = () => {
   useSEO("Stay Updated", "Subscribe to AGSWS field updates, impact stories, and campaign news.");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const { data: copy } = useCMSSection<UpdatesPageContent>("updates_page", updatesPageFallback);
+  const { data: cmsUpdates } = useCMSList<any>("cms_updates", [], { orderBy: { column: "update_date", ascending: false } });
+  const list = cmsUpdates.length
+    ? cmsUpdates.map((u: any) => ({
+        id: u.id,
+        title: u.title,
+        excerpt: u.excerpt || "",
+        category: (u.category || "field") as keyof typeof updateCategoryColors,
+        date: u.update_date || u.created_at,
+      }))
+    : updates;
 
   const handleEmailSub = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +72,8 @@ const Updates = () => {
 
   const handleWhatsApp = () => {
     if (!phone) return;
-    window.open(`https://wa.me/919876543210?text=${encodeURIComponent("Subscribe to AGSWS Updates")}`, "_blank");
+    const wa = (copy.whatsapp_phone || "+919876543210").replace(/[^0-9]/g, "");
+    window.open(`https://wa.me/${wa}?text=${encodeURIComponent("Subscribe to AGSWS Updates")}`, "_blank");
   };
 
   return (
@@ -46,10 +86,10 @@ const Updates = () => {
           <FadeInUp>
             <div className="global-card h-full">
               <Mail size={40} className="text-[var(--teal)] mb-4" />
-              <h3 className="heading-3 text-[var(--dark)] mb-2">Monthly Impact Letter</h3>
-              <p className="text-sm text-[var(--mid)] mb-4">One email a month. Real stories. Real numbers. Zero spam.</p>
+              <h3 className="heading-3 text-[var(--dark)] mb-2">{copy.email_heading}</h3>
+              <p className="text-sm text-[var(--mid)] mb-4">{copy.email_subtitle}</p>
               <ul className="space-y-2 mb-6">
-                {["Monthly impact summary", "New campaign launches", "Beneficiary success stories", "Volunteer opportunities"].map(item => (
+                {copy.email_perks.map(item => (
                   <li key={item} className="flex items-center gap-2 text-sm text-[var(--mid)]">
                     <CheckCircle size={14} className="text-[var(--teal)] flex-shrink-0" />{item}
                   </li>
@@ -60,7 +100,7 @@ const Updates = () => {
                 <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Email address" required className="no-float" />
                 <button type="submit" className="w-full bg-[var(--yellow)] text-[var(--dark)] font-semibold py-2.5 rounded-full text-sm hover:shadow-[var(--shadow-yellow)] transition-shadow">Subscribe →</button>
               </form>
-              <p className="text-[11px] text-[var(--light)] mt-3 text-center">500+ subscribers</p>
+              <p className="text-[11px] text-[var(--light)] mt-3 text-center">{copy.subscribers_label}</p>
             </div>
           </FadeInUp>
 
@@ -70,10 +110,10 @@ const Updates = () => {
               <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center mb-4">
                 <Phone size={20} className="text-white" />
               </div>
-              <h3 className="heading-3 text-[var(--dark)] mb-2">WhatsApp Field Updates</h3>
-              <p className="text-sm text-[var(--mid)] mb-4">Short, real updates from the field — 2–3 times a month. No spam, ever.</p>
+              <h3 className="heading-3 text-[var(--dark)] mb-2">{copy.whatsapp_heading}</h3>
+              <p className="text-sm text-[var(--mid)] mb-4">{copy.whatsapp_subtitle}</p>
               <ul className="space-y-2 mb-6">
-                {["Field photos and stories", "Emergency support alerts", "Event announcements"].map(item => (
+                {copy.whatsapp_perks.map(item => (
                   <li key={item} className="flex items-center gap-2 text-sm text-[var(--mid)]">
                     <CheckCircle size={14} className="text-[#25D366] flex-shrink-0" />{item}
                   </li>
@@ -96,16 +136,16 @@ const Updates = () => {
       <section className="bg-[var(--white)] py-16">
         <div className="max-w-[800px] mx-auto px-6">
           <FadeInUp>
-            <span className="label">Recent Updates</span>
-            <h2 className="heading-2 text-[var(--dark)] mt-3 mb-8">From the Field</h2>
+            <span className="label">{copy.recent_label}</span>
+            <h2 className="heading-2 text-[var(--dark)] mt-3 mb-8">{copy.recent_heading}</h2>
           </FadeInUp>
           <div className="space-y-4">
-            {updates.map((u, i) => (
+            {list.map((u: any, i: number) => (
               <FadeInUp key={u.id} delay={i * 0.04}>
                 <div className="global-card">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-xs text-[var(--light)]">{new Date(u.date).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}</span>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full text-white ${updateCategoryColors[u.category]}`}>{u.category}</span>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full text-white ${updateCategoryColors[u.category as keyof typeof updateCategoryColors] || "bg-teal"}`}>{u.category}</span>
                   </div>
                   <h4 className="font-semibold text-[var(--dark)] mb-1">{u.title}</h4>
                   <p className="text-sm text-[var(--mid)] line-clamp-2">{u.excerpt}</p>
