@@ -41,6 +41,10 @@ const Updates = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const { data: copy } = useCMSSection<UpdatesPageContent>("updates_page", updatesPageFallback);
+  const normalizePerks = (arr: any[]): string[] =>
+    (arr || []).map((p: any) => (typeof p === "string" ? p : p?.value)).filter(Boolean);
+  const emailPerks = normalizePerks(copy.email_perks as any);
+  const whatsappPerks = normalizePerks(copy.whatsapp_perks as any);
   const { data: cmsUpdates } = useCMSList<any>("cms_updates", [], { orderBy: { column: "update_date", ascending: false } });
   const list = cmsUpdates.length
     ? cmsUpdates.map((u: any) => ({
@@ -89,7 +93,7 @@ const Updates = () => {
               <h3 className="heading-3 text-[var(--dark)] mb-2">{copy.email_heading}</h3>
               <p className="text-sm text-[var(--mid)] mb-4">{copy.email_subtitle}</p>
               <ul className="space-y-2 mb-6">
-                {copy.email_perks.map(item => (
+                {emailPerks.map(item => (
                   <li key={item} className="flex items-center gap-2 text-sm text-[var(--mid)]">
                     <CheckCircle size={14} className="text-[var(--teal)] flex-shrink-0" />{item}
                   </li>
@@ -113,7 +117,7 @@ const Updates = () => {
               <h3 className="heading-3 text-[var(--dark)] mb-2">{copy.whatsapp_heading}</h3>
               <p className="text-sm text-[var(--mid)] mb-4">{copy.whatsapp_subtitle}</p>
               <ul className="space-y-2 mb-6">
-                {copy.whatsapp_perks.map(item => (
+                {whatsappPerks.map(item => (
                   <li key={item} className="flex items-center gap-2 text-sm text-[var(--mid)]">
                     <CheckCircle size={14} className="text-[#25D366] flex-shrink-0" />{item}
                   </li>
