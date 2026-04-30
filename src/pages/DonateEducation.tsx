@@ -40,6 +40,38 @@ const DonateEducation = () => {
   const [customAmount, setCustomAmount] = useState("");
   const [frequency, setFrequency] = useState<"once" | "monthly">("once");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [liveDonations, setLiveDonations] = useState<Array<{ city: string; amount: string; time: string }>>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (supabase.from("donations" as any) as any)
+      .select("donor_name, amount_cents, currency, cause, created_at, metadata")
+      .eq("status", "succeeded")
+      .eq("show_on_wall", true)
+      .ilike("cause", "%education%")
+      .order("created_at", { ascending: false })
+      .limit(4)
+      .then(({ data }: any) => {
+        if (cancelled || !data?.length) return;
+        const fmt = (cents: number, ccy: string) =>
+          new Intl.NumberFormat("en-IN", { style: "currency", currency: ccy || "INR", maximumFractionDigits: 0 }).format((cents || 0) / 100);
+        const ago = (iso: string) => {
+          const m = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+          if (m < 60) return `${m} min ago`;
+          const h = Math.round(m / 60);
+          if (h < 24) return `${h} hr ago`;
+          return `${Math.round(h / 24)} d ago`;
+        };
+        setLiveDonations(
+          data.map((d: any) => ({
+            city: d.metadata?.city || (d.donor_name || "Friend").split(" ")[0],
+            amount: fmt(d.amount_cents, d.currency),
+            time: ago(d.created_at),
+          }))
+        );
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<DonorFormData>({
     resolver: zodResolver(donorSchema),
@@ -227,7 +259,10 @@ const DonateEducation = () => {
             <div className="bg-[var(--white)] border border-[var(--border-color)] rounded-[var(--radius-2xl)] p-[28px] shadow-[var(--shadow-card)]">
               <h4 className="font-semibold text-[var(--dark)] mb-5 text-[15px]">Recent Support</h4>
               <div className="space-y-4">
-                {recentDonations.filter(d => d.gateway === "Education").slice(0, 4).map((d, i) => (
+                {(liveDonations.length
+                  ? liveDonations
+                  : recentDonations.filter(d => d.gateway === "Education").slice(0, 4)
+                ).map((d, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-[var(--purple-light)] flex items-center justify-center text-[var(--purple)] font-bold text-sm">{d.city[0]}</div>
                     <div className="flex-1">

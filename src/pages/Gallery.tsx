@@ -18,6 +18,21 @@ const Gallery = () => {
   useSEO("Photo & Video Gallery", "See AGSWS in action — photos and videos from our medical camps, education drives, and community events.");
 
   const { data: cmsGallery } = useCMSList<any>('cms_gallery', [], { orderBy: { column: 'sort_order', ascending: true } });
+  const { data: cmsVideos } = useCMSList<any>('cms_videos', [], { orderBy: { column: 'sort_order', ascending: true } });
+
+  const videos: any[] = useMemo(() => {
+    if (cmsVideos.length > 0) {
+      return cmsVideos.map((v: any) => ({
+        id: v.id,
+        title: v.title,
+        duration: v.duration || '',
+        thumbnail: v.thumbnail || '',
+        thumbnailCategory: v.category || 'community',
+        videoUrl: v.video_url || '',
+      }));
+    }
+    return galleryVideos.map((v: any) => ({ ...v, thumbnail: '', videoUrl: '' }));
+  }, [cmsVideos]);
 
   const photos: any[] = useMemo(() => {
     if (cmsGallery.length > 0) {
@@ -121,11 +136,18 @@ const Gallery = () => {
             <section className="bg-[hsl(var(--background))] py-16">
               <div className="max-w-[1200px] mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {galleryVideos.map((v, i) => (
+                  {videos.map((v: any, i: number) => (
                     <FadeInUp key={v.id} delay={i * 0.1}>
-                      <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="relative rounded-2xl overflow-hidden group cursor-pointer bg-[hsl(var(--card))] border border-[hsl(var(--border))] shadow-sm">
+                      <motion.div
+                        whileHover={{ y: -4 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        onClick={() => v.videoUrl && window.open(v.videoUrl, '_blank', 'noopener')}
+                        className="relative rounded-2xl overflow-hidden group cursor-pointer bg-[hsl(var(--card))] border border-[hsl(var(--border))] shadow-sm"
+                      >
                         <div className="relative h-[260px] overflow-hidden">
-                          <ImagePlaceholder category={v.thumbnailCategory} className="w-full h-full" />
+                          {v.thumbnail
+                            ? <img src={v.thumbnail} alt={v.title} className="w-full h-full object-cover" loading="lazy" />
+                            : <ImagePlaceholder category={v.thumbnailCategory} className="w-full h-full" />}
                           <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                             <motion.div whileHover={{ scale: 1.15 }} className="w-16 h-16 rounded-full bg-white/95 flex items-center justify-center shadow-lg">
                               <Play size={22} className="text-[hsl(var(--primary))] ml-1" />
