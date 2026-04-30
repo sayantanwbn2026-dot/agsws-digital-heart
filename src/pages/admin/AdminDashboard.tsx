@@ -193,6 +193,27 @@ const sections = [
   { id: 'events', label: 'Events', icon: Calendar, table: 'cms_events', fields: eventFields, isCustom: true, group: 'Content' },
   { id: 'blog', label: 'Blog Posts', icon: FileText, table: 'cms_blog_posts', fields: blogFields, group: 'Content' },
   { id: 'gallery', label: 'Gallery', icon: ImageIcon, table: 'cms_gallery', fields: galleryFields, group: 'Content' },
+  { id: 'videos', label: 'Gallery Videos', icon: Film, table: 'cms_videos', fields: [
+    { key: 'title', label: 'Title', type: 'text', required: true },
+    { key: 'duration', label: 'Duration (e.g. 2:14)', type: 'text' },
+    { key: 'category', label: 'Category', type: 'select', options: [
+      { label: 'Medical', value: 'medical' }, { label: 'Education', value: 'education' },
+      { label: 'Community', value: 'community' }, { label: 'Elderly', value: 'elderly' },
+    ]},
+    { key: 'thumbnail', label: 'Thumbnail Image', type: 'image', resolution: '1280×720px', imageFolder: 'videos' },
+    { key: 'video_url', label: 'Video URL (YouTube/MP4)', type: 'text' },
+    { key: 'is_published', label: 'Published', type: 'boolean' },
+  ], group: 'Content' },
+  { id: 'updates', label: 'Field Updates', icon: Activity, table: 'cms_updates', fields: [
+    { key: 'title', label: 'Title', type: 'text', required: true },
+    { key: 'excerpt', label: 'Excerpt', type: 'textarea' },
+    { key: 'category', label: 'Category', type: 'select', options: [
+      { label: 'Field', value: 'field' }, { label: 'Campaign', value: 'campaign' },
+      { label: 'Event', value: 'event' }, { label: 'Announcement', value: 'announcement' },
+    ]},
+    { key: 'update_date', label: 'Date', type: 'date' },
+    { key: 'is_published', label: 'Published', type: 'boolean' },
+  ], group: 'Content' },
   { id: 'resources', label: 'Resources', icon: FolderOpen, table: 'cms_resources', fields: resourceFields, group: 'Content' },
   { id: 'faqs', label: 'FAQs', icon: HelpCircle, table: 'cms_faqs', fields: faqFields, group: 'Content' },
 
@@ -212,6 +233,7 @@ const sections = [
   { id: 'about_timeline', label: 'About — Timeline', icon: CalendarClock, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'about_docs', label: 'About — Docs', icon: Shield, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'about_cta', label: 'About — CTA', icon: Type, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'updates_page', label: 'Updates Page', icon: Mail, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'medical_page', label: 'Medical Aid Page', icon: Heart, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'education_page', label: 'Education Page', icon: BookOpen, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'register_parent', label: 'GoldenAge Page', icon: Heart, table: '', fields: [], isCustom: true, group: 'Pages' },
@@ -232,6 +254,7 @@ const previewUrls: Record<string, string> = {
   analytics_section: '/', cta_banner: '/', trust_band: '/',
   about_mission: '/about', about_values: '/about', about_counters: '/about',
   about_timeline: '/about', about_docs: '/about', about_cta: '/about',
+  updates_page: '/updates', updates: '/updates', videos: '/gallery',
   medical_page: '/initiatives/medical', education_page: '/initiatives/education',
 };
 
@@ -1265,6 +1288,23 @@ const AdminDashboard = () => {
     if (activeSection === 'about_timeline') return <SectionEditor sectionKey="about_timeline" title="About — Journey Timeline" description="Year-by-year milestones" fields={[]} listKey="items" listFields={[{ key: 'year', label: 'Year', type: 'text' }, { key: 'event', label: 'Event Description', type: 'textarea' }]} />;
     if (activeSection === 'about_docs') return <SectionEditor sectionKey="about_docs" title="About — Legal Documents" description="Compliance & transparency document tiles" fields={[]} listKey="items" listFields={[{ key: 'icon', label: 'Icon (Building2, FileCheck, Award, Globe)', type: 'text' }, { key: 'title', label: 'Title', type: 'text' }, { key: 'detail', label: 'Detail', type: 'text' }, { key: 'sub', label: 'Sub-text', type: 'text' }]} />;
     if (activeSection === 'about_cta') return <SectionEditor sectionKey="about_cta" title="About — Final CTA" description="Closing call-to-action band on the About page" fields={[{ key: 'heading', label: 'Heading', type: 'text' }, { key: 'subtitle', label: 'Subtitle', type: 'textarea' }, { key: 'primary_label', label: 'Primary Button Label', type: 'text' }, { key: 'primary_link', label: 'Primary Button Link', type: 'text' }, { key: 'secondary_label', label: 'Secondary Button Label', type: 'text' }, { key: 'secondary_link', label: 'Secondary Button Link', type: 'text' }]} />;
+    if (activeSection === 'updates_page') return <SectionEditor
+      sectionKey="updates_page"
+      title="Updates Page — Subscribe Cards"
+      description="Email + WhatsApp subscribe card copy and the 'Recent Updates' section heading."
+      fields={[
+        { key: 'email_heading', label: 'Email Card Heading', type: 'text' },
+        { key: 'email_subtitle', label: 'Email Card Subtitle', type: 'textarea' },
+        { key: 'subscribers_label', label: 'Subscribers Footer Label', type: 'text' },
+        { key: 'whatsapp_heading', label: 'WhatsApp Card Heading', type: 'text' },
+        { key: 'whatsapp_subtitle', label: 'WhatsApp Card Subtitle', type: 'textarea' },
+        { key: 'whatsapp_phone', label: 'WhatsApp Number (with country code)', type: 'text' },
+        { key: 'recent_label', label: 'Recent Updates — Eyebrow', type: 'text' },
+        { key: 'recent_heading', label: 'Recent Updates — Heading', type: 'text' },
+      ]}
+      listKey="email_perks"
+      listFields={[{ key: 'value', label: 'Email Perk Bullet', type: 'text' }]}
+    />;
     if (activeSection === 'medical_page') return <SectionEditor sectionKey="medical_page" title="Medical Aid Page" description="Intro, benefit cards, helpline, and 'what we cover' list" fields={[{ key: 'intro', label: 'Intro Paragraph', type: 'textarea' }, { key: 'cta_label', label: 'Donate Button Label', type: 'text' }, { key: 'apply_label', label: 'Apply Section Label', type: 'text' }, { key: 'apply_heading', label: 'Apply Heading', type: 'text' }, { key: 'apply_body', label: 'Apply Body', type: 'textarea' }, { key: 'helpline_phone', label: 'Helpline Phone (e.g. +919876543210)', type: 'text' }, { key: 'covers_heading', label: '"What we cover" Heading', type: 'text' }, { key: 'covers', label: 'What We Cover (items)', type: 'string-list' }]} listKey="benefits" listFields={[{ key: 'icon', label: 'Icon (Stethoscope, Pill, Users, Heart)', type: 'text' }, { key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }]} />;
     if (activeSection === 'education_page') return <SectionEditor sectionKey="education_page" title="Education Support Page" description="Intro, benefit cards, helpline, and 'what we cover' list" fields={[{ key: 'intro', label: 'Intro Paragraph', type: 'textarea' }, { key: 'cta_label', label: 'Donate Button Label', type: 'text' }, { key: 'apply_label', label: 'Apply Section Label', type: 'text' }, { key: 'apply_heading', label: 'Apply Heading', type: 'text' }, { key: 'apply_body', label: 'Apply Body', type: 'textarea' }, { key: 'helpline_phone', label: 'Helpline Phone', type: 'text' }, { key: 'covers_heading', label: '"What we cover" Heading', type: 'text' }, { key: 'covers', label: 'What We Cover (items)', type: 'string-list' }]} listKey="benefits" listFields={[{ key: 'icon', label: 'Icon (GraduationCap, Library, BookOpen, Monitor)', type: 'text' }, { key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }]} />;
     if (activeSection === 'footer') return <SectionEditor sectionKey="footer" title="Footer Content" description="Brand tagline, newsletter copy, link columns, impact snapshot, and legal links. Social URLs + contact info live in Site Settings." fields={[{ key: 'brand_tagline', label: 'Brand Tagline (under logo)', type: 'textarea' }, { key: 'newsletter_heading', label: 'Newsletter Heading', type: 'text' }, { key: 'newsletter_subtitle', label: 'Newsletter Subtitle', type: 'text' }, { key: 'copyright_suffix', label: 'Copyright Suffix (e.g. "Built with")', type: 'text' }]} listKey="impact_stats" listFields={[{ key: 'value', label: 'Value (e.g. 2,400+)', type: 'text' }, { key: 'label', label: 'Label', type: 'text' }]} />;
