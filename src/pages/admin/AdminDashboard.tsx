@@ -1436,9 +1436,25 @@ const AdminDashboard = () => {
             )}
           </div>
           <div className="flex items-center gap-2">
+            <a
+              href="/?preview=1"
+              target="_blank"
+              rel="noopener"
+              title="Open the live site with drafts and unpublished items visible"
+              className="flex items-center gap-1.5 h-7 px-2.5 rounded-md text-[11.5px] font-semibold text-white hover:opacity-90 transition-opacity"
+              style={{ background: 'linear-gradient(90deg, hsl(187 68% 32%), hsl(242 35% 42%))' }}
+            >
+              <Eye size={12} /> Preview Site
+            </a>
             {previewUrls[activeSection] && (
-              <a href={previewUrls[activeSection]} target="_blank" rel="noopener" className="flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[11.5px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
-                <Eye size={12} /> Preview
+              <a
+                href={`${previewUrls[activeSection]}${previewUrls[activeSection].includes('?') ? '&' : '?'}preview=1`}
+                target="_blank"
+                rel="noopener"
+                title="Open this page with drafts and unpublished items visible"
+                className="flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[11.5px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <Eye size={12} /> Preview Page
               </a>
             )}
             {!currentSection.isOverview && !currentSection.singleRow && !currentSection.isCustom && allData[activeSection]?.length > 0 && (
