@@ -623,6 +623,81 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_updates: {
+        Row: {
+          category: string
+          created_at: string
+          excerpt: string | null
+          id: string
+          is_published: boolean
+          sort_order: number
+          title: string
+          update_date: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          title: string
+          update_date?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          title?: string
+          update_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_videos: {
+        Row: {
+          category: string | null
+          created_at: string
+          duration: string | null
+          id: string
+          is_published: boolean
+          sort_order: number
+          thumbnail: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          duration?: string | null
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          thumbnail?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          duration?: string | null
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          thumbnail?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       donations: {
         Row: {
           amount_cents: number
