@@ -11,6 +11,7 @@ import Footer from "./components/layout/Footer";
 import StickyDonationRibbon from "./components/layout/StickyDonationRibbon";
 import MobileBottomNav from "./components/layout/MobileBottomNav";
 import LoadingScreen from "./components/layout/LoadingScreen";
+import PreviewBar from "./components/layout/PreviewBar";
 import BackToTop from "./components/ui/BackToTop";
 import { AnimatePresence, motion } from "framer-motion";
 import CookieConsent from "./components/ui/CookieConsent";
@@ -18,6 +19,7 @@ import DonateChoiceOverlay from "./components/ui/DonateChoiceOverlay";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { syncPreviewFromURL } from "@/lib/cms-preview";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Initiatives from "./pages/Initiatives";
@@ -181,6 +183,7 @@ const AppLayout = () => {
 
   return (
     <>
+      {!isAdmin && <PreviewBar />}
       {!isAdmin && <DonateChoiceOverlay />}
       {!isAdmin && <LiveTicker />}
       {!isAdmin && <Navbar />}
@@ -196,6 +199,10 @@ const AppLayout = () => {
 
 const AppInner = () => {
   useLenis();
+
+  useEffect(() => {
+    syncPreviewFromURL();
+  }, []);
 
   return (
     <>
