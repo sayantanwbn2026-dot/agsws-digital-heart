@@ -40,19 +40,19 @@ const DonateChoiceOverlay = () => {
               onClick={(e) => e.stopPropagation()}
               className="relative max-w-[620px] w-full my-auto"
             >
+              {/* Close button — positioned outside the overflow-hidden card so it never gets clipped */}
+              <button
+                onClick={closeOverlay}
+                className="absolute -top-3 -right-3 sm:top-4 sm:right-4 w-10 h-10 rounded-full bg-white shadow-lg ring-1 ring-black/5 flex items-center justify-center transition-all duration-200 hover:rotate-90 z-20"
+                aria-label="Close"
+              >
+                <X size={16} className="text-[var(--mid)]" />
+              </button>
+
               {/* Card with gradient border effect */}
               <div className="relative bg-white rounded-[28px] shadow-[0_32px_80px_rgba(0,0,0,0.3),0_0_0_1px_rgba(31,154,168,0.08)] overflow-hidden">
                 {/* Top accent gradient */}
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[var(--teal)] via-[var(--yellow)] to-[var(--purple)] rounded-t-[28px]" />
-
-                {/* Close button */}
-                <button
-                  onClick={closeOverlay}
-                  className="sticky top-3 ml-auto mr-3 mt-3 w-10 h-10 rounded-full bg-white/95 backdrop-blur-sm shadow-md hover:shadow-lg ring-1 ring-black/5 flex items-center justify-center transition-all duration-200 hover:rotate-90 z-20 -mb-10 block"
-                  aria-label="Close"
-                >
-                  <X size={16} className="text-[var(--mid)]" />
-                </button>
 
                 {/* Content */}
                 <div className="px-5 pt-6 pb-7 sm:px-10 sm:pt-10 sm:pb-8">
