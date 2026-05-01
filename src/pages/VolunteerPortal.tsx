@@ -3,9 +3,22 @@ import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Award, AlertCircle, ArrowRight, User } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
+import { useCMSSection } from "@/hooks/useCMSSection";
+
+const defaultVol = {
+  card_heading: "Find Your Profile",
+  card_subheading: "Enter your Volunteer ID from your welcome email",
+  input_placeholder: "e.g. VOL-2025-0042",
+  helper_text: "Try: VOL-2025-0042 or VOL-2024-0018",
+  error_text: "Volunteer ID not found. Check your welcome email for the correct ID.",
+  cert_heading: "Request Certificate",
+  cert_body: "Download a certificate confirming your volunteer service with AGSWS.",
+  cert_button: "Request Certificate",
+};
 
 const VolunteerPortal = () => {
   useSEO("Volunteer Portal", "Track your AGSWS volunteer hours and request certificates.");
+  const { data: cms } = useCMSSection<typeof defaultVol>('volunteer_portal', defaultVol);
   const [volId, setVolId] = useState("");
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState(false);
@@ -50,8 +63,8 @@ const VolunteerPortal = () => {
                 <User size={18} className="text-[var(--teal)]" />
               </div>
               <div>
-                <h3 className="text-[16px] font-[700] text-[var(--dark)] leading-tight">Find Your Profile</h3>
-                <p className="text-[11px] text-[var(--light)]">Enter your Volunteer ID from your welcome email</p>
+                <h3 className="text-[16px] font-[700] text-[var(--dark)] leading-tight">{cms.card_heading}</h3>
+                <p className="text-[11px] text-[var(--light)]">{cms.card_subheading}</p>
               </div>
             </div>
             <div className="flex gap-2">
@@ -61,7 +74,7 @@ const VolunteerPortal = () => {
                   value={volId}
                   onChange={(e) => setVolId(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  placeholder="e.g. VOL-2025-0042"
+                  placeholder={cms.input_placeholder}
                   className="w-full h-[48px] pl-11 pr-4 text-[14px] text-[var(--dark)] bg-[var(--bg)] border border-[var(--border-color)] rounded-[12px] outline-none focus:border-[var(--teal)] focus:ring-2 focus:ring-[var(--teal)]/10 transition-all placeholder:text-[var(--light)]"
                 />
               </div>
@@ -74,7 +87,7 @@ const VolunteerPortal = () => {
                 <ArrowRight size={16} /> View
               </motion.button>
             </div>
-            <p className="text-[11px] text-[var(--light)] mt-2">Try: VOL-2025-0042 or VOL-2024-0018</p>
+            <p className="text-[11px] text-[var(--light)] mt-2">{cms.helper_text}</p>
           </motion.div>
         </div>
 
@@ -83,7 +96,7 @@ const VolunteerPortal = () => {
             <motion.div key="err" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-[520px] mx-auto mt-6 px-6">
               <div className="bg-[var(--yellow-light)] border border-[var(--yellow)]/40 rounded-[14px] p-5 flex gap-3">
                 <AlertCircle className="text-[var(--yellow)] flex-shrink-0" size={20} />
-                <p className="text-[13px] text-[var(--mid)]">Volunteer ID not found. Check your welcome email for the correct ID.</p>
+                <p className="text-[13px] text-[var(--mid)]">{cms.error_text}</p>
               </div>
             </motion.div>
           )}
@@ -140,16 +153,16 @@ const VolunteerPortal = () => {
                   <div className="bg-[var(--yellow-light)] rounded-[14px] p-5">
                     <div className="flex items-center gap-2 mb-2">
                       <Award size={18} className="text-[var(--yellow)]" />
-                      <span className="font-[600] text-[14px] text-[var(--dark)]">Request Certificate</span>
+                      <span className="font-[600] text-[14px] text-[var(--dark)]">{cms.cert_heading}</span>
                     </div>
-                    <p className="text-[12px] text-[var(--mid)] mb-3">Download a certificate confirming your volunteer service with AGSWS.</p>
+                    <p className="text-[12px] text-[var(--mid)] mb-3">{cms.cert_body}</p>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => alert("Certificate generation will be available on launch.")}
                       className="w-full bg-[var(--yellow)] text-[var(--dark)] font-[700] py-3 rounded-full flex items-center justify-center gap-2 text-[13px] shadow-[var(--shadow-yellow)]"
                     >
-                      <Award size={14} /> Request Certificate
+                      <Award size={14} /> {cms.cert_button}
                     </motion.button>
                   </div>
                 </div>
