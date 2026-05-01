@@ -236,6 +236,9 @@ const sections = [
   { id: 'updates_page', label: 'Updates Page', icon: Mail, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'medical_page', label: 'Medical Aid Page', icon: Heart, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'education_page', label: 'Education Page', icon: BookOpen, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'impact_report', label: 'Impact Report Page', icon: BarChart3, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'donor_wall', label: 'Donor Wall Page', icon: Users, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'volunteer_portal', label: 'Volunteer Portal Page', icon: Users, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'register_parent', label: 'GoldenAge Page', icon: Heart, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'register_parent_docs', label: 'GoldenAge Docs', icon: FileText, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'analytics_sidebar', label: 'Analytics — Sidebar', icon: BarChart3, table: '', fields: [], isCustom: true, group: 'Pages' },
@@ -256,6 +259,7 @@ const previewUrls: Record<string, string> = {
   about_timeline: '/about', about_docs: '/about', about_cta: '/about',
   updates_page: '/updates', updates: '/updates', videos: '/gallery',
   medical_page: '/initiatives/medical', education_page: '/initiatives/education',
+  impact_report: '/impact', donor_wall: '/donor-wall', volunteer_portal: '/volunteer-portal',
 };
 
 const CHART_COLORS = ['hsl(187, 68%, 39%)', 'hsl(242, 29%, 50%)', 'hsl(28, 22%, 62%)', 'hsl(47, 80%, 55%)', 'hsl(0, 70%, 55%)', 'hsl(160, 60%, 45%)', 'hsl(280, 50%, 55%)'];

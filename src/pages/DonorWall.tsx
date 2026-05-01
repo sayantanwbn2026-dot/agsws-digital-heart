@@ -5,6 +5,9 @@ import FadeInUp from "@/components/ui/FadeInUp";
 import PageHero from "@/components/layout/PageHero";
 import { supabase } from "@/lib/supabase/client";
 import { Heart, BookOpen, Users, TrendingUp } from "lucide-react";
+import { useCMSSection } from "@/hooks/useCMSSection";
+
+const iconMap: Record<string, any> = { Heart, BookOpen, Users, TrendingUp };
 
 function getTier(amount: number) {
   if (amount >= 10000) return { label: "Champion", cls: "bg-[var(--yellow)]/10 text-[var(--yellow)] border border-[var(--yellow)]/20" };
@@ -20,19 +23,28 @@ function getGatewayInfo(gateway: string) {
   return { icon: Heart, color: "var(--teal)", bg: "bg-[var(--teal)]" };
 }
 
-const filters = ["All", "Medical Aid", "Education", "Registration"];
-
-const summaryStats = [
+const defaultWall = {
+  filters: ["All", "Medical Aid", "Education", "Registration"],
+  summary_stats: [
   { icon: Users, label: "Total Donors", value: "2,847", color: "var(--teal)" },
   { icon: TrendingUp, label: "This Month", value: "124", color: "var(--yellow)" },
   { icon: Heart, label: "Cities", value: "42", color: "var(--purple)" },
-];
+  ],
+  footer_count: "2,847",
+  footer_text: "donors on this wall",
+};
 
 const DonorWall = () => {
   useSEO("Donor Wall", "Our wall of donors — every name represents a real act of kindness.");
   const [entries, setEntries] = useState<any[]>([]);
   const [gateway, setGateway] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { data: cms } = useCMSSection<any>('donor_wall', defaultWall);
+  const filters: string[] = cms.filters ?? defaultWall.filters;
+  const summaryStats = (cms.summary_stats ?? defaultWall.summary_stats).map((s: any) => ({
+    ...s,
+    icon: typeof s.icon === 'string' ? (iconMap[s.icon] || Users) : s.icon,
+  }));
 
   const loadWall = async (gw: string | null = null) => {
     setLoading(true);
@@ -156,7 +168,7 @@ const DonorWall = () => {
           </div>
 
           <FadeInUp className="text-center mt-14">
-            <p className="text-[14px] text-[var(--mid)]">Join <strong className="text-[var(--teal)] font-[700]">2,847</strong> donors on this wall</p>
+            <p className="text-[14px] text-[var(--mid)]">Join <strong className="text-[var(--teal)] font-[700]">{cms.footer_count}</strong> {cms.footer_text}</p>
           </FadeInUp>
         </div>
       </section>
