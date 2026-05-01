@@ -26,58 +26,63 @@ const DonateChoiceOverlay = () => {
             onClick={closeOverlay}
           />
 
-          {/* Modal */}
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          {/* Modal — outer container is scrollable on tall content / short viewports */}
+          <div
+            className="fixed inset-0 z-[9999] overflow-y-auto overscroll-contain"
+            onClick={closeOverlay}
+          >
+            <div className="min-h-full flex items-center justify-center p-4 sm:p-6">
             <motion.div
               initial={{ scale: 0.92, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="relative max-w-[620px] w-full overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-[620px] w-full my-auto"
             >
               {/* Card with gradient border effect */}
-              <div className="relative bg-white rounded-[28px] shadow-[0_32px_80px_rgba(0,0,0,0.3),0_0_0_1px_rgba(31,154,168,0.08)]">
+              <div className="relative bg-white rounded-[28px] shadow-[0_32px_80px_rgba(0,0,0,0.3),0_0_0_1px_rgba(31,154,168,0.08)] overflow-hidden">
                 {/* Top accent gradient */}
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[var(--teal)] via-[var(--yellow)] to-[var(--purple)] rounded-t-[28px]" />
 
                 {/* Close button */}
                 <button
                   onClick={closeOverlay}
-                  className="absolute top-5 right-5 w-10 h-10 rounded-full bg-[var(--bg)] hover:bg-[var(--border-color)] flex items-center justify-center transition-all duration-200 hover:rotate-90 z-10"
+                  className="sticky top-3 ml-auto mr-3 mt-3 w-10 h-10 rounded-full bg-white/95 backdrop-blur-sm shadow-md hover:shadow-lg ring-1 ring-black/5 flex items-center justify-center transition-all duration-200 hover:rotate-90 z-20 -mb-10 block"
                   aria-label="Close"
                 >
                   <X size={16} className="text-[var(--mid)]" />
                 </button>
 
                 {/* Content */}
-                <div className="px-8 pt-10 pb-8 sm:px-10">
+                <div className="px-5 pt-6 pb-7 sm:px-10 sm:pt-10 sm:pb-8">
                   {/* Header */}
-                  <div className="text-center mb-8">
+                  <div className="text-center mb-6 sm:mb-8">
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.15, type: "spring", stiffness: 300, damping: 20 }}
-                      className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] flex items-center justify-center mx-auto mb-5 shadow-[0_8px_24px_rgba(31,154,168,0.3)]"
+                      className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] flex items-center justify-center mx-auto mb-4 sm:mb-5 shadow-[0_8px_24px_rgba(31,154,168,0.3)]"
                     >
-                      <Sparkles size={24} className="text-white" />
+                      <Sparkles size={22} className="text-white" />
                     </motion.div>
-                    <h2 className="text-[24px] sm:text-[28px] font-[800] text-[var(--dark)] tracking-[-0.03em] leading-[1.15]">
+                    <h2 className="text-[22px] sm:text-[28px] font-[800] text-[var(--dark)] tracking-[-0.03em] leading-[1.15]">
                       Choose Your Impact
                     </h2>
-                    <p className="text-[14px] text-[var(--mid)] mt-2.5 max-w-[360px] mx-auto leading-relaxed">
+                    <p className="text-[13px] sm:text-[14px] text-[var(--mid)] mt-2 sm:mt-2.5 max-w-[360px] mx-auto leading-relaxed">
                       100% of your donation directly reaches those who need it most.
                     </p>
                   </div>
 
                   {/* Choice Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* Medical */}
                     <motion.button
                       onClick={() => handleChoice("/donate/medical")}
                       whileHover={{ y: -4, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="group relative bg-gradient-to-br from-white to-[#F0F9FA] rounded-[20px] border-[1.5px] border-[var(--border-color)] p-6 text-left cursor-pointer hover:border-[var(--teal)] hover:shadow-[0_12px_32px_rgba(31,154,168,0.12)] transition-[border-color,box-shadow] duration-300 overflow-hidden"
+                      className="group relative bg-gradient-to-br from-white to-[#F0F9FA] rounded-[20px] border-[1.5px] border-[var(--border-color)] p-5 sm:p-6 text-left cursor-pointer hover:border-[var(--teal)] hover:shadow-[0_12px_32px_rgba(31,154,168,0.12)] transition-[border-color,box-shadow] duration-300 overflow-hidden"
                     >
                       {/* Background glow */}
                       <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-[var(--teal)]/[0.06] blur-2xl group-hover:bg-[var(--teal)]/[0.12] transition-colors duration-500" />
@@ -87,7 +92,7 @@ const DonateChoiceOverlay = () => {
                           <Heart size={22} className="text-white" />
                         </div>
                         <h3 className="font-[700] text-[17px] text-[var(--dark)] mb-1.5">Medical Aid</h3>
-                        <p className="text-[13px] text-[var(--mid)] leading-relaxed mb-5">Hospital, surgery & emergency care for families in need</p>
+                        <p className="text-[13px] text-[var(--mid)] leading-relaxed mb-4">Hospital, surgery & emergency care for families in need</p>
 
                         <div className="flex flex-wrap gap-2 mb-5">
                           {["₹500+", "Stripe Secure", "Instant Receipt"].map(tag => (
@@ -110,7 +115,7 @@ const DonateChoiceOverlay = () => {
                       whileHover={{ y: -4, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="group relative bg-gradient-to-br from-white to-[#F5F4FB] rounded-[20px] border-[1.5px] border-[var(--border-color)] p-6 text-left cursor-pointer hover:border-[var(--purple)] hover:shadow-[0_12px_32px_rgba(92,90,166,0.12)] transition-[border-color,box-shadow] duration-300 overflow-hidden"
+                      className="group relative bg-gradient-to-br from-white to-[#F5F4FB] rounded-[20px] border-[1.5px] border-[var(--border-color)] p-5 sm:p-6 text-left cursor-pointer hover:border-[var(--purple)] hover:shadow-[0_12px_32px_rgba(92,90,166,0.12)] transition-[border-color,box-shadow] duration-300 overflow-hidden"
                     >
                       <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-[var(--purple)]/[0.06] blur-2xl group-hover:bg-[var(--purple)]/[0.12] transition-colors duration-500" />
 
@@ -119,7 +124,7 @@ const DonateChoiceOverlay = () => {
                           <BookOpen size={22} className="text-white" />
                         </div>
                         <h3 className="font-[700] text-[17px] text-[var(--dark)] mb-1.5">Education</h3>
-                        <p className="text-[13px] text-[var(--mid)] leading-relaxed mb-5">School fees, books & meals for children's futures</p>
+                        <p className="text-[13px] text-[var(--mid)] leading-relaxed mb-4">School fees, books & meals for children's futures</p>
 
                         <div className="flex flex-wrap gap-2 mb-5">
                           {["₹1,500+", "Sponsor", "Stripe Secure"].map(tag => (
@@ -169,6 +174,7 @@ const DonateChoiceOverlay = () => {
                 </div>
               </div>
             </motion.div>
+            </div>
           </div>
         </>
       )}
