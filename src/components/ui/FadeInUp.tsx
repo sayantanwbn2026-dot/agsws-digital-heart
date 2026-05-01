@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 
 interface Props {
   children: React.ReactNode
@@ -10,16 +10,18 @@ interface Props {
   once?: boolean
 }
 
-export function FadeInUp({
+export const FadeInUp = forwardRef<HTMLDivElement, Props>(function FadeInUp({
   children, delay = 0, y = 28,
   duration = 0.5, className, once = true
-}: Props) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once, margin: '-60px 0px' })
+}, forwardedRef) {
+  const innerRef = useRef<HTMLDivElement>(null)
+  // Expose the inner div node to any forwarded ref (object or callback).
+  useImperativeHandle(forwardedRef, () => innerRef.current as HTMLDivElement, [])
+  const isInView = useInView(innerRef, { once, margin: '-60px 0px' })
 
   return (
     <motion.div
-      ref={ref}
+      ref={innerRef}
       className={className}
       initial={{ opacity: 0, y }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
@@ -32,6 +34,6 @@ export function FadeInUp({
       {children}
     </motion.div>
   )
-}
+})
 
 export default FadeInUp;
