@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Heart, BookOpen, ArrowRight, Shield, Sparkles, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 
 const DonateChoiceOverlay = () => {
@@ -11,6 +12,19 @@ const DonateChoiceOverlay = () => {
     closeOverlay();
     navigate(path);
   };
+
+  // Esc to close + lock body scroll while open
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeOverlay(); };
+    window.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen, closeOverlay]);
 
   return (
     <AnimatePresence>
