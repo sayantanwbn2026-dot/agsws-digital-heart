@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { CMS_UPDATE_EVENT } from '@/lib/cms-sync'
 import { isPreviewMode, previewFetchTable } from '@/lib/cms-preview'
+import { subscribeRealtime } from '@/lib/cms-realtime'
 
 export function useCMSSection<T>(sectionKey: string, fallback: T): { data: T; loading: boolean } {
   const [data, setData] = useState<T>(fallback)
@@ -47,12 +48,14 @@ export function useCMSSection<T>(sectionKey: string, fallback: T): { data: T; lo
     const visibilityHandler = () => { if (document.visibilityState === 'visible') fetchData() }
     window.addEventListener('focus', focusHandler)
     document.addEventListener('visibilitychange', visibilityHandler)
+    const unsub = subscribeRealtime('cms_sections', handler)
     return () => {
       window.removeEventListener(CMS_UPDATE_EVENT, handler)
       window.removeEventListener('agsws-preview-changed', handler)
       window.removeEventListener('storage', storageHandler)
       window.removeEventListener('focus', focusHandler)
       document.removeEventListener('visibilitychange', visibilityHandler)
+      unsub()
     }
   }, [fetchData])
 

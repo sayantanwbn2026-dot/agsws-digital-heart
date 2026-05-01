@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { CMS_UPDATE_EVENT } from '@/lib/cms-sync'
 import { isPreviewMode, previewFetchTable } from '@/lib/cms-preview'
+import { subscribeRealtime } from '@/lib/cms-realtime'
 
 interface Options {
   filter?: { column: string; value: any }
@@ -78,11 +79,13 @@ export function useCMSList<T>(
     window.addEventListener('storage', (e) => {
       if (e.key === 'agsws_cms_last_updated') handler()
     })
+    const unsub = subscribeRealtime(table, handler)
     return () => {
       window.removeEventListener(CMS_UPDATE_EVENT, handler)
       window.removeEventListener('agsws-preview-changed', handler)
+      unsub()
     }
-  }, [fetchData])
+  }, [fetchData, table])
 
   return { data, loading, refetch: fetchData }
 }
