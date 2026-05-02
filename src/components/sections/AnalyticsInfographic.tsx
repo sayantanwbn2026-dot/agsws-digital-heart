@@ -5,6 +5,7 @@ import CountUp from "react-countup";
 import { TrendingUp, Heart, GraduationCap, Users, Activity } from "lucide-react";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { useCMSSection } from "@/hooks/useCMSSection";
+import { useGlobalStats } from "@/hooks/useGlobalStats";
 
 const iconMap: Record<string, any> = { Heart, GraduationCap, Users, TrendingUp };
 
@@ -52,6 +53,19 @@ const AnalyticsInfographic = () => {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], [-15, 15]);
   const { data } = useCMSSection<typeof defaultData>('analytics', defaultData);
+  const { get } = useGlobalStats();
+
+  // Universal stats override the per-section sidebar values when matching keys exist.
+  const sidebarStats = (data.sidebar_stats || []).map((s: any) => {
+    const slug = (s.label || '').toLowerCase();
+    let key = slug.includes('patient') ? 'patients'
+            : slug.includes('student') || slug.includes('child') ? 'students'
+            : slug.includes('famil') ? 'families'
+            : null;
+    if (!key) return s;
+    const g = get(key);
+    return g.numeric ? { ...s, value: g.numeric } : s;
+  });
 
   const chartData = data.chart_data;
   const maxVal = Math.max(...chartData.flatMap(d => [d.medical, d.education]));
@@ -121,7 +135,7 @@ const AnalyticsInfographic = () => {
 
             <FadeInUp delay={0.15}>
               <div className="grid grid-cols-2 gap-4">
-                {data.sidebar_stats.map((s: any, i: number) => {
+                {sidebarStats.map((s: any, i: number) => {
                   const Icon = iconMap[s.icon] || Heart;
                   return (
                     <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.06 }} className="bg-white/[0.04] rounded-[16px] border border-white/[0.06] p-4 text-center">
