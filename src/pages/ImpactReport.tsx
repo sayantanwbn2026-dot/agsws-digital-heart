@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { ArrowRight, Heart, BookOpen, Users, TrendingUp, Quote } from "lucide-react";
+import { useGlobalStats } from "@/hooks/useGlobalStats";
 
 const sections = ["Cover", "Numbers", "Medical", "Education", "Reach", "Story", "Finances", "CTA"];
 
@@ -70,6 +71,12 @@ const ImpactReport = () => {
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const [activeSection, setActiveSection] = useState(0);
   const { openOverlay } = useDonateOverlay();
+  const { get } = useGlobalStats();
+  const patients = get('patients', { numeric: 2400, suffix: '+', label: 'Patients Supported' });
+  const students = get('students', { numeric: 850, suffix: '+', label: 'Children Educated' });
+  const families = get('families', { numeric: 120, suffix: '+', label: 'Families Registered' });
+  const years = get('years', { numeric: 6, suffix: '', label: 'Years of Service' });
+  const funds = get('funds', { numeric: 48, prefix: '₹', suffix: 'L+', label: 'Funds Distributed' });
 
   useEffect(() => {
     const handler = () => {
@@ -118,11 +125,11 @@ const ImpactReport = () => {
             The Year in Numbers
           </motion.p>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
-            <StatBlock value={2400} suffix="+" label="Patients Supported" icon={Heart} />
-            <StatBlock value={850} suffix="+" label="Children Educated" icon={BookOpen} />
-            <StatBlock value={120} suffix="+" label="Families Registered" icon={Users} />
-            <StatBlock value={6} suffix="" label="Years of Service" />
-            <StatBlock value={48} suffix="L+" label="Funds Deployed (₹)" icon={TrendingUp} />
+            <StatBlock value={patients.numeric} suffix={patients.suffix || '+'} label={patients.label || 'Patients Supported'} icon={Heart} />
+            <StatBlock value={students.numeric} suffix={students.suffix || '+'} label={students.label || 'Children Educated'} icon={BookOpen} />
+            <StatBlock value={families.numeric} suffix={families.suffix || '+'} label={families.label || 'Families Registered'} icon={Users} />
+            <StatBlock value={years.numeric} suffix={years.suffix} label={years.label || 'Years of Service'} />
+            <StatBlock value={funds.numeric} suffix={funds.suffix || 'L+'} label={`${funds.label || 'Funds Deployed'} (${funds.prefix || '₹'})`} icon={TrendingUp} />
           </div>
         </div>
       </ParallaxSection>
@@ -138,7 +145,7 @@ const ImpactReport = () => {
               Medical Aid
             </motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-10 leading-tight">
-              2,400 patients<br />supported this year.
+              {patients.display || '2,400'} patients<br />supported this year.
             </motion.h2>
             <div className="space-y-0">
               {[["847", "Emergency cases handled"], ["312", "Surgeries supported"], ["₹28.4L", "Total medical funds deployed"]].map(([num, desc], i) => (
@@ -173,7 +180,7 @@ const ImpactReport = () => {
               Education
             </motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-10 leading-tight">
-              850 children<br />kept in school.
+              {students.display || '850'} children<br />kept in school.
             </motion.h2>
             <div className="space-y-0">
               {[["124", "Full year sponsorships"], ["3,200+", "School meals funded"], ["₹12.6L", "Education funds deployed"]].map(([num, desc], i) => (
@@ -227,7 +234,7 @@ const ImpactReport = () => {
             ))}
           </div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl md:text-4xl font-bold text-white mb-4">
-            120+ parents registered. 18 cities. 4 countries.
+            {families.display || '120+'} parents registered. 18 cities. 4 countries.
           </motion.h2>
           <p className="text-white/40 text-base max-w-lg mx-auto">North Kolkata to London — connecting families separated by distance.</p>
         </div>
