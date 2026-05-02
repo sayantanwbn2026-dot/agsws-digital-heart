@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { useCMSData } from "@/hooks/useCMSData";
 import { useCMSList } from "@/hooks/useCMSList";
+import KPIStatCard from "@/components/ui/KPIStatCard";
 
 const CompassionText = () => {
   const letters = "Compassion".split("");
@@ -18,13 +19,6 @@ const CompassionText = () => {
     </motion.span>
   );
 };
-
-const StatCard = ({ value, label, delay }: { value: string; label: string; delay: number }) => (
-  <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.5 }} className="text-center px-4">
-    <p className="text-[clamp(24px,3.5vw,36px)] font-[800] text-white leading-none tracking-[-0.02em]">{value}</p>
-    <p className="text-[10px] font-[500] text-white/50 mt-1.5 uppercase tracking-[0.1em]">{label}</p>
-  </motion.div>
-);
 
 const fallbackHeroStats = [
   { value: "2,400+", label: "Patients Aided" },
@@ -122,7 +116,13 @@ const HeroSection = () => {
         {/* Stats - hidden on mobile */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.6 }} className="hidden sm:flex flex-wrap justify-center divide-x divide-white/[0.1] mb-8">
           {heroStats.map((s, i) => (
-            <StatCard key={s.label} value={s.value} label={s.label} delay={1.15 + i * 0.1} />
+            <KPIStatCard
+              key={s.label}
+              variant="hero"
+              display={s.value}
+              label={s.label}
+              delay={1.15 + i * 0.1}
+            />
           ))}
         </motion.div>
 
