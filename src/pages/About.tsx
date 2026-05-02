@@ -3,6 +3,7 @@ import FadeInUp from "@/components/ui/FadeInUp";
 import { team as staticTeam } from "@/data/team";
 import { useCMSList } from "@/hooks/useCMSList";
 import { useCMSSection } from "@/hooks/useCMSSection";
+import { useGlobalStats } from "@/hooks/useGlobalStats";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Building2, Award, Globe, FileCheck, Heart, Target, Eye, ArrowRight, Quote } from "lucide-react";
@@ -78,7 +79,11 @@ const About = () => {
   const { data: docsData } = useCMSSection<{ items: typeof defaultDocs }>('about_docs', { items: defaultDocs });
   const { data: ctaData } = useCMSSection<typeof defaultCTA>('about_cta', defaultCTA);
   const values = valuesData.items ?? defaultValues;
-  const counters = countersData.items ?? defaultCounters.items;
+  const { stats: globalStats } = useGlobalStats();
+  // Prefer universal cms_stats. Keep "Years Active" as the first counter if present.
+  const counters = globalStats.length
+    ? globalStats.slice(0, 4).map(s => ({ value: s.display, label: s.label }))
+    : (countersData.items ?? defaultCounters.items);
   const timeline = timelineData.items ?? defaultTimeline;
   const docs = docsData.items ?? defaultDocs;
   const team = cmsTeam.length ? cmsTeam.map((m: any) => ({

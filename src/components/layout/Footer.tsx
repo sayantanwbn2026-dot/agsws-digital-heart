@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import toast from "react-hot-toast";
 import { useCMSSection } from "@/hooks/useCMSSection";
 import { useCMSData } from "@/hooks/useCMSData";
+import { useGlobalStats } from "@/hooks/useGlobalStats";
 import { isValidEmail, normalizeEmail } from "@/lib/validation";
 
 const SOCIAL_ICONS: Record<string, typeof Facebook> = {
@@ -79,6 +80,13 @@ const Footer = () => {
 
   const { data: footerCMS } = useCMSSection<FooterContent>("footer", {});
   const { data: site } = useCMSData<any>("cms_site_settings", {});
+  const { stats: globalStats } = useGlobalStats();
+
+  // Build impact_stats from the universal cms_stats table (4 most-relevant KPIs)
+  // Only fall back to footer-CMS overrides or hardcoded defaults if cms_stats is empty.
+  const globalImpactStats = globalStats.length
+    ? globalStats.slice(0, 4).map(s => ({ value: s.display, label: s.label }))
+    : null;
 
   // Merge CMS content with defaults
   const c: FooterContent = {
@@ -86,7 +94,7 @@ const Footer = () => {
     ...footerCMS,
     explore_links: footerCMS?.explore_links?.length ? footerCMS.explore_links : DEFAULT_CONTENT.explore_links,
     involved_links: footerCMS?.involved_links?.length ? footerCMS.involved_links : DEFAULT_CONTENT.involved_links,
-    impact_stats: footerCMS?.impact_stats?.length ? footerCMS.impact_stats : DEFAULT_CONTENT.impact_stats,
+    impact_stats: globalImpactStats ?? (footerCMS?.impact_stats?.length ? footerCMS.impact_stats : DEFAULT_CONTENT.impact_stats),
     legal_links: footerCMS?.legal_links?.length ? footerCMS.legal_links : DEFAULT_CONTENT.legal_links,
   };
 

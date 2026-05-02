@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { ArrowRight, Heart, BookOpen, Users, TrendingUp, Quote } from "lucide-react";
+import { useGlobalStats } from "@/hooks/useGlobalStats";
 
 const sections = ["Cover", "Numbers", "Medical", "Education", "Reach", "Story", "Finances", "CTA"];
 
@@ -70,6 +71,12 @@ const ImpactReport = () => {
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const [activeSection, setActiveSection] = useState(0);
   const { openOverlay } = useDonateOverlay();
+  const { get } = useGlobalStats();
+  const patients = get('patients', { numeric: 2400, suffix: '+', label: 'Patients Supported' });
+  const students = get('students', { numeric: 850, suffix: '+', label: 'Children Educated' });
+  const families = get('families', { numeric: 120, suffix: '+', label: 'Families Registered' });
+  const years = get('years', { numeric: 6, suffix: '', label: 'Years of Service' });
+  const funds = get('funds', { numeric: 48, prefix: '₹', suffix: 'L+', label: 'Funds Distributed' });
 
   useEffect(() => {
     const handler = () => {
@@ -97,11 +104,11 @@ const ImpactReport = () => {
           <circle cx="300" cy="300" r="200" stroke="white" strokeWidth="0.4" fill="none" />
           <circle cx="300" cy="300" r="120" stroke="white" strokeWidth="0.4" fill="none" />
         </svg>
-        <div className="relative z-10 text-center max-w-[800px] mx-auto px-6 w-full">
+        <div className="relative z-10 text-center max-w-[800px] mx-auto px-5 sm:px-6 w-full">
           <motion.span initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="inline-block bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] text-[10px] font-bold px-5 py-2 rounded-full uppercase tracking-[0.2em] mb-8 border border-[hsl(var(--primary))]/20">
             Annual Report · 2024–25
           </motion.span>
-          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} className="text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} className="text-[44px] sm:text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
             Impact<br /><span className="text-[hsl(var(--accent))]">Report</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-base text-white/50 mb-14">One year. Thousands of lives. Zero compromise.</motion.p>
@@ -113,16 +120,16 @@ const ImpactReport = () => {
 
       {/* S1: Numbers */}
       <ParallaxSection id="impact-s1" className="bg-[hsl(187,68%,5%)]">
-        <div className="max-w-[1100px] mx-auto px-6 py-24 relative z-10 w-full">
+        <div className="max-w-[1100px] mx-auto px-5 sm:px-6 py-16 sm:py-24 relative z-10 w-full">
           <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--accent))] mb-16">
             The Year in Numbers
           </motion.p>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
-            <StatBlock value={2400} suffix="+" label="Patients Supported" icon={Heart} />
-            <StatBlock value={850} suffix="+" label="Children Educated" icon={BookOpen} />
-            <StatBlock value={120} suffix="+" label="Families Registered" icon={Users} />
-            <StatBlock value={6} suffix="" label="Years of Service" />
-            <StatBlock value={48} suffix="L+" label="Funds Deployed (₹)" icon={TrendingUp} />
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
+            <StatBlock value={patients.numeric} suffix={patients.suffix || '+'} label={patients.label || 'Patients Supported'} icon={Heart} />
+            <StatBlock value={students.numeric} suffix={students.suffix || '+'} label={students.label || 'Children Educated'} icon={BookOpen} />
+            <StatBlock value={families.numeric} suffix={families.suffix || '+'} label={families.label || 'Families Registered'} icon={Users} />
+            <StatBlock value={years.numeric} suffix={years.suffix} label={years.label || 'Years of Service'} />
+            <StatBlock value={funds.numeric} suffix={funds.suffix || 'L+'} label={`${funds.label || 'Funds Deployed'} (${funds.prefix || '₹'})`} icon={TrendingUp} />
           </div>
         </div>
       </ParallaxSection>
@@ -138,7 +145,7 @@ const ImpactReport = () => {
               Medical Aid
             </motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-10 leading-tight">
-              2,400 patients<br />supported this year.
+              {patients.display || '2,400'} patients<br />supported this year.
             </motion.h2>
             <div className="space-y-0">
               {[["847", "Emergency cases handled"], ["312", "Surgeries supported"], ["₹28.4L", "Total medical funds deployed"]].map(([num, desc], i) => (
@@ -173,7 +180,7 @@ const ImpactReport = () => {
               Education
             </motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-10 leading-tight">
-              850 children<br />kept in school.
+              {students.display || '850'} children<br />kept in school.
             </motion.h2>
             <div className="space-y-0">
               {[["124", "Full year sponsorships"], ["3,200+", "School meals funded"], ["₹12.6L", "Education funds deployed"]].map(([num, desc], i) => (
@@ -227,7 +234,7 @@ const ImpactReport = () => {
             ))}
           </div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl md:text-4xl font-bold text-white mb-4">
-            120+ parents registered. 18 cities. 4 countries.
+            {families.display || '120+'} parents registered. 18 cities. 4 countries.
           </motion.h2>
           <p className="text-white/40 text-base max-w-lg mx-auto">North Kolkata to London — connecting families separated by distance.</p>
         </div>

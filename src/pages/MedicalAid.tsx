@@ -73,15 +73,15 @@ const MedicalAid = () => {
     <main id="main-content">
       <PageHero title="Medical Aid & Hospital Support" label="Initiative" bgVariant="teal-dark" breadcrumb={[{ label: "Home", href: "/" }, { label: "Initiatives", href: "/initiatives" }, { label: "Medical Aid" }]} />
 
-      <section className="bg-card py-20 lg:py-28">
-        <div className="max-w-[900px] mx-auto px-6">
+      <section className="bg-card py-14 sm:py-20 lg:py-28">
+        <div className="max-w-[900px] mx-auto px-5 sm:px-6">
           <FadeInUp>
-            <p className="text-[15px] lg:text-[17px] text-[var(--mid)] mb-12 leading-[1.8] max-w-[700px]">
+            <p className="text-[14px] sm:text-[15px] lg:text-[17px] text-[var(--mid)] mb-10 sm:mb-12 leading-[1.8] max-w-[700px]">
               {cms.intro}
             </p>
           </FadeInUp>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-12 sm:mb-16">
             {benefits.map((item: any, i: number) => {
               const Icon = iconMap[item.icon] || Stethoscope;
               return (
@@ -107,10 +107,10 @@ const MedicalAid = () => {
       </section>
 
       <section className="bg-[var(--teal-light)] border-t-4 border-[var(--teal)] py-16">
-        <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10 items-start">
+        <div className="max-w-[1100px] mx-auto px-5 sm:px-6 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 lg:gap-10 items-start">
           <div>
             <span className="text-[11px] font-[600] text-[var(--teal)] uppercase tracking-[0.1em] mb-2 block">{cms.apply_label}</span>
-            <h3 className="text-[22px] font-[800] text-[var(--dark)] mb-4 tracking-[-0.01em]">{cms.apply_heading}</h3>
+            <h3 className="text-[20px] sm:text-[22px] font-[800] text-[var(--dark)] mb-4 tracking-[-0.01em]">{cms.apply_heading}</h3>
             <p className="text-[14px] text-[var(--mid)] leading-relaxed mb-6">
               {cms.apply_body}
             </p>
@@ -137,7 +137,7 @@ const MedicalAid = () => {
       <AnimatePresence>
         {showApply && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center backdrop-blur-md p-4" onClick={() => setShowApply(false)}>
-            <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full max-w-[520px] rounded-[24px] p-8 shadow-[var(--shadow-lg)] max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full max-w-[520px] rounded-[20px] sm:rounded-[24px] p-5 sm:p-8 shadow-[var(--shadow-lg)] max-h-[90vh] overflow-y-auto">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] flex items-center justify-center">
                   <Stethoscope size={18} className="text-white" />

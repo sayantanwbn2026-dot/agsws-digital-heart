@@ -50,8 +50,8 @@ const VolunteerPortal = () => {
     <main id="main-content">
       <PageHero title="Volunteer Portal" size="sm" breadcrumb={[{ label: "Home", href: "/" }, { label: "Volunteer Portal" }]} />
 
-      <section className="bg-[var(--bg)] py-16 lg:py-20">
-        <div className="max-w-[520px] mx-auto px-6">
+      <section className="bg-[var(--bg)] py-12 sm:py-16 lg:py-20">
+        <div className="max-w-[520px] mx-auto px-5 sm:px-6">
           <motion.div
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -67,7 +67,7 @@ const VolunteerPortal = () => {
                 <p className="text-[11px] text-[var(--light)]">{cms.card_subheading}</p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1 relative">
                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--light)]" />
                 <input
@@ -82,7 +82,7 @@ const VolunteerPortal = () => {
                 onClick={handleSearch}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="h-[48px] px-6 bg-[var(--teal)] text-white font-[600] rounded-[12px] flex items-center gap-2 text-[13px] hover:bg-[var(--teal-dark)] transition-colors"
+                className="h-[48px] px-6 bg-[var(--teal)] text-white font-[600] rounded-[12px] flex items-center justify-center gap-2 text-[13px] hover:bg-[var(--teal-dark)] transition-colors"
               >
                 <ArrowRight size={16} /> View
               </motion.button>
