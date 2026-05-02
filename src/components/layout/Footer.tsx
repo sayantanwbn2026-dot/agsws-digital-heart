@@ -8,6 +8,7 @@ import { useCMSSection } from "@/hooks/useCMSSection";
 import { useCMSData } from "@/hooks/useCMSData";
 import { useGlobalStats } from "@/hooks/useGlobalStats";
 import { isValidEmail, normalizeEmail } from "@/lib/validation";
+import KPIStatCard from "@/components/ui/KPIStatCard";
 
 const SOCIAL_ICONS: Record<string, typeof Facebook> = {
   facebook: Facebook, twitter: Twitter, instagram: Instagram, linkedin: Linkedin, youtube: Youtube,
@@ -236,11 +237,14 @@ const Footer = () => {
           >
             <h4 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[hsl(var(--accent))] mb-6">Impact</h4>
             <div className="space-y-5">
-              {c.impact_stats!.map(stat => (
-                <div key={stat.label}>
-                  <p className="text-lg font-bold text-white">{stat.value}</p>
-                  <p className="text-[10px] text-white/40 uppercase tracking-wider">{stat.label}</p>
-                </div>
+              {c.impact_stats!.map((stat, i) => (
+                <KPIStatCard
+                  key={stat.label}
+                  variant="footer"
+                  display={stat.value}
+                  label={stat.label}
+                  delay={0.4 + i * 0.05}
+                />
               ))}
             </div>
           </motion.div>

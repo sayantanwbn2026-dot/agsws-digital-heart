@@ -6,6 +6,7 @@ import { TrendingUp, Heart, GraduationCap, Users, Activity } from "lucide-react"
 import FadeInUp from "@/components/ui/FadeInUp";
 import { useCMSSection } from "@/hooks/useCMSSection";
 import { useGlobalStats } from "@/hooks/useGlobalStats";
+import KPIStatCard from "@/components/ui/KPIStatCard";
 
 const iconMap: Record<string, any> = { Heart, GraduationCap, Users, TrendingUp };
 
@@ -138,11 +139,17 @@ const AnalyticsInfographic = () => {
                 {sidebarStats.map((s: any, i: number) => {
                   const Icon = iconMap[s.icon] || Heart;
                   return (
-                    <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.06 }} className="bg-white/[0.04] rounded-[16px] border border-white/[0.06] p-4 text-center">
-                      <Icon size={18} className="mx-auto mb-2" style={{ color: s.color }} />
-                      <p className="text-[18px] font-[800] text-white">{inView ? <CountUp end={s.value} duration={2} /> : 0}{s.label === "Success %" ? "%" : "+"}</p>
-                      <p className="text-[9px] text-white/30 uppercase tracking-[0.06em] font-[500]">{s.label}</p>
-                    </motion.div>
+                    <KPIStatCard
+                      key={s.label}
+                      variant="analytics"
+                      animate
+                      icon={Icon}
+                      accent={s.color}
+                      numeric={s.value}
+                      suffix={s.label === "Success %" ? "%" : "+"}
+                      label={s.label}
+                      delay={0.2 + i * 0.06}
+                    />
                   );
                 })}
               </div>
