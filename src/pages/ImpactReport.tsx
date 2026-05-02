@@ -7,6 +7,7 @@ import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { ArrowRight, Heart, BookOpen, Users, TrendingUp, Quote } from "lucide-react";
 import { useGlobalStats } from "@/hooks/useGlobalStats";
+import KPIStatCard from "@/components/ui/KPIStatCard";
 
 const sections = ["Cover", "Numbers", "Medical", "Education", "Reach", "Story", "Finances", "CTA"];
 
@@ -27,27 +28,6 @@ const SectionNav = ({ active }: { active: number }) => (
     ))}
   </div>
 );
-
-const StatBlock = ({ value, suffix, label, icon: Icon }: { value: number; suffix: string; label: string; icon?: typeof Heart }) => {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6 }}
-      className="text-center group"
-    >
-      {Icon && <Icon size={24} className="mx-auto mb-3 text-[hsl(var(--primary))]/60" />}
-      <span className="text-[clamp(48px,8vw,80px)] font-extrabold text-white leading-none tracking-tighter block" style={{ fontVariantNumeric: "tabular-nums" }}>
-        {inView ? <CountUp end={value} duration={2.5} /> : "0"}{suffix}
-      </span>
-      <p className="text-sm font-medium text-white/40 uppercase tracking-widest mt-3">{label}</p>
-      <motion.div initial={{ width: 0 }} animate={inView ? { width: 32 } : {}} transition={{ delay: 2, duration: 0.5 }} className="h-[2px] bg-[hsl(var(--accent))] mx-auto mt-4 rounded-full" />
-    </motion.div>
-  );
-};
 
 const ParallaxSection = ({ children, id, className }: { children: React.ReactNode; id: string; className?: string }) => {
   const ref = useRef(null);
@@ -125,11 +105,11 @@ const ImpactReport = () => {
             The Year in Numbers
           </motion.p>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
-            <StatBlock value={patients.numeric} suffix={patients.suffix || '+'} label={patients.label || 'Patients Supported'} icon={Heart} />
-            <StatBlock value={students.numeric} suffix={students.suffix || '+'} label={students.label || 'Children Educated'} icon={BookOpen} />
-            <StatBlock value={families.numeric} suffix={families.suffix || '+'} label={families.label || 'Families Registered'} icon={Users} />
-            <StatBlock value={years.numeric} suffix={years.suffix} label={years.label || 'Years of Service'} />
-            <StatBlock value={funds.numeric} suffix={funds.suffix || 'L+'} label={`${funds.label || 'Funds Deployed'} (${funds.prefix || '₹'})`} icon={TrendingUp} />
+            <KPIStatCard variant="report" animate icon={Heart} numeric={patients.numeric} suffix={patients.suffix || '+'} label={patients.label || 'Patients Supported'} />
+            <KPIStatCard variant="report" animate icon={BookOpen} numeric={students.numeric} suffix={students.suffix || '+'} label={students.label || 'Children Educated'} />
+            <KPIStatCard variant="report" animate icon={Users} numeric={families.numeric} suffix={families.suffix || '+'} label={families.label || 'Families Registered'} />
+            <KPIStatCard variant="report" animate numeric={years.numeric} suffix={years.suffix} label={years.label || 'Years of Service'} />
+            <KPIStatCard variant="report" animate icon={TrendingUp} numeric={funds.numeric} prefix={funds.prefix || '₹'} suffix={funds.suffix || 'L+'} label={funds.label || 'Funds Deployed'} />
           </div>
         </div>
       </ParallaxSection>
