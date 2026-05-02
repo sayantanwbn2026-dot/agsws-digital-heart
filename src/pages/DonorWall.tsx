@@ -104,14 +104,14 @@ const DonorWall = () => {
         <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)]">
           
           {/* Summary stats */}
-          <div className="grid grid-cols-3 gap-4 mb-10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-8 sm:mb-10">
             {summaryStats.map((s, i) => (
               <FadeInUp key={s.label} delay={i * 0.08}>
-                <div className="bg-white rounded-[var(--radius-xl)] border border-[var(--border-color)] p-5 text-center shadow-[var(--shadow-card)]">
+                <div className="bg-white rounded-[var(--radius-xl)] border border-[var(--border-color)] p-4 sm:p-5 text-center shadow-[var(--shadow-card)]">
                   <div className="w-10 h-10 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: `color-mix(in srgb, ${s.color} 10%, white)` }}>
                     <s.icon size={18} style={{ color: s.color }} />
                   </div>
-                  <p className="text-[clamp(22px,3vw,28px)] font-[800] text-[var(--dark)] leading-none">{s.value}</p>
+                  <p className="text-[clamp(20px,4vw,28px)] font-[800] text-[var(--dark)] leading-none">{s.value}</p>
                   <p className="text-[11px] font-[500] text-[var(--light)] uppercase tracking-[0.06em] mt-1">{s.label}</p>
                 </div>
               </FadeInUp>
@@ -119,14 +119,14 @@ const DonorWall = () => {
           </div>
 
           {/* Filters */}
-          <div className="flex gap-2 mb-8 flex-wrap">
+          <div className="flex gap-2 mb-6 sm:mb-8 flex-wrap overflow-x-auto -mx-1 px-1">
             {filters.map(f => {
               const isActive = (gateway === null && f === "All") || gateway === f;
               return (
                 <button
                   key={f}
                   onClick={() => { const gw = f === "All" ? null : f; setGateway(gw); loadWall(gw); }}
-                  className={`px-5 py-2 rounded-full text-[13px] font-[600] border transition-all duration-200 ${isActive ? "bg-[var(--teal)] text-white border-[var(--teal)]" : "bg-white text-[var(--mid)] border-[var(--border-color)] hover:border-[var(--teal)] hover:text-[var(--teal)]"}`}
+                  className={`whitespace-nowrap px-4 sm:px-5 py-2 rounded-full text-[12px] sm:text-[13px] font-[600] border transition-all duration-200 ${isActive ? "bg-[var(--teal)] text-white border-[var(--teal)]" : "bg-white text-[var(--mid)] border-[var(--border-color)] hover:border-[var(--teal)] hover:text-[var(--teal)]"}`}
                 >
                   {f}
                 </button>

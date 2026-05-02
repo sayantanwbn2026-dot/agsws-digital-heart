@@ -104,11 +104,11 @@ const ImpactReport = () => {
           <circle cx="300" cy="300" r="200" stroke="white" strokeWidth="0.4" fill="none" />
           <circle cx="300" cy="300" r="120" stroke="white" strokeWidth="0.4" fill="none" />
         </svg>
-        <div className="relative z-10 text-center max-w-[800px] mx-auto px-6 w-full">
+        <div className="relative z-10 text-center max-w-[800px] mx-auto px-5 sm:px-6 w-full">
           <motion.span initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="inline-block bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] text-[10px] font-bold px-5 py-2 rounded-full uppercase tracking-[0.2em] mb-8 border border-[hsl(var(--primary))]/20">
             Annual Report · 2024–25
           </motion.span>
-          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} className="text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} className="text-[44px] sm:text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
             Impact<br /><span className="text-[hsl(var(--accent))]">Report</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-base text-white/50 mb-14">One year. Thousands of lives. Zero compromise.</motion.p>
@@ -120,11 +120,11 @@ const ImpactReport = () => {
 
       {/* S1: Numbers */}
       <ParallaxSection id="impact-s1" className="bg-[hsl(187,68%,5%)]">
-        <div className="max-w-[1100px] mx-auto px-6 py-24 relative z-10 w-full">
+        <div className="max-w-[1100px] mx-auto px-5 sm:px-6 py-16 sm:py-24 relative z-10 w-full">
           <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--accent))] mb-16">
             The Year in Numbers
           </motion.p>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
             <StatBlock value={patients.numeric} suffix={patients.suffix || '+'} label={patients.label || 'Patients Supported'} icon={Heart} />
             <StatBlock value={students.numeric} suffix={students.suffix || '+'} label={students.label || 'Children Educated'} icon={BookOpen} />
             <StatBlock value={families.numeric} suffix={families.suffix || '+'} label={families.label || 'Families Registered'} icon={Users} />
