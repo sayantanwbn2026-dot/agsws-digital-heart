@@ -1,5 +1,5 @@
 import { useSEO } from "@/hooks/useSEO";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
