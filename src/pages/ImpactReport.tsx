@@ -6,6 +6,7 @@ import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { ArrowRight, Heart, BookOpen, Users, TrendingUp, Quote } from "lucide-react";
 import { useGlobalStats } from "@/hooks/useGlobalStats";
+import { useCMSSection } from "@/hooks/useCMSSection";
 import KPIStatCard from "@/components/ui/KPIStatCard";
 
 const sections = ["Cover", "Numbers", "Medical", "Education", "Reach", "Story", "Finances", "CTA"];
@@ -56,6 +57,27 @@ const ImpactReport = () => {
   const families = get('families', { numeric: 120, suffix: '+', label: 'Families Registered' });
   const years = get('years', { numeric: 6, suffix: '', label: 'Years of Service' });
   const funds = get('funds', { numeric: 48, prefix: '₹', suffix: 'L+', label: 'Funds Distributed' });
+  const { data: cms } = useCMSSection<any>('impact_report', {
+    cover_label: 'Annual Report · 2024–25',
+    cover_title_top: 'Impact', cover_title_bottom: 'Report',
+    cover_subtitle: 'One year. Thousands of lives. Zero compromise.',
+    numbers_label: 'The Year in Numbers',
+    medical_label: 'Medical Aid',
+    medical_heading: '2,400 patients supported this year.',
+    medical_rows: [['847','Emergency cases handled'],['312','Surgeries supported'],['₹28.4L','Total medical funds deployed']].map(([num, desc]) => ({ num, desc })),
+    education_label: 'Education',
+    education_heading: '850 children kept in school.',
+    education_rows: [['124','Full year sponsorships'],['3,200+','School meals funded'],['₹12.6L','Education funds deployed']].map(([num, desc]) => ({ num, desc })),
+    reach_label: 'Geographic Reach',
+    reach_heading: '120+ parents registered. 18 cities. 4 countries.',
+    reach_subtitle: 'North Kolkata to London — connecting families separated by distance.',
+    story_quote: '"My father was attended to within 3 hours. I was in Singapore. AGSWS was in Kolkata. That\\'s all that mattered."',
+    story_name: 'Priya Sengupta', story_role: 'Registered daughter, since 2023', story_link: '/blog/ranu-mondal-emergency-care',
+    finances_label: 'Where Money Went', finances_heading: 'Financial Transparency',
+    cta_heading_left: '2025–26 starts', cta_heading_right: 'now.',
+    cta_subtitle: "Every rupee you give today becomes part of next year's impact report. Will your name be in it?",
+    cta_button: 'Donate Now →',
+  });
 
   useEffect(() => {
     const handler = () => {
