@@ -107,12 +107,12 @@ const ImpactReport = () => {
         </svg>
         <div className="relative z-10 text-center max-w-[800px] mx-auto px-5 sm:px-6 w-full">
           <motion.span initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="inline-block bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] text-[10px] font-bold px-5 py-2 rounded-full uppercase tracking-[0.2em] mb-8 border border-[hsl(var(--primary))]/20">
-            Annual Report · 2024–25
+            {cms.cover_label}
           </motion.span>
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} className="text-[44px] sm:text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
-            Impact<br /><span className="text-[hsl(var(--accent))]">Report</span>
+            {cms.cover_title_top}<br /><span className="text-[hsl(var(--accent))]">{cms.cover_title_bottom}</span>
           </motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-base text-white/50 mb-14">One year. Thousands of lives. Zero compromise.</motion.p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-base text-white/50 mb-14">{cms.cover_subtitle}</motion.p>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="flex items-center justify-center gap-2 text-white/30 text-sm animate-bounce">
             Scroll to explore ↓
           </motion.div>
@@ -123,7 +123,7 @@ const ImpactReport = () => {
       <ParallaxSection id="impact-s1" className="bg-[hsl(187,68%,5%)]">
         <div className="max-w-[1100px] mx-auto px-5 sm:px-6 py-16 sm:py-24 relative z-10 w-full">
           <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--accent))] mb-16">
-            The Year in Numbers
+            {cms.numbers_label}
           </motion.p>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
             <KPIStatCard variant="report" animate statKey="patients" icon={Heart} />
@@ -143,23 +143,23 @@ const ImpactReport = () => {
         <div className="max-w-[1200px] mx-auto px-6 py-24 relative z-10 w-full">
           <div className="max-w-lg">
             <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.15em] mb-6">
-              Medical Aid
+              {cms.medical_label}
             </motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-10 leading-tight">
-              {patients.display || '2,400'} patients<br />supported this year.
+              {cms.medical_heading}
             </motion.h2>
             <div className="space-y-0">
-              {[["847", "Emergency cases handled"], ["312", "Surgeries supported"], ["₹28.4L", "Total medical funds deployed"]].map(([num, desc], i) => (
+              {(cms.medical_rows || []).map((row: any, i: number) => (
                 <motion.div
-                  key={desc}
+                  key={row.desc || i}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                   className="flex items-center gap-5 py-5 border-b border-white/[0.08]"
                 >
-                  <span className="text-2xl font-extrabold text-[hsl(var(--accent))] w-24 font-mono">{num}</span>
-                  <span className="text-white/60 text-sm">{desc}</span>
+                  <span className="text-2xl font-extrabold text-[hsl(var(--accent))] w-24 font-mono">{row.num}</span>
+                  <span className="text-white/60 text-sm">{row.desc}</span>
                 </motion.div>
               ))}
             </div>
@@ -178,23 +178,23 @@ const ImpactReport = () => {
         <div className="max-w-[1200px] mx-auto px-6 py-24 relative z-10 flex justify-end w-full">
           <div className="max-w-lg">
             <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.15em] mb-6">
-              Education
+              {cms.education_label}
             </motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-10 leading-tight">
-              {students.display || '850'} children<br />kept in school.
+              {cms.education_heading}
             </motion.h2>
             <div className="space-y-0">
-              {[["124", "Full year sponsorships"], ["3,200+", "School meals funded"], ["₹12.6L", "Education funds deployed"]].map(([num, desc], i) => (
+              {(cms.education_rows || []).map((row: any, i: number) => (
                 <motion.div
-                  key={desc}
+                  key={row.desc || i}
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                   className="flex items-center gap-5 py-5 border-b border-white/[0.08]"
                 >
-                  <span className="text-2xl font-extrabold text-[hsl(var(--accent))] w-24 font-mono">{num}</span>
-                  <span className="text-white/60 text-sm">{desc}</span>
+                  <span className="text-2xl font-extrabold text-[hsl(var(--accent))] w-24 font-mono">{row.num}</span>
+                  <span className="text-white/60 text-sm">{row.desc}</span>
                 </motion.div>
               ))}
             </div>
