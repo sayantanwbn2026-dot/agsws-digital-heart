@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { ArrowRight, Heart, BookOpen, Users, TrendingUp, Quote } from "lucide-react";
-import { useGlobalStats } from "@/hooks/useGlobalStats";
+import { useCMSSection } from "@/hooks/useCMSSection";
 import KPIStatCard from "@/components/ui/KPIStatCard";
 
 const sections = ["Cover", "Numbers", "Medical", "Education", "Reach", "Story", "Finances", "CTA"];
@@ -50,12 +50,27 @@ const ImpactReport = () => {
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const [activeSection, setActiveSection] = useState(0);
   const { openOverlay } = useDonateOverlay();
-  const { get } = useGlobalStats();
-  const patients = get('patients', { numeric: 2400, suffix: '+', label: 'Patients Supported' });
-  const students = get('students', { numeric: 850, suffix: '+', label: 'Children Educated' });
-  const families = get('families', { numeric: 120, suffix: '+', label: 'Families Registered' });
-  const years = get('years', { numeric: 6, suffix: '', label: 'Years of Service' });
-  const funds = get('funds', { numeric: 48, prefix: '₹', suffix: 'L+', label: 'Funds Distributed' });
+  const { data: cms } = useCMSSection<any>('impact_report', {
+    cover_label: 'Annual Report · 2024–25',
+    cover_title_top: 'Impact', cover_title_bottom: 'Report',
+    cover_subtitle: 'One year. Thousands of lives. Zero compromise.',
+    numbers_label: 'The Year in Numbers',
+    medical_label: 'Medical Aid',
+    medical_heading: '2,400 patients supported this year.',
+    medical_rows: [['847','Emergency cases handled'],['312','Surgeries supported'],['₹28.4L','Total medical funds deployed']].map(([num, desc]) => ({ num, desc })),
+    education_label: 'Education',
+    education_heading: '850 children kept in school.',
+    education_rows: [['124','Full year sponsorships'],['3,200+','School meals funded'],['₹12.6L','Education funds deployed']].map(([num, desc]) => ({ num, desc })),
+    reach_label: 'Geographic Reach',
+    reach_heading: '120+ parents registered. 18 cities. 4 countries.',
+    reach_subtitle: 'North Kolkata to London — connecting families separated by distance.',
+    story_quote: "\"My father was attended to within 3 hours. I was in Singapore. AGSWS was in Kolkata. That's all that mattered.\"",
+    story_name: 'Priya Sengupta', story_role: 'Registered daughter, since 2023', story_link: '/blog/ranu-mondal-emergency-care',
+    finances_label: 'Where Money Went', finances_heading: 'Financial Transparency',
+    cta_heading_left: '2025–26 starts', cta_heading_right: 'now.',
+    cta_subtitle: "Every rupee you give today becomes part of next year's impact report. Will your name be in it?",
+    cta_button: 'Donate Now →',
+  });
 
   useEffect(() => {
     const handler = () => {
@@ -85,12 +100,12 @@ const ImpactReport = () => {
         </svg>
         <div className="relative z-10 text-center max-w-[800px] mx-auto px-5 sm:px-6 w-full">
           <motion.span initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="inline-block bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] text-[10px] font-bold px-5 py-2 rounded-full uppercase tracking-[0.2em] mb-8 border border-[hsl(var(--primary))]/20">
-            Annual Report · 2024–25
+            {cms.cover_label}
           </motion.span>
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }} className="text-[44px] sm:text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
-            Impact<br /><span className="text-[hsl(var(--accent))]">Report</span>
+            {cms.cover_title_top}<br /><span className="text-[hsl(var(--accent))]">{cms.cover_title_bottom}</span>
           </motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-base text-white/50 mb-14">One year. Thousands of lives. Zero compromise.</motion.p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-base text-white/50 mb-14">{cms.cover_subtitle}</motion.p>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="flex items-center justify-center gap-2 text-white/30 text-sm animate-bounce">
             Scroll to explore ↓
           </motion.div>
@@ -101,14 +116,14 @@ const ImpactReport = () => {
       <ParallaxSection id="impact-s1" className="bg-[hsl(187,68%,5%)]">
         <div className="max-w-[1100px] mx-auto px-5 sm:px-6 py-16 sm:py-24 relative z-10 w-full">
           <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--accent))] mb-16">
-            The Year in Numbers
+            {cms.numbers_label}
           </motion.p>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
-            <KPIStatCard variant="report" animate icon={Heart} numeric={patients.numeric} suffix={patients.suffix || '+'} label={patients.label || 'Patients Supported'} />
-            <KPIStatCard variant="report" animate icon={BookOpen} numeric={students.numeric} suffix={students.suffix || '+'} label={students.label || 'Children Educated'} />
-            <KPIStatCard variant="report" animate icon={Users} numeric={families.numeric} suffix={families.suffix || '+'} label={families.label || 'Families Registered'} />
-            <KPIStatCard variant="report" animate numeric={years.numeric} suffix={years.suffix} label={years.label || 'Years of Service'} />
-            <KPIStatCard variant="report" animate icon={TrendingUp} numeric={funds.numeric} prefix={funds.prefix || '₹'} suffix={funds.suffix || 'L+'} label={funds.label || 'Funds Deployed'} />
+            <KPIStatCard variant="report" animate statKey="patients" icon={Heart} />
+            <KPIStatCard variant="report" animate statKey="students" icon={BookOpen} />
+            <KPIStatCard variant="report" animate statKey="families" icon={Users} />
+            <KPIStatCard variant="report" animate statKey="years" />
+            <KPIStatCard variant="report" animate statKey="funds" icon={TrendingUp} />
           </div>
         </div>
       </ParallaxSection>
@@ -121,23 +136,23 @@ const ImpactReport = () => {
         <div className="max-w-[1200px] mx-auto px-6 py-24 relative z-10 w-full">
           <div className="max-w-lg">
             <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.15em] mb-6">
-              Medical Aid
+              {cms.medical_label}
             </motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-10 leading-tight">
-              {patients.display || '2,400'} patients<br />supported this year.
+              {cms.medical_heading}
             </motion.h2>
             <div className="space-y-0">
-              {[["847", "Emergency cases handled"], ["312", "Surgeries supported"], ["₹28.4L", "Total medical funds deployed"]].map(([num, desc], i) => (
+              {(cms.medical_rows || []).map((row: any, i: number) => (
                 <motion.div
-                  key={desc}
+                  key={row.desc || i}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                   className="flex items-center gap-5 py-5 border-b border-white/[0.08]"
                 >
-                  <span className="text-2xl font-extrabold text-[hsl(var(--accent))] w-24 font-mono">{num}</span>
-                  <span className="text-white/60 text-sm">{desc}</span>
+                  <span className="text-2xl font-extrabold text-[hsl(var(--accent))] w-24 font-mono">{row.num}</span>
+                  <span className="text-white/60 text-sm">{row.desc}</span>
                 </motion.div>
               ))}
             </div>
@@ -156,23 +171,23 @@ const ImpactReport = () => {
         <div className="max-w-[1200px] mx-auto px-6 py-24 relative z-10 flex justify-end w-full">
           <div className="max-w-lg">
             <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.15em] mb-6">
-              Education
+              {cms.education_label}
             </motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-10 leading-tight">
-              {students.display || '850'} children<br />kept in school.
+              {cms.education_heading}
             </motion.h2>
             <div className="space-y-0">
-              {[["124", "Full year sponsorships"], ["3,200+", "School meals funded"], ["₹12.6L", "Education funds deployed"]].map(([num, desc], i) => (
+              {(cms.education_rows || []).map((row: any, i: number) => (
                 <motion.div
-                  key={desc}
+                  key={row.desc || i}
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                   className="flex items-center gap-5 py-5 border-b border-white/[0.08]"
                 >
-                  <span className="text-2xl font-extrabold text-[hsl(var(--accent))] w-24 font-mono">{num}</span>
-                  <span className="text-white/60 text-sm">{desc}</span>
+                  <span className="text-2xl font-extrabold text-[hsl(var(--accent))] w-24 font-mono">{row.num}</span>
+                  <span className="text-white/60 text-sm">{row.desc}</span>
                 </motion.div>
               ))}
             </div>
@@ -187,7 +202,7 @@ const ImpactReport = () => {
       <ParallaxSection id="impact-s4" className="bg-[hsl(187,68%,5%)]">
         <div className="max-w-[900px] mx-auto px-6 py-24 text-center relative z-10 w-full">
           <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--accent))] mb-6">
-            Geographic Reach
+            {cms.reach_label}
           </motion.span>
           <div className="relative w-[300px] h-[300px] mx-auto mb-12">
             {[
@@ -213,9 +228,9 @@ const ImpactReport = () => {
             ))}
           </div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {families.display || '120+'} parents registered. 18 cities. 4 countries.
+            {cms.reach_heading}
           </motion.h2>
-          <p className="text-white/40 text-base max-w-lg mx-auto">North Kolkata to London — connecting families separated by distance.</p>
+          <p className="text-white/40 text-base max-w-lg mx-auto">{cms.reach_subtitle}</p>
         </div>
       </ParallaxSection>
 
@@ -228,16 +243,16 @@ const ImpactReport = () => {
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <Quote size={32} className="text-[hsl(var(--accent))]/30 mb-4" />
             <p className="text-2xl md:text-3xl font-light italic text-white/85 leading-relaxed mb-8">
-              "My father was attended to within 3 hours. I was in Singapore. AGSWS was in Kolkata. That's all that mattered."
+              {cms.story_quote}
             </p>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[hsl(var(--primary))]/20 flex items-center justify-center text-[hsl(var(--primary))] text-lg font-bold">P</div>
+              <div className="w-12 h-12 rounded-full bg-[hsl(var(--primary))]/20 flex items-center justify-center text-[hsl(var(--primary))] text-lg font-bold">{(cms.story_name || 'P')[0]}</div>
               <div>
-                <p className="font-semibold text-white">Priya Sengupta</p>
-                <p className="text-sm text-white/40">Registered daughter, since 2023</p>
+                <p className="font-semibold text-white">{cms.story_name}</p>
+                <p className="text-sm text-white/40">{cms.story_role}</p>
               </div>
             </div>
-            <Link to="/blog/ranu-mondal-emergency-care" className="inline-flex items-center gap-2 mt-8 text-sm font-semibold text-[hsl(var(--primary))] hover:text-white transition-colors">
+            <Link to={cms.story_link || '#'} className="inline-flex items-center gap-2 mt-8 text-sm font-semibold text-[hsl(var(--primary))] hover:text-white transition-colors">
               Read Full Story <ArrowRight size={14} />
             </Link>
           </motion.div>
@@ -248,9 +263,9 @@ const ImpactReport = () => {
       <ParallaxSection id="impact-s6" className="bg-[hsl(var(--card))]">
         <div className="max-w-[900px] mx-auto px-6 py-24 text-center relative z-10 w-full">
           <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--primary))] mb-4">
-            Where Money Went
+            {cms.finances_label}
           </motion.span>
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl font-bold text-[hsl(var(--foreground))] mb-12">Financial Transparency</motion.h2>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl font-bold text-[hsl(var(--foreground))] mb-12">{cms.finances_heading}</motion.h2>
           <DonutChart />
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12">
             {[
@@ -277,10 +292,10 @@ const ImpactReport = () => {
       <ParallaxSection id="impact-s7" className="bg-gradient-to-br from-[hsl(187,70%,25%)] via-[hsl(187,68%,18%)] to-[hsl(187,68%,10%)]">
         <div className="max-w-[700px] mx-auto px-6 py-24 text-center relative z-10 w-full">
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-6">
-            2025–26 starts <span className="text-[hsl(var(--accent))]">now.</span>
+            {cms.cta_heading_left} <span className="text-[hsl(var(--accent))]">{cms.cta_heading_right}</span>
           </motion.h2>
           <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-base text-white/60 mb-10 max-w-lg mx-auto">
-            Every rupee you give today becomes part of next year's impact report. Will your name be in it?
+            {cms.cta_subtitle}
           </motion.p>
           <motion.button
             onClick={openOverlay}
@@ -288,7 +303,7 @@ const ImpactReport = () => {
             whileTap={{ scale: 0.97 }}
             className="px-12 py-4 text-base font-bold bg-[hsl(var(--accent))] text-[hsl(var(--foreground))] rounded-full shadow-lg hover:shadow-xl transition-shadow"
           >
-            Donate Now →
+            {cms.cta_button}
           </motion.button>
           <div className="flex flex-wrap justify-center gap-4 mt-12">
             {[

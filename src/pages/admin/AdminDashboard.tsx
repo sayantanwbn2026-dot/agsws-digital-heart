@@ -1311,6 +1311,74 @@ const AdminDashboard = () => {
     />;
     if (activeSection === 'medical_page') return <SectionEditor sectionKey="medical_page" title="Medical Aid Page" description="Intro, benefit cards, helpline, and 'what we cover' list" fields={[{ key: 'intro', label: 'Intro Paragraph', type: 'textarea' }, { key: 'cta_label', label: 'Donate Button Label', type: 'text' }, { key: 'apply_label', label: 'Apply Section Label', type: 'text' }, { key: 'apply_heading', label: 'Apply Heading', type: 'text' }, { key: 'apply_body', label: 'Apply Body', type: 'textarea' }, { key: 'helpline_phone', label: 'Helpline Phone (e.g. +919876543210)', type: 'text' }, { key: 'covers_heading', label: '"What we cover" Heading', type: 'text' }, { key: 'covers', label: 'What We Cover (items)', type: 'string-list' }]} listKey="benefits" listFields={[{ key: 'icon', label: 'Icon (Stethoscope, Pill, Users, Heart)', type: 'text' }, { key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }]} />;
     if (activeSection === 'education_page') return <SectionEditor sectionKey="education_page" title="Education Support Page" description="Intro, benefit cards, helpline, and 'what we cover' list" fields={[{ key: 'intro', label: 'Intro Paragraph', type: 'textarea' }, { key: 'cta_label', label: 'Donate Button Label', type: 'text' }, { key: 'apply_label', label: 'Apply Section Label', type: 'text' }, { key: 'apply_heading', label: 'Apply Heading', type: 'text' }, { key: 'apply_body', label: 'Apply Body', type: 'textarea' }, { key: 'helpline_phone', label: 'Helpline Phone', type: 'text' }, { key: 'covers_heading', label: '"What we cover" Heading', type: 'text' }, { key: 'covers', label: 'What We Cover (items)', type: 'string-list' }]} listKey="benefits" listFields={[{ key: 'icon', label: 'Icon (GraduationCap, Library, BookOpen, Monitor)', type: 'text' }, { key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }]} />;
+    if (activeSection === 'donor_wall') return <SectionEditor
+      sectionKey="donor_wall"
+      title="Donor Wall Page"
+      description="Filter chips, summary KPI cards, and footer counter copy."
+      fields={[
+        { key: 'filters', label: 'Filter Chips (e.g. All, Medical Aid)', type: 'string-list' },
+        { key: 'footer_count', label: 'Footer Count (e.g. 2,847)', type: 'text' },
+        { key: 'footer_text', label: 'Footer Text (after the count)', type: 'text' },
+      ]}
+      listKey="summary_stats"
+      listFields={[
+        { key: 'icon', label: 'Icon (Users, TrendingUp, Heart)', type: 'text' },
+        { key: 'label', label: 'Label', type: 'text' },
+        { key: 'value', label: 'Value', type: 'text' },
+        { key: 'color', label: 'Accent Color (var(--teal), var(--yellow), var(--purple))', type: 'text' },
+      ]}
+    />;
+    if (activeSection === 'volunteer_portal') return <SectionEditor
+      sectionKey="volunteer_portal"
+      title="Volunteer Portal Page"
+      description="Profile-lookup card, certificate-request card, and helper/error copy."
+      fields={[
+        { key: 'card_heading', label: 'Lookup Card Heading', type: 'text' },
+        { key: 'card_subheading', label: 'Lookup Card Subheading', type: 'text' },
+        { key: 'input_placeholder', label: 'Input Placeholder', type: 'text' },
+        { key: 'helper_text', label: 'Helper Text (under input)', type: 'text' },
+        { key: 'error_text', label: 'Not-Found Error Text', type: 'textarea' },
+        { key: 'cert_heading', label: 'Certificate Card Heading', type: 'text' },
+        { key: 'cert_body', label: 'Certificate Card Body', type: 'textarea' },
+        { key: 'cert_button', label: 'Certificate Button Label', type: 'text' },
+      ]}
+    />;
+    if (activeSection === 'impact_report') return <SectionEditor
+      sectionKey="impact_report"
+      title="Impact Report Page"
+      description="Cover, year-in-numbers, medical / education stripes, geographic reach, story, finances, and final CTA."
+      fields={[
+        { key: 'cover_label', label: 'Cover — Eyebrow Label', type: 'text' },
+        { key: 'cover_title_top', label: 'Cover — Title Top Line', type: 'text' },
+        { key: 'cover_title_bottom', label: 'Cover — Title Bottom Line', type: 'text' },
+        { key: 'cover_subtitle', label: 'Cover — Subtitle', type: 'textarea' },
+        { key: 'numbers_label', label: 'Numbers — Eyebrow Label', type: 'text' },
+        { key: 'medical_label', label: 'Medical — Eyebrow', type: 'text' },
+        { key: 'medical_heading', label: 'Medical — Heading', type: 'text' },
+        { key: 'education_label', label: 'Education — Eyebrow', type: 'text' },
+        { key: 'education_heading', label: 'Education — Heading', type: 'text' },
+        { key: 'reach_label', label: 'Reach — Eyebrow', type: 'text' },
+        { key: 'reach_heading', label: 'Reach — Heading', type: 'text' },
+        { key: 'reach_subtitle', label: 'Reach — Subtitle', type: 'textarea' },
+        { key: 'story_quote', label: 'Story — Quote', type: 'textarea' },
+        { key: 'story_name', label: 'Story — Name', type: 'text' },
+        { key: 'story_role', label: 'Story — Role', type: 'text' },
+        { key: 'story_link', label: 'Story — Read More Link', type: 'text' },
+        { key: 'finances_label', label: 'Finances — Eyebrow', type: 'text' },
+        { key: 'finances_heading', label: 'Finances — Heading', type: 'text' },
+        { key: 'finances_total', label: 'Finances — Total (e.g. ₹48.4L)', type: 'text' },
+        { key: 'finances_total_label', label: 'Finances — Total Label', type: 'text' },
+        { key: 'cta_heading_left', label: 'CTA — Heading Left', type: 'text' },
+        { key: 'cta_heading_right', label: 'CTA — Heading Right (highlighted)', type: 'text' },
+        { key: 'cta_subtitle', label: 'CTA — Subtitle', type: 'textarea' },
+        { key: 'cta_button', label: 'CTA — Button Label', type: 'text' },
+      ]}
+      listKey="medical_rows"
+      listFields={[
+        { key: 'num', label: 'Number (e.g. 847)', type: 'text' },
+        { key: 'desc', label: 'Description', type: 'text' },
+      ]}
+    />;
     if (activeSection === 'footer') return <SectionEditor sectionKey="footer" title="Footer Content" description="Brand tagline, newsletter copy, link columns, impact snapshot, and legal links. Social URLs + contact info live in Site Settings." fields={[{ key: 'brand_tagline', label: 'Brand Tagline (under logo)', type: 'textarea' }, { key: 'newsletter_heading', label: 'Newsletter Heading', type: 'text' }, { key: 'newsletter_subtitle', label: 'Newsletter Subtitle', type: 'text' }, { key: 'copyright_suffix', label: 'Copyright Suffix (e.g. "Built with")', type: 'text' }]} listKey="impact_stats" listFields={[{ key: 'value', label: 'Value (e.g. 2,400+)', type: 'text' }, { key: 'label', label: 'Label', type: 'text' }]} />;
     return null;
   };

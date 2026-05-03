@@ -26,10 +26,16 @@ import { useInView } from 'react-intersection-observer'
 import * as Icons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useGlobalStats } from '@/hooks/useGlobalStats'
 
 export type KPIVariant = 'hero' | 'report' | 'footer' | 'analytics' | 'light'
 
 export interface KPIStatCardProps {
+  /** Shorthand: pull display/numeric/prefix/suffix/label directly from the
+   *  global cms_stats table by slug (e.g. "patients", "students", "funds").
+   *  When provided, overrides numeric/display/prefix/suffix/label unless
+   *  those props are also explicitly set. */
+  statKey?: string
   /** Optional pre-formatted display string (e.g. "₹48L+"). If provided and
    *  `animate` is false, this is rendered verbatim. */
   display?: string
@@ -39,8 +45,9 @@ export interface KPIStatCardProps {
   prefix?: string
   /** String shown after the number, e.g. "+", "L+", "%". */
   suffix?: string
-  /** Stat label (rendered as small uppercase caption). */
-  label: string
+  /** Stat label (rendered as small uppercase caption). Optional when
+   *  `statKey` is provided — the label will be sourced from cms_stats. */
+  label?: string
   /** Lucide icon component, OR a string name resolved from lucide-react.
    *  Only rendered by variants that show icons (report, analytics). */
   icon?: LucideIcon | string | null
@@ -130,6 +137,7 @@ const VARIANT_STYLES: Record<KPIVariant, {
 }
 
 const KPIStatCard = ({
+  statKey,
   display,
   numeric,
   prefix = '',
@@ -144,6 +152,18 @@ const KPIStatCard = ({
 }: KPIStatCardProps) => {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 })
   const styles = VARIANT_STYLES[variant]
+  const { get } = useGlobalStats()
+
+  // When statKey is provided, hydrate any missing field from the CMS row.
+  if (statKey) {
+    const stat = get(statKey)
+    if (display === undefined) display = stat.display
+    if (numeric === undefined) numeric = stat.numeric
+    if (!prefix) prefix = stat.prefix
+    if (!suffix) suffix = stat.suffix
+    if (!label) label = stat.label
+    if (!icon && stat.icon) icon = stat.icon as any
+  }
   const Icon = resolveIcon(icon)
 
   // Render the number. CountUp only fires when both animate=true AND a
