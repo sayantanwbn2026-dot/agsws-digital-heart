@@ -209,7 +209,7 @@ const ImpactReport = () => {
       <ParallaxSection id="impact-s4" className="bg-[hsl(187,68%,5%)]">
         <div className="max-w-[900px] mx-auto px-6 py-24 text-center relative z-10 w-full">
           <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--accent))] mb-6">
-            Geographic Reach
+            {cms.reach_label}
           </motion.span>
           <div className="relative w-[300px] h-[300px] mx-auto mb-12">
             {[
@@ -235,9 +235,9 @@ const ImpactReport = () => {
             ))}
           </div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl md:text-4xl font-bold text-white mb-4">
-            {families.display || '120+'} parents registered. 18 cities. 4 countries.
+            {cms.reach_heading}
           </motion.h2>
-          <p className="text-white/40 text-base max-w-lg mx-auto">North Kolkata to London — connecting families separated by distance.</p>
+          <p className="text-white/40 text-base max-w-lg mx-auto">{cms.reach_subtitle}</p>
         </div>
       </ParallaxSection>
 
@@ -250,16 +250,16 @@ const ImpactReport = () => {
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <Quote size={32} className="text-[hsl(var(--accent))]/30 mb-4" />
             <p className="text-2xl md:text-3xl font-light italic text-white/85 leading-relaxed mb-8">
-              "My father was attended to within 3 hours. I was in Singapore. AGSWS was in Kolkata. That's all that mattered."
+              {cms.story_quote}
             </p>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[hsl(var(--primary))]/20 flex items-center justify-center text-[hsl(var(--primary))] text-lg font-bold">P</div>
+              <div className="w-12 h-12 rounded-full bg-[hsl(var(--primary))]/20 flex items-center justify-center text-[hsl(var(--primary))] text-lg font-bold">{(cms.story_name || 'P')[0]}</div>
               <div>
-                <p className="font-semibold text-white">Priya Sengupta</p>
-                <p className="text-sm text-white/40">Registered daughter, since 2023</p>
+                <p className="font-semibold text-white">{cms.story_name}</p>
+                <p className="text-sm text-white/40">{cms.story_role}</p>
               </div>
             </div>
-            <Link to="/blog/ranu-mondal-emergency-care" className="inline-flex items-center gap-2 mt-8 text-sm font-semibold text-[hsl(var(--primary))] hover:text-white transition-colors">
+            <Link to={cms.story_link || '#'} className="inline-flex items-center gap-2 mt-8 text-sm font-semibold text-[hsl(var(--primary))] hover:text-white transition-colors">
               Read Full Story <ArrowRight size={14} />
             </Link>
           </motion.div>
@@ -270,9 +270,9 @@ const ImpactReport = () => {
       <ParallaxSection id="impact-s6" className="bg-[hsl(var(--card))]">
         <div className="max-w-[900px] mx-auto px-6 py-24 text-center relative z-10 w-full">
           <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--primary))] mb-4">
-            Where Money Went
+            {cms.finances_label}
           </motion.span>
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl font-bold text-[hsl(var(--foreground))] mb-12">Financial Transparency</motion.h2>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl font-bold text-[hsl(var(--foreground))] mb-12">{cms.finances_heading}</motion.h2>
           <DonutChart />
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12">
             {[
@@ -299,10 +299,10 @@ const ImpactReport = () => {
       <ParallaxSection id="impact-s7" className="bg-gradient-to-br from-[hsl(187,70%,25%)] via-[hsl(187,68%,18%)] to-[hsl(187,68%,10%)]">
         <div className="max-w-[700px] mx-auto px-6 py-24 text-center relative z-10 w-full">
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-bold text-white mb-6">
-            2025–26 starts <span className="text-[hsl(var(--accent))]">now.</span>
+            {cms.cta_heading_left} <span className="text-[hsl(var(--accent))]">{cms.cta_heading_right}</span>
           </motion.h2>
           <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-base text-white/60 mb-10 max-w-lg mx-auto">
-            Every rupee you give today becomes part of next year's impact report. Will your name be in it?
+            {cms.cta_subtitle}
           </motion.p>
           <motion.button
             onClick={openOverlay}
@@ -310,7 +310,7 @@ const ImpactReport = () => {
             whileTap={{ scale: 0.97 }}
             className="px-12 py-4 text-base font-bold bg-[hsl(var(--accent))] text-[hsl(var(--foreground))] rounded-full shadow-lg hover:shadow-xl transition-shadow"
           >
-            Donate Now →
+            {cms.cta_button}
           </motion.button>
           <div className="flex flex-wrap justify-center gap-4 mt-12">
             {[
