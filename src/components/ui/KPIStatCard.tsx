@@ -45,8 +45,9 @@ export interface KPIStatCardProps {
   prefix?: string
   /** String shown after the number, e.g. "+", "L+", "%". */
   suffix?: string
-  /** Stat label (rendered as small uppercase caption). */
-  label: string
+  /** Stat label (rendered as small uppercase caption). Optional when
+   *  `statKey` is provided — the label will be sourced from cms_stats. */
+  label?: string
   /** Lucide icon component, OR a string name resolved from lucide-react.
    *  Only rendered by variants that show icons (report, analytics). */
   icon?: LucideIcon | string | null
