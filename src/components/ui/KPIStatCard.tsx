@@ -151,7 +151,6 @@ const KPIStatCard = ({
 }: KPIStatCardProps) => {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 })
   const styles = VARIANT_STYLES[variant]
-  const Icon = resolveIcon(icon)
   const { get } = useGlobalStats()
 
   // When statKey is provided, hydrate any missing field from the CMS row.
@@ -164,6 +163,7 @@ const KPIStatCard = ({
     if (!label) label = stat.label
     if (!icon && stat.icon) icon = stat.icon as any
   }
+  const Icon = resolveIcon(icon)
 
   // Render the number. CountUp only fires when both animate=true AND a
   // numeric value is provided. Otherwise we trust the display string.
