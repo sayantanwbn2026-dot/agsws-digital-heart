@@ -71,7 +71,7 @@ const ImpactReport = () => {
     reach_label: 'Geographic Reach',
     reach_heading: '120+ parents registered. 18 cities. 4 countries.',
     reach_subtitle: 'North Kolkata to London — connecting families separated by distance.',
-    story_quote: '"My father was attended to within 3 hours. I was in Singapore. AGSWS was in Kolkata. That\\'s all that mattered."',
+    story_quote: "\"My father was attended to within 3 hours. I was in Singapore. AGSWS was in Kolkata. That's all that mattered.\"",
     story_name: 'Priya Sengupta', story_role: 'Registered daughter, since 2023', story_link: '/blog/ranu-mondal-emergency-care',
     finances_label: 'Where Money Went', finances_heading: 'Financial Transparency',
     cta_heading_left: '2025–26 starts', cta_heading_right: 'now.',
