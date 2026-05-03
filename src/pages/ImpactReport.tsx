@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { ArrowRight, Heart, BookOpen, Users, TrendingUp, Quote } from "lucide-react";
-import { useGlobalStats } from "@/hooks/useGlobalStats";
 import { useCMSSection } from "@/hooks/useCMSSection";
 import KPIStatCard from "@/components/ui/KPIStatCard";
 
@@ -51,12 +50,6 @@ const ImpactReport = () => {
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const [activeSection, setActiveSection] = useState(0);
   const { openOverlay } = useDonateOverlay();
-  const { get } = useGlobalStats();
-  const patients = get('patients', { numeric: 2400, suffix: '+', label: 'Patients Supported' });
-  const students = get('students', { numeric: 850, suffix: '+', label: 'Children Educated' });
-  const families = get('families', { numeric: 120, suffix: '+', label: 'Families Registered' });
-  const years = get('years', { numeric: 6, suffix: '', label: 'Years of Service' });
-  const funds = get('funds', { numeric: 48, prefix: '₹', suffix: 'L+', label: 'Funds Distributed' });
   const { data: cms } = useCMSSection<any>('impact_report', {
     cover_label: 'Annual Report · 2024–25',
     cover_title_top: 'Impact', cover_title_bottom: 'Report',
