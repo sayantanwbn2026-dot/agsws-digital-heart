@@ -104,11 +104,11 @@ const ImpactReport = () => {
             The Year in Numbers
           </motion.p>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
-            <KPIStatCard variant="report" animate icon={Heart} numeric={patients.numeric} suffix={patients.suffix || '+'} label={patients.label || 'Patients Supported'} />
-            <KPIStatCard variant="report" animate icon={BookOpen} numeric={students.numeric} suffix={students.suffix || '+'} label={students.label || 'Children Educated'} />
-            <KPIStatCard variant="report" animate icon={Users} numeric={families.numeric} suffix={families.suffix || '+'} label={families.label || 'Families Registered'} />
-            <KPIStatCard variant="report" animate numeric={years.numeric} suffix={years.suffix} label={years.label || 'Years of Service'} />
-            <KPIStatCard variant="report" animate icon={TrendingUp} numeric={funds.numeric} prefix={funds.prefix || '₹'} suffix={funds.suffix || 'L+'} label={funds.label || 'Funds Deployed'} />
+            <KPIStatCard variant="report" animate statKey="patients" icon={Heart} />
+            <KPIStatCard variant="report" animate statKey="students" icon={BookOpen} />
+            <KPIStatCard variant="report" animate statKey="families" icon={Users} />
+            <KPIStatCard variant="report" animate statKey="years" />
+            <KPIStatCard variant="report" animate statKey="funds" icon={TrendingUp} />
           </div>
         </div>
       </ParallaxSection>
