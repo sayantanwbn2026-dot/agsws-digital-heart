@@ -34,10 +34,10 @@ const RefundPolicy = () => (
       Bank credit may take an additional 3–5 business days depending on your card issuer.
     </p>
 
-    <h2>5. Tax Receipts</h2>
+    <h2>5. Donation Receipts</h2>
     <p>
-      If a refund is processed after an 80G receipt has been issued, the receipt will be voided and a
-      cancellation notice sent. You must not claim tax exemption on refunded donations.
+      If a refund is processed after a donation receipt has been issued, the receipt will be voided and a
+      cancellation notice sent.
     </p>
 
     <h2>6. Non-Refundable Cases</h2>

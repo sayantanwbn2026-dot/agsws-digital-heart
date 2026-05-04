@@ -22,8 +22,7 @@ const TermsOfUse = () => (
     <h2>3. Donations</h2>
     <p>
       Donations are voluntary and non-refundable except in cases of duplicate or erroneous transactions
-      (see Refund Policy). 80G tax-exemption receipts are issued for eligible donations from Indian
-      taxpayers as per the Income Tax Act, 1961.
+      (see Refund Policy). Official donation receipts are issued for all completed contributions.
     </p>
 
     <h2>4. GoldenAge Care</h2>
