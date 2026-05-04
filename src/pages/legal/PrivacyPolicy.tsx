@@ -16,7 +16,7 @@ const PrivacyPolicy = () => (
 
     <h2>2. How We Use Your Information</h2>
     <ul>
-      <li>Process donations and issue 80G tax-exemption receipts</li>
+      <li>Process donations and issue official donation receipts</li>
       <li>Deliver GoldenAge Care services and emergency contact response</li>
       <li>Review and respond to support applications</li>
       <li>Send transactional confirmations, impact updates, and newsletter content</li>

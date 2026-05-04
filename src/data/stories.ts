@@ -59,7 +59,7 @@ export const stories = [
     slug: "q3-impact-report",
     category: "Report",
     excerpt: "A transparent look at how every rupee was spent in Q3 2024 — 78% directly to programs.",
-    body: "In Q3 2024, AGSWS received ₹12.4 lakhs in donations. Of this, ₹9.67 lakhs (78%) went directly to program costs — medical aid, education materials, and parent registration operations. ₹1.49 lakhs (12%) covered operational expenses, and ₹1.24 lakhs (10%) went to administration. Every donor received a detailed breakdown with their 80G receipt.",
+    body: "In Q3 2024, AGSWS received ₹12.4 lakhs in donations. Of this, ₹9.67 lakhs (78%) went directly to program costs — medical aid, education materials, and parent registration operations. ₹1.49 lakhs (12%) covered operational expenses, and ₹1.24 lakhs (10%) went to administration. Every donor received a detailed breakdown with their donation receipt.",
     date: "2024-10-01",
     author: "Finance Team",
     readTime: "7 min read",

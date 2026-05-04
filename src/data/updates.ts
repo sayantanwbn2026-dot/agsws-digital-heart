@@ -14,7 +14,7 @@ export const updates: Update[] = [
   { id: "u5", title: "Parent Registration Now Open in Howrah", excerpt: "Families in Howrah can now register elderly parents for emergency medical support.", category: "announcement", date: "2025-02-28" },
   { id: "u6", title: "February Field Report: 47 Patients Supported", excerpt: "In February, AGSWS supported 47 patients across 4 hospitals with a combined fund deployment of ₹3.2 lakhs.", category: "field", date: "2025-02-25" },
   { id: "u7", title: "Volunteer Training Batch 6 Completed", excerpt: "12 new volunteers completed their orientation training and are now assigned to field operations.", category: "event", date: "2025-02-18" },
-  { id: "u8", title: "80G Tax Filing Reminder", excerpt: "Donors: your 80G receipts for FY 2024–25 are available in your email. File before March 31 for tax benefits.", category: "announcement", date: "2025-02-10" },
+  { id: "u8", title: "FY 2024–25 Donation Receipts Available", excerpt: "Donors: your annual donation receipts for FY 2024–25 are now available in your email inbox.", category: "announcement", date: "2025-02-10" },
 ];
 
 export const updateCategoryColors: Record<string, string> = {
