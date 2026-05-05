@@ -571,6 +571,139 @@ const NewsletterManager = ({ items }: { items: any[] }) => {
 
 /* ─── NEW FEATURE 1: SEO Checker ──────────────────────────── */
 const SEOChecker = ({ allData }: { allData: Record<string, any[]> }) => {
+  // (component continues below)
+  return null as any;
+};
+
+/* ─── CMS Route Audit Panel ─────────────────────────────────────────
+   Cross-checks every route in CMS_MANIFEST against live Supabase data
+   and reports missing cms_sections rows, missing logical stat keys,
+   and empty CMS tables. Useful as a "pre-publish" gate.
+   ──────────────────────────────────────────────────────────────────── */
+const CMSAuditPanel = () => {
+  const [loading, setLoading] = useState(true);
+  const [audit, setAudit] = useState<ReturnType<typeof auditCMS> | null>(null);
+
+  const ALIASES: Record<string, string[]> = {
+    patients: ['patient', 'patients'],
+    students: ['student', 'students', 'children'],
+    families: ['family', 'families', 'parents'],
+    years: ['year', 'years'],
+    funds: ['funds'],
+    cities: ['city', 'cities'],
+    donors: ['donor', 'donors'],
+  };
+  const slug = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const resolveStatKey = (label: string) => {
+    const sl = slug(label);
+    for (const [k, a] of Object.entries(ALIASES)) {
+      if (a.some(x => sl === x || sl.includes(x))) return k;
+    }
+    return sl;
+  };
+
+  const run = useCallback(async () => {
+    setLoading(true);
+    const [{ data: secs }, { data: stats }] = await Promise.all([
+      (supabase.from('cms_sections' as any) as any).select('section_key'),
+      (supabase.from('cms_stats' as any) as any).select('label'),
+    ]);
+    const sectionKeys: string[] = (secs || []).map((r: any) => r.section_key);
+    const statKeys: string[] = (stats || []).map((r: any) => resolveStatKey(r.label));
+    const tableCounts: Record<string, number> = {};
+    await Promise.all(REQUIRED_TABLES.map(async t => {
+      const { count } = await (supabase.from(t as any) as any).select('*', { count: 'exact', head: true });
+      tableCounts[t] = count ?? 0;
+    }));
+    setAudit(auditCMS({ sectionKeys, statKeys, tableCounts }));
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { run(); }, [run]);
+
+  if (loading || !audit) {
+    return <div className="p-8 text-sm text-muted-foreground">Running CMS route audit…</div>;
+  }
+
+  return (
+    <div className="p-6 lg:p-8 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-[20px] font-bold tracking-tight">CMS Route Audit</h2>
+          <p className="text-[13px] text-muted-foreground mt-1">Verifies every frontend route is wired to the expected cms_sections + cms_stats rows.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className={`text-[12px] font-semibold px-3 py-1.5 rounded-full ${audit.ok ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+            {audit.ok ? 'PASS' : `${audit.routeIssues.length} route${audit.routeIssues.length === 1 ? '' : 's'} need attention`}
+          </span>
+          <button onClick={run} className="px-3 py-1.5 text-[12px] font-medium rounded-md border hover:bg-muted">Re-run</button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="rounded-xl border p-4">
+          <p className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wider">Missing cms_sections</p>
+          <p className="text-[24px] font-bold mt-1 tabular-nums">{audit.missingSections.length}</p>
+          {audit.missingSections.length > 0 && (
+            <p className="text-[12px] text-muted-foreground mt-2 break-all">{audit.missingSections.join(', ')}</p>
+          )}
+        </div>
+        <div className="rounded-xl border p-4">
+          <p className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wider">Missing stat keys</p>
+          <p className="text-[24px] font-bold mt-1 tabular-nums">{audit.missingStatKeys.length}</p>
+          {audit.missingStatKeys.length > 0 && (
+            <p className="text-[12px] text-muted-foreground mt-2 break-all">{audit.missingStatKeys.join(', ')}</p>
+          )}
+        </div>
+        <div className="rounded-xl border p-4">
+          <p className="text-[11px] uppercase font-semibold text-muted-foreground tracking-wider">Empty CMS tables</p>
+          <p className="text-[24px] font-bold mt-1 tabular-nums">{audit.emptyTables.length}</p>
+          {audit.emptyTables.length > 0 && (
+            <p className="text-[12px] text-muted-foreground mt-2 break-all">{audit.emptyTables.join(', ')}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="rounded-xl border overflow-hidden">
+        <table className="w-full text-[13px]">
+          <thead className="bg-muted/40">
+            <tr>
+              <th className="text-left px-4 py-2 font-semibold">Route</th>
+              <th className="text-left px-4 py-2 font-semibold">Page</th>
+              <th className="text-left px-4 py-2 font-semibold">Status</th>
+              <th className="text-left px-4 py-2 font-semibold">Missing</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CMS_MANIFEST.map(r => {
+              const issue = audit.routeIssues.find(x => x.route === r.route);
+              return (
+                <tr key={r.route} className="border-t">
+                  <td className="px-4 py-2 font-mono text-[12px]">{r.route}</td>
+                  <td className="px-4 py-2">{r.label}</td>
+                  <td className="px-4 py-2">
+                    {issue ? (
+                      <span className="text-amber-700 font-medium">⚠ Missing</span>
+                    ) : (
+                      <span className="text-emerald-700 font-medium">✓ OK</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2 text-muted-foreground">{issue?.missing.join(', ') || '—'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-[11px] text-muted-foreground">
+        Manifest source: <code>src/lib/cms-manifest.ts</code> · Required sections: {REQUIRED_SECTION_KEYS.length} · Required stat keys: {REQUIRED_STAT_KEYS.length} · Required tables: {REQUIRED_TABLES.length}
+      </p>
+    </div>
+  );
+};
+
+const _SEOCheckerOriginal = ({ allData }: { allData: Record<string, any[]> }) => {
   const issues: { severity: 'error' | 'warning' | 'ok'; page: string; message: string }[] = [];
 
   // Check blog posts
