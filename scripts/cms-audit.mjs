@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Build-time CMS audit. Runs against the live Supabase project and verifies
 // every cms_sections key + cms_stats logical key + required CMS table referenced
 // by src/lib/cms-manifest.ts has data. Intended to run via the Vite plugin in
