@@ -569,12 +569,6 @@ const NewsletterManager = ({ items }: { items: any[] }) => {
   );
 };
 
-/* ─── NEW FEATURE 1: SEO Checker ──────────────────────────── */
-const SEOChecker = ({ allData }: { allData: Record<string, any[]> }) => {
-  // (component continues below)
-  return null as any;
-};
-
 /* ─── CMS Route Audit Panel ─────────────────────────────────────────
    Cross-checks every route in CMS_MANIFEST against live Supabase data
    and reports missing cms_sections rows, missing logical stat keys,
@@ -703,7 +697,8 @@ const CMSAuditPanel = () => {
   );
 };
 
-const _SEOCheckerOriginal = ({ allData }: { allData: Record<string, any[]> }) => {
+/* ─── NEW FEATURE 1: SEO Checker ──────────────────────────── */
+const SEOChecker = ({ allData }: { allData: Record<string, any[]> }) => {
   const issues: { severity: 'error' | 'warning' | 'ok'; page: string; message: string }[] = [];
 
   // Check blog posts
