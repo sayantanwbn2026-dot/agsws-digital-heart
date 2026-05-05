@@ -1384,6 +1384,46 @@ const AdminDashboard = () => {
       ]}
     />;
     if (activeSection === 'footer') return <SectionEditor sectionKey="footer" title="Footer Content" description="Brand tagline, newsletter copy, link columns, impact snapshot, and legal links. Social URLs + contact info live in Site Settings." fields={[{ key: 'brand_tagline', label: 'Brand Tagline (under logo)', type: 'textarea' }, { key: 'newsletter_heading', label: 'Newsletter Heading', type: 'text' }, { key: 'newsletter_subtitle', label: 'Newsletter Subtitle', type: 'text' }, { key: 'copyright_suffix', label: 'Copyright Suffix (e.g. "Built with")', type: 'text' }]} listKey="impact_stats" listFields={[{ key: 'value', label: 'Value (e.g. 2,400+)', type: 'text' }, { key: 'label', label: 'Label', type: 'text' }]} />;
+    if (activeSection === 'contact_page') return <SectionEditor
+      sectionKey="contact_page"
+      title="Contact Page"
+      description="Hero, form heading, contact info card, and volunteer roles."
+      fields={[
+        { key: 'hero_label', label: 'Hero Eyebrow Label', type: 'text' },
+        { key: 'hero_title', label: 'Hero Title', type: 'text' },
+        { key: 'form_heading', label: 'Form Heading', type: 'text' },
+        { key: 'form_subtitle', label: 'Form Subtitle', type: 'text' },
+        { key: 'info_heading', label: 'Info Card Heading', type: 'text' },
+        { key: 'info_address', label: 'Address', type: 'text' },
+        { key: 'info_phone', label: 'Phone', type: 'text' },
+        { key: 'info_email', label: 'Email', type: 'text' },
+        { key: 'info_hours', label: 'Office Hours', type: 'text' },
+        { key: 'volunteer_label', label: 'Volunteer Eyebrow', type: 'text' },
+        { key: 'volunteer_heading', label: 'Volunteer Heading', type: 'text' },
+      ]}
+      listKey="volunteer_roles"
+      listFields={[
+        { key: 'icon', label: 'Icon (Heart, BookOpen, Users, Wrench)', type: 'text' },
+        { key: 'title', label: 'Title', type: 'text' },
+        { key: 'desc', label: 'Description', type: 'textarea' },
+        { key: 'color', label: 'Accent Color (var(--teal), var(--purple), var(--teal-dark), var(--beige))', type: 'text' },
+      ]}
+    />;
+    if (activeSection === 'transparency_page') return <SectionEditor
+      sectionKey="transparency_page"
+      title="Transparency Page"
+      description="Hero copy and allocation section copy."
+      fields={[
+        { key: 'hero_label', label: 'Hero Eyebrow Label', type: 'text' },
+        { key: 'hero_title', label: 'Hero Title', type: 'text' },
+        { key: 'hero_subtitle', label: 'Hero Subtitle', type: 'textarea' },
+        { key: 'allocation_label', label: 'Allocation — Eyebrow', type: 'text' },
+        { key: 'allocation_heading', label: 'Allocation — Heading', type: 'text' },
+        { key: 'allocation_intro', label: 'Allocation — Intro Paragraph', type: 'textarea' },
+        { key: 'programme_caption', label: 'Programme Spend Caption', type: 'text' },
+      ]}
+    />;
+    if (activeSection === 'cms_audit') return <CMSAuditPanel />;
     return null;
   };
 
