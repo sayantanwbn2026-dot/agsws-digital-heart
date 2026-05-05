@@ -242,10 +242,13 @@ const sections = [
   { id: 'register_parent', label: 'GoldenAge Page', icon: Heart, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'register_parent_docs', label: 'GoldenAge Docs', icon: FileText, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'analytics_sidebar', label: 'Analytics — Sidebar', icon: BarChart3, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'contact_page', label: 'Contact Page', icon: Mail, table: '', fields: [], isCustom: true, group: 'Pages' },
+  { id: 'transparency_page', label: 'Transparency Page', icon: Shield, table: '', fields: [], isCustom: true, group: 'Pages' },
   { id: 'footer', label: 'Footer Content', icon: PanelLeftClose, table: '', fields: [], isCustom: true, group: 'Pages' },
 
   { id: 'payment', label: 'Payment Settings', icon: CreditCard, table: 'cms_payment_config', fields: paymentFields, singleRow: true, group: 'Settings' },
   { id: 'settings', label: 'Site Settings', icon: Settings, table: 'cms_site_settings', fields: settingsFields, singleRow: true, group: 'Settings' },
+  { id: 'cms_audit', label: 'CMS Audit', icon: FileSearch, table: '', fields: [], isCustom: true, group: 'Operations' },
 ];
 
 const previewUrls: Record<string, string> = {
@@ -260,6 +263,7 @@ const previewUrls: Record<string, string> = {
   updates_page: '/updates', updates: '/updates', videos: '/gallery',
   medical_page: '/initiatives/medical', education_page: '/initiatives/education',
   impact_report: '/impact', donor_wall: '/donor-wall', volunteer_portal: '/volunteer-portal',
+  contact_page: '/contact', transparency_page: '/transparency',
 };
 
 const CHART_COLORS = ['hsl(187, 68%, 39%)', 'hsl(242, 29%, 50%)', 'hsl(28, 22%, 62%)', 'hsl(47, 80%, 55%)', 'hsl(0, 70%, 55%)', 'hsl(160, 60%, 45%)', 'hsl(280, 50%, 55%)'];
