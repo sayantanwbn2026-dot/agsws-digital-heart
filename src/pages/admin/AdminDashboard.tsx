@@ -17,6 +17,8 @@ import PaymentsManager from "./components/PaymentsManager";
 import EventEditor from "./components/EventEditor";
 import { useCMSApi } from "@/hooks/useCMSApi";
 import toast from "react-hot-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { CMS_MANIFEST, REQUIRED_SECTION_KEYS, REQUIRED_TABLES, REQUIRED_STAT_KEYS, auditCMS } from "@/lib/cms-manifest";
 
 // ─── CMS Section Configurations ─────────────────────────────────
 const heroFields: FieldConfig[] = [
