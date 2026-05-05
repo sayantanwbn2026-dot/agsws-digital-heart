@@ -2,6 +2,21 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { runAudit } from "./scripts/cms-audit.mjs";
+
+function cmsAuditPlugin(env: Record<string, string>) {
+  return {
+    name: "cms-route-audit",
+    apply: "build" as const,
+    async buildStart() {
+      await runAudit({
+        url: env.VITE_SUPABASE_URL,
+        key: env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY,
+        strict: env.CMS_AUDIT_STRICT === "1",
+      });
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -14,7 +29,11 @@ export default defineConfig(({ mode }) => {
         overlay: false,
       },
     },
-    plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+    plugins: [
+      react(),
+      mode === "development" && componentTagger(),
+      cmsAuditPlugin(env),
+    ].filter(Boolean),
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
