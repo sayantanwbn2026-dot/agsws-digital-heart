@@ -5,6 +5,17 @@ import { Link } from "react-router-dom";
 import { FileCheck, Award, Globe, Shield, ArrowRight, Download, ArrowUpRight } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useCMSSection } from "@/hooks/useCMSSection";
+
+const defaultTransparency = {
+  hero_label: "Open Accounts",
+  hero_title: "Where every rupee goes.",
+  hero_subtitle: "Full financial transparency. Every donation tracked, every quarter reported, every account audited.",
+  allocation_label: "Allocation",
+  allocation_heading: "How every rupee is used.",
+  allocation_intro: "Our model is simple: most of what you give reaches a beneficiary directly. The rest keeps the system honest and running.",
+  programme_caption: "Inside the 78% programme spend",
+};
 
 /* ──────────────────────────────────────────────────────────────
    Data
@@ -256,13 +267,14 @@ const QuarterlyView = () => {
 
 const TransparencyPage = () => {
   useSEO("Transparency", "AGSWS Donation Transparency — see exactly how every rupee is used.");
+  const { data: cms } = useCMSSection<typeof defaultTransparency>('transparency_page', defaultTransparency);
 
   return (
     <main id="main-content">
       <PageHero
-        title="Where every rupee goes."
-        label="Open Accounts"
-        subtitle="Full financial transparency. Every donation tracked, every quarter reported, every account audited."
+        title={cms.hero_title}
+        label={cms.hero_label}
+        subtitle={cms.hero_subtitle}
         bgVariant="teal-dark"
         size="md"
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Transparency" }]}
@@ -293,12 +305,12 @@ const TransparencyPage = () => {
       <section className="bg-white section">
         <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)]">
           <FadeInUp className="mb-10 sm:mb-14 max-w-[640px]">
-            <span className="label">Allocation</span>
+            <span className="label">{cms.allocation_label}</span>
             <h2 className="text-[var(--dark)] mt-2 before:hidden text-[clamp(24px,3.6vw,36px)]">
-              How every rupee is used.
+              {cms.allocation_heading}
             </h2>
             <p className="text-[var(--mid)] mt-3 text-[14px] sm:text-[15px] leading-[1.7]">
-              Our model is simple: most of what you give reaches a beneficiary directly. The rest keeps the system honest and running.
+              {cms.allocation_intro}
             </p>
           </FadeInUp>
 
@@ -312,7 +324,7 @@ const TransparencyPage = () => {
           <FadeInUp delay={0.15}>
             <div className="mt-6 sm:mt-8 bg-[var(--teal-light)]/40 border border-[var(--teal)]/15 rounded-[var(--radius-xl)] p-5 sm:p-6">
               <p className="text-[11px] font-[600] uppercase tracking-[0.1em] text-[var(--teal-dark)] mb-3">
-                Inside the 78% programme spend
+                {cms.programme_caption}
               </p>
               <div className="flex flex-wrap gap-2">
                 {allocation[0].items.map((i) => (
