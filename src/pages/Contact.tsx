@@ -9,16 +9,35 @@ import { PremiumInput, PremiumTextarea, PremiumSelect, PremiumCard, PremiumButto
 import { supabase } from "@/integrations/supabase/client";
 import toast from "react-hot-toast";
 import { isValidEmail, normalizeEmail, isValidIndianPhone } from "@/lib/validation";
+import { useCMSSection } from "@/hooks/useCMSSection";
 
-const volunteerRoles = [
-  { icon: Heart, title: "Medical Volunteer", desc: "Assist with health camps and hospital coordination.", color: "var(--teal)" },
-  { icon: BookOpen, title: "Education Volunteer", desc: "Teach and tutor at community libraries and schools.", color: "var(--purple)" },
-  { icon: Users, title: "Field Coordinator", desc: "On-ground support for parent registration and emergency response.", color: "var(--teal-dark)" },
-  { icon: Wrench, title: "Admin Support", desc: "Help with data entry, donor relations, and operations.", color: "var(--beige)" },
-];
+const iconMap: Record<string, any> = { Heart, BookOpen, Users, Wrench };
+
+const defaultContact = {
+  hero_label: "Contact Us",
+  hero_title: "Get In Touch",
+  form_heading: "Send Us a Message",
+  form_subtitle: "We respond within 24 hours",
+  info_heading: "Contact Information",
+  info_address: "123 Park Street, Kolkata, WB 700016",
+  info_phone: "+91 98765 43210",
+  info_email: "contact@agsws.org",
+  info_hours: "Mon–Sat: 9 AM – 6 PM IST",
+  volunteer_label: "Get Involved",
+  volunteer_heading: "Volunteer With Us",
+  volunteer_roles: [
+    { icon: "Heart", title: "Medical Volunteer", desc: "Assist with health camps and hospital coordination.", color: "var(--teal)" },
+    { icon: "BookOpen", title: "Education Volunteer", desc: "Teach and tutor at community libraries and schools.", color: "var(--purple)" },
+    { icon: "Users", title: "Field Coordinator", desc: "On-ground support for parent registration and emergency response.", color: "var(--teal-dark)" },
+    { icon: "Wrench", title: "Admin Support", desc: "Help with data entry, donor relations, and operations.", color: "var(--beige)" },
+  ],
+};
 
 const Contact = () => {
   useSEO("Contact", "Get in touch with AGSWS — contact us or volunteer.");
+  const { data: cms } = useCMSSection<typeof defaultContact>('contact_page', defaultContact);
+  const volunteerRoles = (cms.volunteer_roles?.length ? cms.volunteer_roles : defaultContact.volunteer_roles)
+    .map((r: any) => ({ ...r, icon: iconMap[r.icon] || Heart }));
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm();
   const [volunteerModal, setVolunteerModal] = useState<string | null>(null);
   const [vol, setVol] = useState({ name: "", email: "", phone: "", message: "" });
@@ -57,7 +76,7 @@ const Contact = () => {
 
   return (
     <main id="main-content">
-      <PageHero title="Get In Touch" label="Contact Us" size="sm" breadcrumb={[{ label: "Home", href: "/" }, { label: "Contact" }]} />
+      <PageHero title={cms.hero_title} label={cms.hero_label} size="sm" breadcrumb={[{ label: "Home", href: "/" }, { label: "Contact" }]} />
 
       <section className="bg-[var(--bg)] py-20 lg:py-28">
         <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
@@ -68,8 +87,8 @@ const Contact = () => {
                   <MessageSquare size={18} className="text-white" />
                 </div>
                 <div>
-                  <h2 className="text-[20px] font-[700] text-[var(--dark)] leading-tight">Send Us a Message</h2>
-                  <p className="text-[12px] text-[var(--light)]">We respond within 24 hours</p>
+                  <h2 className="text-[20px] font-[700] text-[var(--dark)] leading-tight">{cms.form_heading}</h2>
+                  <p className="text-[12px] text-[var(--light)]">{cms.form_subtitle}</p>
                 </div>
               </div>
               
@@ -97,13 +116,13 @@ const Contact = () => {
           <FadeInUp delay={0.15}>
             <div className="space-y-5">
               <div className="bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-[20px] p-7 text-white shadow-[var(--shadow-lg)]">
-                <h3 className="text-[18px] font-[700] mb-6">Contact Information</h3>
+                <h3 className="text-[18px] font-[700] mb-6">{cms.info_heading}</h3>
                 <div className="flex flex-col gap-5">
                   {[
-                    { icon: MapPin, label: "Visit Us", text: "123 Park Street, Kolkata, WB 700016" },
-                    { icon: Phone, label: "Call Us", text: "+91 98765 43210" },
-                    { icon: Mail, label: "Email Us", text: "contact@agsws.org" },
-                    { icon: Clock, label: "Office Hours", text: "Mon–Sat: 9 AM – 6 PM IST" },
+                    { icon: MapPin, label: "Visit Us", text: cms.info_address },
+                    { icon: Phone, label: "Call Us", text: cms.info_phone },
+                    { icon: Mail, label: "Email Us", text: cms.info_email },
+                    { icon: Clock, label: "Office Hours", text: cms.info_hours },
                   ].map(({ icon: Icon, label, text }) => (
                     <div key={text} className="flex gap-3 items-start group">
                       <div className="w-9 h-9 rounded-xl bg-white/[0.1] flex items-center justify-center shrink-0 group-hover:bg-white/[0.15] transition-colors">
@@ -134,9 +153,9 @@ const Contact = () => {
         <div className="max-w-[1100px] mx-auto px-6">
           <FadeInUp className="text-center mb-14">
             <div className="inline-flex items-center gap-2 bg-[var(--teal-light)] text-[var(--teal)] text-[11px] font-[600] uppercase tracking-[0.1em] px-4 py-1.5 rounded-full mb-4">
-              <Sparkles size={12} /> Get Involved
+              <Sparkles size={12} /> {cms.volunteer_label}
             </div>
-            <h2 className="text-[28px] lg:text-[36px] font-[800] text-[var(--dark)] tracking-[-0.02em]">Volunteer With Us</h2>
+            <h2 className="text-[28px] lg:text-[36px] font-[800] text-[var(--dark)] tracking-[-0.02em]">{cms.volunteer_heading}</h2>
           </FadeInUp>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {volunteerRoles.map((role, i) => (
