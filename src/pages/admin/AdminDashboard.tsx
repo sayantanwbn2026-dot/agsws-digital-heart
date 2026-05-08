@@ -60,6 +60,7 @@ const storyFields: FieldConfig[] = [
     { label: 'Community', value: 'Community' }, { label: 'Report', value: 'Report' },
   ]},
   { key: 'is_published', label: 'Published', type: 'boolean' },
+  { key: 'is_featured', label: 'Feature on Home (Latest Stories)', type: 'boolean' },
   { key: 'published_at', label: 'Publish Date', type: 'date' },
 ];
 
