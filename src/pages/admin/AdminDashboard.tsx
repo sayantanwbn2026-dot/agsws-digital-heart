@@ -1518,12 +1518,22 @@ const AdminDashboard = () => {
     if (activeSection === 'contact_page') return <SectionEditor
       sectionKey="contact_page"
       title="Contact Page"
-      description="Hero, form heading, contact info card, and volunteer roles."
+      description="Hero, form fields, contact info card, volunteer roles, FAQ help text, and submission success message."
       fields={[
         { key: 'hero_label', label: 'Hero Eyebrow Label', type: 'text' },
         { key: 'hero_title', label: 'Hero Title', type: 'text' },
         { key: 'form_heading', label: 'Form Heading', type: 'text' },
         { key: 'form_subtitle', label: 'Form Subtitle', type: 'text' },
+        { key: 'form_name_label', label: 'Form — Name Label', type: 'text' },
+        { key: 'form_name_placeholder', label: 'Form — Name Placeholder', type: 'text' },
+        { key: 'form_email_label', label: 'Form — Email Label', type: 'text' },
+        { key: 'form_email_placeholder', label: 'Form — Email Placeholder', type: 'text' },
+        { key: 'form_subject_label', label: 'Form — Subject Label', type: 'text' },
+        { key: 'form_message_label', label: 'Form — Message Label', type: 'text' },
+        { key: 'form_message_placeholder', label: 'Form — Message Placeholder', type: 'text' },
+        { key: 'form_submit_label', label: 'Form — Submit Button', type: 'text' },
+        { key: 'success_message', label: 'Submission Success Message', type: 'textarea' },
+        { key: 'faq_heading', label: 'FAQ Section Heading', type: 'text' },
         { key: 'info_heading', label: 'Info Card Heading', type: 'text' },
         { key: 'info_address', label: 'Address', type: 'text' },
         { key: 'info_phone', label: 'Phone', type: 'text' },
