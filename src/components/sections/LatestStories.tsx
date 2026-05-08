@@ -14,7 +14,7 @@ const LatestStories = () => {
   });
   const featuredFirst = [...cmsPosts].sort((a: any, b: any) => Number(!!b.is_featured) - Number(!!a.is_featured));
   const stories = featuredFirst.length
-    ? cmsPosts.map((p: any) => ({
+    ? featuredFirst.map((p: any) => ({
         slug: p.slug,
         title: p.title,
         excerpt: p.excerpt ?? '',
