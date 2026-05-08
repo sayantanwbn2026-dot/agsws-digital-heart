@@ -1549,6 +1549,21 @@ const AdminDashboard = () => {
         { key: 'desc', label: 'Description', type: 'textarea' },
         { key: 'color', label: 'Accent Color (var(--teal), var(--purple), var(--teal-dark), var(--beige))', type: 'text' },
       ]}
+      extraLists={[
+        {
+          listKey: 'subjects',
+          label: 'Subject Options',
+          listFields: [{ key: 'value' as any, label: 'Option', type: 'text' as any }] as any,
+        },
+        {
+          listKey: 'faq_items',
+          label: 'FAQ — Help Text',
+          listFields: [
+            { key: 'q', label: 'Question', type: 'text' },
+            { key: 'a', label: 'Answer', type: 'textarea' },
+          ],
+        },
+      ]}
     />;
     if (activeSection === 'transparency_page') return <SectionEditor
       sectionKey="transparency_page"
