@@ -6,12 +6,14 @@ import ImagePlaceholder from "../ui/ImagePlaceholder";
 import { useCMSList } from "@/hooks/useCMSList";
 
 const LatestStories = () => {
+  // Pull more than 3 so we can prioritise featured posts client-side.
   const { data: cmsPosts } = useCMSList<any>('cms_blog_posts', [], {
     filter: { column: 'is_published', value: true },
     orderBy: { column: 'published_at', ascending: false },
-    limit: 3
+    limit: 12
   });
-  const stories = cmsPosts.length
+  const featuredFirst = [...cmsPosts].sort((a: any, b: any) => Number(!!b.is_featured) - Number(!!a.is_featured));
+  const stories = featuredFirst.length
     ? cmsPosts.map((p: any) => ({
         slug: p.slug,
         title: p.title,
