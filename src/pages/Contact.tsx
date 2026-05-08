@@ -193,6 +193,37 @@ const Contact = () => {
 
       {/* Volunteer Modal */}
       <AnimatePresence>
+        {/* placeholder */}
+      </AnimatePresence>
+
+      {/* FAQ */}
+      {(cms.faq_items?.length ?? 0) > 0 && (
+        <section className="bg-[var(--bg)] py-16 lg:py-20">
+          <div className="max-w-[820px] mx-auto px-6">
+            <FadeInUp className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 bg-[var(--teal-light)] text-[var(--teal)] text-[11px] font-[600] uppercase tracking-[0.1em] px-4 py-1.5 rounded-full mb-3">
+                <HelpCircle size={12} /> Help
+              </div>
+              <h2 className="text-[24px] lg:text-[30px] font-[800] text-[var(--dark)] tracking-[-0.02em]">{cms.faq_heading || "Frequently Asked Questions"}</h2>
+            </FadeInUp>
+            <div className="space-y-3">
+              {(cms.faq_items || []).map((item: any, i: number) => (
+                <FadeInUp key={i} delay={i * 0.05}>
+                  <details className="group bg-[var(--white)] rounded-[16px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] open:shadow-[var(--shadow-md)] transition-shadow">
+                    <summary className="flex items-center justify-between cursor-pointer list-none">
+                      <span className="text-[15px] font-[600] text-[var(--dark)]">{item.q}</span>
+                      <ArrowRight size={14} className="text-[var(--teal)] group-open:rotate-90 transition-transform" />
+                    </summary>
+                    <p className="mt-3 text-[13px] text-[var(--mid)] leading-[1.7]">{item.a}</p>
+                  </details>
+                </FadeInUp>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <AnimatePresence>
         {volunteerModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center backdrop-blur-md" onClick={() => setVolunteerModal(null)}>
             <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full sm:max-w-md sm:rounded-[24px] rounded-t-[24px] p-8 shadow-[var(--shadow-lg)]">
