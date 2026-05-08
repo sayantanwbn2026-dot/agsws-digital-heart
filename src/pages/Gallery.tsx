@@ -170,19 +170,27 @@ const Gallery = () => {
 
       <AnimatePresence>
         {lightboxIndex !== null && filtered[lightboxIndex] && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center" onClick={closeLightbox}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-6" onClick={closeLightbox}>
             <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-white/[0.06] px-4 py-1.5 rounded-full text-white/50 text-[12px] font-medium backdrop-blur-sm">{lightboxIndex + 1} / {filtered.length}</div>
-            <button className="absolute top-5 right-5 text-white/70 p-2.5 hover:bg-white/10 rounded-xl transition-colors" onClick={closeLightbox}><X size={22} /></button>
-            <button className="absolute left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); navigate(-1); }}><ChevronLeft size={22} /></button>
-            <button className="absolute right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); navigate(1); }}><ChevronRight size={22} /></button>
-            <motion.div key={lightboxIndex} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.25 }} className="max-w-[85vw] max-h-[75vh]" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-5 right-5 text-white/70 p-2.5 hover:bg-white/10 rounded-xl transition-colors z-10" onClick={closeLightbox}><X size={22} /></button>
+            <button className="absolute left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm z-10" onClick={(e) => { e.stopPropagation(); navigate(-1); }}><ChevronLeft size={22} /></button>
+            <button className="absolute right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm z-10" onClick={(e) => { e.stopPropagation(); navigate(1); }}><ChevronRight size={22} /></button>
+            <motion.div
+              key={lightboxIndex}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col items-center justify-center gap-5 max-w-[90vw] max-h-[85vh]"
+              onClick={e => e.stopPropagation()}
+            >
               {filtered[lightboxIndex].image && !filtered[lightboxIndex].image.startsWith('placeholder') ? (
-                <img src={filtered[lightboxIndex].image} alt={filtered[lightboxIndex].caption} className="max-w-[85vw] max-h-[75vh] rounded-xl object-contain" />
+                <img src={filtered[lightboxIndex].image} alt={filtered[lightboxIndex].caption} className="max-w-[85vw] max-h-[70vh] rounded-xl object-contain" />
               ) : (
                 <ImagePlaceholder category={filtered[lightboxIndex].category} className="w-[500px] h-[375px] md:w-[700px] md:h-[500px] rounded-xl" />
               )}
+              <p className="text-white/80 text-[14px] max-w-lg text-center font-medium">{filtered[lightboxIndex].caption}</p>
             </motion.div>
-            <p className="text-white/80 text-[14px] mt-5 max-w-lg text-center font-medium">{filtered[lightboxIndex].caption}</p>
           </motion.div>
         )}
       </AnimatePresence>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { useForm } from "react-hook-form";
-import { MapPin, Phone, Mail, Clock, Heart, BookOpen, Users, Wrench, Send, ArrowRight, MessageSquare, Sparkles } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Heart, BookOpen, Users, Wrench, Send, ArrowRight, MessageSquare, Sparkles, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumTextarea, PremiumSelect, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
@@ -30,6 +30,22 @@ const defaultContact = {
     { icon: "BookOpen", title: "Education Volunteer", desc: "Teach and tutor at community libraries and schools.", color: "var(--purple)" },
     { icon: "Users", title: "Field Coordinator", desc: "On-ground support for parent registration and emergency response.", color: "var(--teal-dark)" },
     { icon: "Wrench", title: "Admin Support", desc: "Help with data entry, donor relations, and operations.", color: "var(--beige)" },
+  ],
+  subjects: ["Donation Inquiry", "Parent Registration", "Volunteering", "Partnership", "Other"],
+  form_name_label: "Full Name",
+  form_name_placeholder: "Your name",
+  form_email_label: "Email Address",
+  form_email_placeholder: "your@email.com",
+  form_subject_label: "Subject",
+  form_message_label: "Message",
+  form_message_placeholder: "Write your message here...",
+  form_submit_label: "Send Message",
+  success_message: "Message sent! We'll reply within 24 hours.",
+  faq_heading: "Frequently Asked Questions",
+  faq_items: [
+    { q: "How quickly will you respond?", a: "We respond to every message within 24 hours on business days." },
+    { q: "Can I visit your office?", a: "Yes — please book ahead by phone or email so a coordinator can host you." },
+    { q: "How do I apply for medical or education support?", a: "Use the Apply for Support page or write to us — our team will guide you through eligibility." },
   ],
 };
 
@@ -69,7 +85,7 @@ const Contact = () => {
     toast.success(
       row?.application_ref
         ? `Message sent! Reference: ${row.application_ref}`
-        : "Message sent! We'll reply within 24 hours."
+        : (cms.success_message || defaultContact.success_message)
     );
     reset();
   };
@@ -94,20 +110,18 @@ const Contact = () => {
               
               <form onSubmit={handleSubmit(onContactSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <PremiumInput label="Full Name" {...register("name")} placeholder="Your name" />
-                  <PremiumInput label="Email Address" {...register("email")} type="email" placeholder="your@email.com" icon={<Mail size={15} />} />
+                  <PremiumInput label={cms.form_name_label || "Full Name"} {...register("name")} placeholder={cms.form_name_placeholder || "Your name"} />
+                  <PremiumInput label={cms.form_email_label || "Email Address"} {...register("email")} type="email" placeholder={cms.form_email_placeholder || "your@email.com"} icon={<Mail size={15} />} />
                 </div>
-                <PremiumSelect label="Subject" {...register("subject")}>
+                <PremiumSelect label={cms.form_subject_label || "Subject"} {...register("subject")}>
                   <option value="">Select a subject</option>
-                  <option>Donation Inquiry</option>
-                  <option>Parent Registration</option>
-                  <option>Volunteering</option>
-                  <option>Partnership</option>
-                  <option>Other</option>
+                  {(cms.subjects?.length ? cms.subjects : defaultContact.subjects).map((s: string) => (
+                    <option key={s}>{s}</option>
+                  ))}
                 </PremiumSelect>
-                <PremiumTextarea label="Message" {...register("message")} placeholder="Write your message here..." rows={5} />
+                <PremiumTextarea label={cms.form_message_label || "Message"} {...register("message")} placeholder={cms.form_message_placeholder || "Write your message here..."} rows={5} />
                 <PremiumButton type="submit" disabled={isSubmitting} loading={isSubmitting} icon={<Send size={16} />}>
-                  {isSubmitting ? "Sending..." : "Send Message"}
+                  {isSubmitting ? "Sending..." : (cms.form_submit_label || "Send Message")}
                 </PremiumButton>
               </form>
             </PremiumCard>
@@ -178,6 +192,37 @@ const Contact = () => {
       </section>
 
       {/* Volunteer Modal */}
+      <AnimatePresence>
+        {/* placeholder */}
+      </AnimatePresence>
+
+      {/* FAQ */}
+      {(cms.faq_items?.length ?? 0) > 0 && (
+        <section className="bg-[var(--bg)] py-16 lg:py-20">
+          <div className="max-w-[820px] mx-auto px-6">
+            <FadeInUp className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 bg-[var(--teal-light)] text-[var(--teal)] text-[11px] font-[600] uppercase tracking-[0.1em] px-4 py-1.5 rounded-full mb-3">
+                <HelpCircle size={12} /> Help
+              </div>
+              <h2 className="text-[24px] lg:text-[30px] font-[800] text-[var(--dark)] tracking-[-0.02em]">{cms.faq_heading || "Frequently Asked Questions"}</h2>
+            </FadeInUp>
+            <div className="space-y-3">
+              {(cms.faq_items || []).map((item: any, i: number) => (
+                <FadeInUp key={i} delay={i * 0.05}>
+                  <details className="group bg-[var(--white)] rounded-[16px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] open:shadow-[var(--shadow-md)] transition-shadow">
+                    <summary className="flex items-center justify-between cursor-pointer list-none">
+                      <span className="text-[15px] font-[600] text-[var(--dark)]">{item.q}</span>
+                      <ArrowRight size={14} className="text-[var(--teal)] group-open:rotate-90 transition-transform" />
+                    </summary>
+                    <p className="mt-3 text-[13px] text-[var(--mid)] leading-[1.7]">{item.a}</p>
+                  </details>
+                </FadeInUp>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <AnimatePresence>
         {volunteerModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center backdrop-blur-md" onClick={() => setVolunteerModal(null)}>

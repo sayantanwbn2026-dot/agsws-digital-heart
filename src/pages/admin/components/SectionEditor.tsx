@@ -23,9 +23,11 @@ interface SectionEditorProps {
   /** If the content has a list of items under a key, set this */
   listKey?: string;
   listFields?: FieldDef[];
+  /** Additional list groups under different keys in the same section */
+  extraLists?: { listKey: string; label?: string; listFields: FieldDef[] }[];
 }
 
-const SectionEditor = ({ sectionKey, title, description, fields, listKey, listFields }: SectionEditorProps) => {
+const SectionEditor = ({ sectionKey, title, description, fields, listKey, listFields, extraLists }: SectionEditorProps) => {
   const { uploadImage } = useCMSApi();
   const [content, setContent] = useState<any>({});
   const [fetching, setFetching] = useState(true);
@@ -91,23 +93,24 @@ const SectionEditor = ({ sectionKey, title, description, fields, listKey, listFi
   };
 
   const updateField = (key: string, value: any) => setContent((prev: any) => ({ ...prev, [key]: value }));
+  const updateListItemFor = (key: string, index: number, fieldKey: string, value: any) => {
+    const items = [...(content[key] || [])];
+    items[index] = { ...items[index], [fieldKey]: value };
+    setContent((prev: any) => ({ ...prev, [key]: items }));
+  };
+  const addListItemFor = (key: string, lf: FieldDef[]) => {
+    const newItem: any = {};
+    lf.forEach(f => { newItem[f.key] = f.type === 'number' ? 0 : f.type === 'string-list' ? [] : ''; });
+    setContent((prev: any) => ({ ...prev, [key]: [...(prev[key] || []), newItem] }));
+  };
+  const removeListItemFor = (key: string, index: number) => {
+    const items = [...(content[key] || [])];
+    items.splice(index, 1);
+    setContent((prev: any) => ({ ...prev, [key]: items }));
+  };
   const updateListItem = (index: number, key: string, value: any) => {
     if (!listKey) return;
-    const items = [...(content[listKey] || [])];
-    items[index] = { ...items[index], [key]: value };
-    setContent((prev: any) => ({ ...prev, [listKey]: items }));
-  };
-  const addListItem = () => {
-    if (!listKey || !listFields) return;
-    const newItem: any = {};
-    listFields.forEach(f => { newItem[f.key] = f.type === 'number' ? 0 : f.type === 'string-list' ? [] : ''; });
-    setContent((prev: any) => ({ ...prev, [listKey]: [...(prev[listKey] || []), newItem] }));
-  };
-  const removeListItem = (index: number) => {
-    if (!listKey) return;
-    const items = [...(content[listKey] || [])];
-    items.splice(index, 1);
-    setContent((prev: any) => ({ ...prev, [listKey]: items }));
+    updateListItemFor(listKey, index, key, value);
   };
 
   const handleImageUpload = async (key: string, file: File, folder: string, listIndex?: number) => {
@@ -262,43 +265,43 @@ const SectionEditor = ({ sectionKey, title, description, fields, listKey, listFi
         )}
       </div>
 
-      {listKey && listFields && (
-        <div className="bg-card rounded-xl border border-border shadow-sm">
+      {[...(listKey && listFields ? [{ listKey, listFields, label: listKey.replace(/_/g, ' ') }] : []), ...(extraLists || [])].map((grp) => (
+        <div key={grp.listKey} className="bg-card rounded-xl border border-border shadow-sm">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-foreground capitalize">{listKey.replace(/_/g, ' ')}</h4>
-            <button onClick={addListItem}
+            <h4 className="text-sm font-semibold text-foreground capitalize">{grp.label || grp.listKey.replace(/_/g, ' ')}</h4>
+            <button onClick={() => addListItemFor(grp.listKey, grp.listFields)}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:opacity-90">
               <Plus size={12} /> Add Item
             </button>
           </div>
           <div className="divide-y divide-border">
-            {(content[listKey] || []).map((item: any, index: number) => (
+            {(content[grp.listKey] || []).map((item: any, index: number) => (
               <div key={index} className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <GripVertical size={14} />
                     <span className="text-xs font-bold">Item {index + 1}</span>
                   </div>
-                  <button onClick={() => removeListItem(index)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                  <button onClick={() => removeListItemFor(grp.listKey, index)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
                     <Trash2 size={13} />
                   </button>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  {listFields.map(field => (
+                  {grp.listFields.map(field => (
                     <div key={field.key} className={(field.type === 'textarea' || field.type === 'string-list' || field.type === 'image') ? 'md:col-span-2' : ''}>
                       <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">{field.label}</label>
-                      {renderField(field, item[field.key], (v) => updateListItem(index, field.key, v), index)}
+                      {renderField(field, item[field.key], (v) => updateListItemFor(grp.listKey, index, field.key, v), index)}
                     </div>
                   ))}
                 </div>
               </div>
             ))}
-            {(!content[listKey] || content[listKey].length === 0) && (
+            {(!content[grp.listKey] || content[grp.listKey].length === 0) && (
               <p className="px-6 py-8 text-center text-sm text-muted-foreground">No items yet. Click "Add Item" to create one.</p>
             )}
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 };
