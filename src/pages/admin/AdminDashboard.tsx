@@ -1534,6 +1534,7 @@ const AdminDashboard = () => {
         { key: 'form_submit_label', label: 'Form — Submit Button', type: 'text' },
         { key: 'success_message', label: 'Submission Success Message', type: 'textarea' },
         { key: 'faq_heading', label: 'FAQ Section Heading', type: 'text' },
+        { key: 'subjects', label: 'Subject Options (press Enter to add)', type: 'string-list' },
         { key: 'info_heading', label: 'Info Card Heading', type: 'text' },
         { key: 'info_address', label: 'Address', type: 'text' },
         { key: 'info_phone', label: 'Phone', type: 'text' },
@@ -1550,11 +1551,6 @@ const AdminDashboard = () => {
         { key: 'color', label: 'Accent Color (var(--teal), var(--purple), var(--teal-dark), var(--beige))', type: 'text' },
       ]}
       extraLists={[
-        {
-          listKey: 'subjects',
-          label: 'Subject Options',
-          listFields: [{ key: 'value' as any, label: 'Option', type: 'text' as any }] as any,
-        },
         {
           listKey: 'faq_items',
           label: 'FAQ — Help Text',
