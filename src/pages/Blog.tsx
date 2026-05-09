@@ -27,12 +27,16 @@ const Blog = () => {
   useSEO("Blog", "AGSWS stories of impact — real stories from the field.");
   const { data: cmsBlog } = useCMSList<any>('cms_blog_posts', [], {
     filter: { column: 'is_published', value: true },
-    orderBy: { column: 'created_at', ascending: false }
+    orderBy: { column: 'published_at', ascending: false }
   });
 
   const blogPosts: any[] = useMemo(() => {
     if (cmsBlog.length > 0) {
-      return cmsBlog.map((p: any) => ({
+      // Featured posts first, then by published_at desc — matches LatestStories on Home.
+      const ordered = [...cmsBlog].sort(
+        (a: any, b: any) => Number(!!b.is_featured) - Number(!!a.is_featured)
+      );
+      return ordered.map((p: any) => ({
         slug: p.slug,
         title: p.title,
         excerpt: p.excerpt || '',
@@ -41,6 +45,7 @@ const Blog = () => {
         readTime: '5 min read',
         image: p.image || '',
         author: p.author,
+        is_featured: !!p.is_featured,
       }));
     }
     return stories.map(s => ({ ...s, image: '' }));
