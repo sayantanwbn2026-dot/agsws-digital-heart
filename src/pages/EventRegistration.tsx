@@ -60,40 +60,43 @@ const EventRegistration = () => {
     setSubmitting(true);
     const requestedSeats = Number(form.attendees) || 1;
 
-    // Capacity check: count seats already taken (confirmed only) for this event
+    // Capacity check via service-role edge function (RLS denies public read)
     let confirmedSeats = 0;
     try {
-      const { data: existing } = await (supabase.from("support_applications" as any) as any)
-        .select("form_data,status")
-        .eq("type", "event_registration")
-        .neq("status", "rejected");
-      const sameEvent = (existing || []).filter((r: any) => r?.form_data?.event_id === event.id && r?.status !== "waitlisted");
-      confirmedSeats = sameEvent.reduce((sum: number, r: any) => sum + (Number(r?.form_data?.attendees) || 1), 0);
+      const { data: seatsRes } = await supabase.functions.invoke("public-submit", {
+        body: { kind: "event_seats_taken", event_id: event.id },
+      });
+      confirmedSeats = Number((seatsRes as any)?.seats) || 0;
     } catch {
-      // If the read is blocked by RLS, fall back to confirmed status
+      // ignore; default to 0
     }
     const remaining = Math.max(0, (event.capacity || 0) - confirmedSeats);
     const willWaitlist = requestedSeats > remaining;
     const finalStatus = willWaitlist ? "waitlisted" : "pending";
 
-    const { data: inserted, error } = await (supabase.from("support_applications" as any) as any).insert({
-      type: "event_registration",
-      applicant_name: name,
-      email,
-      phone: form.phone.trim(),
-      status: finalStatus,
-      form_data: {
-        event_id: event.id,
-        event_title: event.title,
-        event_date: event.date,
-        event_location: event.location,
-        attendees: requestedSeats,
-        source: form.source,
-        waitlisted: willWaitlist,
+    const { data: inserted, error } = await supabase.functions.invoke("public-submit", {
+      body: {
+        kind: "support_application",
+        payload: {
+          type: "event_registration",
+          applicant_name: name,
+          email,
+          phone: form.phone.trim(),
+          status: finalStatus,
+          form_data: {
+            event_id: event.id,
+            event_title: event.title,
+            event_date: event.date,
+            event_location: event.location,
+            attendees: requestedSeats,
+            source: form.source,
+            waitlisted: willWaitlist,
+          },
+        },
       },
-    }).select("application_ref").maybeSingle();
+    });
 
-    if (error) {
+    if (error || (inserted as any)?.error) {
       setSubmitting(false);
       toast.error("Could not register. Please try again.");
       return;
