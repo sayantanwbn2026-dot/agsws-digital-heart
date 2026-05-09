@@ -80,24 +80,21 @@ const CSRPartnership = () => {
         values.focusVolunteering && "Volunteering",
       ].filter(Boolean);
 
-      const { data: row, error } = await (supabase.from('support_applications' as any) as any)
-        .insert({
-          type: 'csr',
-          applicant_name: values.contactName || values.companyName,
-          email: values.contactEmail,
-          phone: values.contactPhone,
-          form_data: { ...values, focusAreas },
-        })
-        .select('application_ref, applicant_name, email, phone, type')
-        .single();
-
+      const { data: row, error } = await supabase.functions.invoke('public-submit', {
+        body: {
+          kind: 'support_application',
+          payload: {
+            type: 'csr',
+            applicant_name: values.contactName || values.companyName,
+            email: values.contactEmail,
+            phone: values.contactPhone,
+            form_data: { ...values, focusAreas },
+          },
+        },
+      });
       if (error) throw error;
-      setApplicationRef(row?.application_ref || null);
-
-      // Fire-and-forget admin notification
-      supabase.functions.invoke('send-email', {
-        body: { type: 'admin-application', to: 'admin', data: row },
-      }).catch(err => console.error('[csr admin email]', err));
+      if ((row as any)?.error) throw new Error((row as any).error);
+      setApplicationRef((row as any)?.application_ref || null);
 
       setSubmitted(true);
     } catch (err: any) {
