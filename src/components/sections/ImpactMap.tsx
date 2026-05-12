@@ -71,6 +71,12 @@ const ImpactMap = () => {
             const color = colorMap[region.type] || colorMap.medical;
             const Icon = ICONS[region.icon || 'MapPin'] || MapPin;
 
+            // Keep tooltip inside the map: flip to right/left edge if pin is near borders.
+            const tooltipW = 220;
+            const isNearLeft = region.position_x < 18;
+            const isNearRight = region.position_x > 82;
+            const isNearTop = region.position_y < 22;
+
             return (
               <motion.div
                 key={region.id}
@@ -96,21 +102,42 @@ const ImpactMap = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 8, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    className="absolute bottom-14 left-1/2 w-[200px] bg-white rounded-xl p-4 shadow-lg z-50 text-left border border-[hsl(var(--border))]"
-                    style={{ marginLeft: "-100px" }}
+                    className="absolute w-[220px] bg-white rounded-xl p-3.5 shadow-xl z-50 text-left border border-[hsl(var(--border))] pointer-events-none"
+                    style={{
+                      [isNearTop ? 'top' : 'bottom']: isNearTop ? '3.25rem' : '3.25rem',
+                      left: isNearLeft ? '50%' : isNearRight ? 'auto' : '50%',
+                      right: isNearRight ? '50%' : 'auto',
+                      marginLeft: isNearLeft ? '-12px' : isNearRight ? '0' : `-${tooltipW / 2}px`,
+                      marginRight: isNearRight ? '-12px' : '0',
+                    }}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Icon size={14} style={{ color }} />
                       <span className="text-[11px] font-bold uppercase tracking-wider text-[hsl(var(--foreground))]">{region.name}</span>
                     </div>
                     {region.description && (
-                      <p className="text-[12px] text-[hsl(var(--muted-foreground))] mb-2">{region.description}</p>
+                      <p className="text-[12px] text-[hsl(var(--muted-foreground))] mb-2 leading-snug">{region.description}</p>
                     )}
                     {region.metric && (
-                      <div className="bg-[hsl(var(--background))] rounded-lg py-1.5 px-2.5 text-center">
+                      <div className="rounded-lg py-1.5 px-2.5 text-center" style={{ backgroundColor: `${color}14` }}>
                         <span className="text-[11px] font-semibold" style={{ color }}>{region.metric}</span>
                       </div>
                     )}
+                    {/* connector arrow */}
+                    <span
+                      aria-hidden
+                      className="absolute w-2.5 h-2.5 bg-white border-[hsl(var(--border))] rotate-45"
+                      style={{
+                        [isNearTop ? 'top' : 'bottom']: '-5px',
+                        left: isNearLeft ? '14px' : isNearRight ? 'auto' : '50%',
+                        right: isNearRight ? '14px' : 'auto',
+                        marginLeft: isNearLeft || isNearRight ? '0' : '-5px',
+                        borderRightWidth: isNearTop ? 0 : '1px',
+                        borderBottomWidth: isNearTop ? 0 : '1px',
+                        borderTopWidth: isNearTop ? '1px' : 0,
+                        borderLeftWidth: isNearTop ? '1px' : 0,
+                      }}
+                    />
                   </motion.div>
                 )}
               </motion.div>
