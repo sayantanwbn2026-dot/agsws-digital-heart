@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { galleryPhotos, galleryVideos } from "@/data/gallery";
 import { events as fallbackEvents, type AGSWSEvent } from "@/data/events";
-import { getEventAlbum } from "@/data/eventAlbums";
+import { getEventAlbum, type AlbumPhoto } from "@/data/eventAlbums";
 import { useCMSList } from "@/hooks/useCMSList";
 import FadeInUp from "@/components/ui/FadeInUp";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
@@ -23,6 +23,7 @@ const Gallery = () => {
   const { data: cmsGallery } = useCMSList<any>('cms_gallery', [], { orderBy: { column: 'sort_order', ascending: true } });
   const { data: cmsVideos } = useCMSList<any>('cms_videos', [], { orderBy: { column: 'sort_order', ascending: true } });
   const { data: cmsEvents } = useCMSList<any>('cms_events', [], { orderBy: { column: 'event_date', ascending: false } });
+  const { data: cmsAlbumPhotos } = useCMSList<any>('cms_event_albums', [], { orderBy: { column: 'sort_order', ascending: true } });
   const [searchParams, setSearchParams] = useSearchParams();
 
   const videos: any[] = useMemo(() => {
@@ -88,12 +89,35 @@ const Gallery = () => {
     [filter, photos]
   );
 
+  // Build a map of event_id -> uploaded album photos (CMS-managed). When an
+  // event has uploads, we use them; otherwise we fall back to the placeholder
+  // album so we never render an empty folder.
+  const albumByEvent = useMemo(() => {
+    const map = new Map<string, AlbumPhoto[]>();
+    for (const row of cmsAlbumPhotos as any[]) {
+      const list = map.get(row.event_id) || [];
+      list.push({
+        id: row.id,
+        image: row.image,
+        category: (row.category || 'community') as AlbumPhoto['category'],
+        caption: row.caption || '',
+      });
+      map.set(row.event_id, list);
+    }
+    return map;
+  }, [cmsAlbumPhotos]);
+
+  const photosForEvent = useCallback((evt: AGSWSEvent): AlbumPhoto[] => {
+    const uploaded = albumByEvent.get(evt.id);
+    return uploaded && uploaded.length > 0 ? uploaded : getEventAlbum(evt);
+  }, [albumByEvent]);
+
   const activeAlbum = useMemo(() => {
     if (!activeAlbumId) return null;
     const event = pastEvents.find(e => e.id === activeAlbumId);
     if (!event) return null;
-    return { event, photos: getEventAlbum(event) };
-  }, [activeAlbumId, pastEvents]);
+    return { event, photos: photosForEvent(event) };
+  }, [activeAlbumId, pastEvents, photosForEvent]);
 
   // Deep-link from Events page: /gallery?album=<eventId>
   useEffect(() => {
@@ -211,7 +235,7 @@ const Gallery = () => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pastEvents.map((evt, i) => {
-                      const album = getEventAlbum(evt);
+                      const album = photosForEvent(evt);
                       const cover = album[0];
                       const date = new Date(evt.date);
                       return (

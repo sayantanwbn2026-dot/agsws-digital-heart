@@ -62,6 +62,47 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_event_albums: {
+        Row: {
+          caption: string | null
+          category: string | null
+          created_at: string
+          event_id: string
+          id: string
+          image: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          image: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          image?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_event_albums_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cms_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cms_events: {
         Row: {
           capacity: number | null
