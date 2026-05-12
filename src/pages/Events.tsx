@@ -1,8 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { events as fallbackEvents, eventTypeLabels, eventTypeColors, type AGSWSEvent } from "@/data/events";
-import { getEventAlbum } from "@/data/eventAlbums";
 import { useCMSList } from "@/hooks/useCMSList";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import PageHero from "@/components/layout/PageHero";
@@ -12,7 +11,7 @@ import { MapPin, Clock, X, ChevronLeft, ChevronRight, Calendar, Users, ArrowRigh
 const filterTypes = ["all", "medical", "education", "registration", "awareness", "volunteer"] as const;
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-const EventCard = ({ event, onClick, index }: { event: AGSWSEvent; onClick: () => void; index: number }) => {
+const EventCard = ({ event, onClick, index, compact = false }: { event: AGSWSEvent; onClick: () => void; index: number; compact?: boolean }) => {
   const d = new Date(event.date);
   const spotsLeft = event.capacity - event.registered;
   const pct = (event.registered / event.capacity) * 100;
@@ -24,6 +23,30 @@ const EventCard = ({ event, onClick, index }: { event: AGSWSEvent; onClick: () =
     awareness: "from-[var(--beige)] to-[#9A8A6E]",
     volunteer: "from-[var(--teal-dark)] to-[#0D1B1C]",
   };
+
+  if (compact) {
+    return (
+      <motion.button
+        type="button"
+        onClick={onClick}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.04, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+        whileHover={{ y: -3 }}
+        className="group relative w-full text-left bg-white rounded-2xl border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden p-4 flex items-center gap-4 hover:shadow-[var(--shadow-lg)] transition-shadow"
+      >
+        <div className={`flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br ${typeGradients[event.type] || typeGradients.medical} flex flex-col items-center justify-center text-white`}>
+          <span className="font-[800] text-[18px] leading-none">{d.getDate()}</span>
+          <span className="text-white/75 text-[9px] font-[600] uppercase mt-0.5">{months[d.getMonth()]?.slice(0, 3)}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-[700] text-[14px] text-[var(--dark)] leading-tight tracking-[-0.01em] line-clamp-1">{event.title}</h3>
+          <p className="text-[11.5px] text-[var(--mid)] mt-1 flex items-center gap-1.5"><MapPin size={10} className="text-[var(--teal)]" />{event.venue || event.location}</p>
+        </div>
+        <span className="flex-shrink-0 text-[10px] font-[600] text-[var(--light)] bg-[var(--bg)] px-2.5 py-1 rounded-full uppercase tracking-[0.04em]">Completed</span>
+      </motion.button>
+    );
+  }
 
   return (
     <motion.div
