@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { galleryPhotos, galleryVideos } from "@/data/gallery";
 import { events as fallbackEvents, type AGSWSEvent } from "@/data/events";
-import { getEventAlbum, type AlbumPhoto } from "@/data/eventAlbums";
+import { getEventAlbum } from "@/data/eventAlbums";
 import { useCMSList } from "@/hooks/useCMSList";
 import FadeInUp from "@/components/ui/FadeInUp";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
