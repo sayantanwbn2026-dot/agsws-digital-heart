@@ -1,11 +1,14 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { galleryPhotos, galleryVideos } from "@/data/gallery";
+import { events as fallbackEvents, type AGSWSEvent } from "@/data/events";
+import { getEventAlbum } from "@/data/eventAlbums";
 import { useCMSList } from "@/hooks/useCMSList";
 import FadeInUp from "@/components/ui/FadeInUp";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ZoomIn, ChevronLeft, ChevronRight, X, Play, Camera, Film } from "lucide-react";
+import { ZoomIn, ChevronLeft, ChevronRight, X, Play, Camera, Film, FolderOpen, Calendar, MapPin } from "lucide-react";
 
 const categories = ["all", "medical", "education", "community", "elderly", "child", "hospital", "classroom"] as const;
 const catLabels: Record<string, string> = {
@@ -19,6 +22,8 @@ const Gallery = () => {
 
   const { data: cmsGallery } = useCMSList<any>('cms_gallery', [], { orderBy: { column: 'sort_order', ascending: true } });
   const { data: cmsVideos } = useCMSList<any>('cms_videos', [], { orderBy: { column: 'sort_order', ascending: true } });
+  const { data: cmsEvents } = useCMSList<any>('cms_events', [], { orderBy: { column: 'event_date', ascending: false } });
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const videos: any[] = useMemo(() => {
     if (cmsVideos.length > 0) {
@@ -46,9 +51,34 @@ const Gallery = () => {
     return galleryPhotos.map(p => ({ ...p, image: '' }));
   }, [cmsGallery]);
 
+  const pastEvents: AGSWSEvent[] = useMemo(() => {
+    const source: AGSWSEvent[] = cmsEvents.length > 0
+      ? cmsEvents
+          .filter((e: any) => e.is_published !== false)
+          .map((e: any) => ({
+            id: e.id,
+            title: e.title,
+            type: 'medical' as const,
+            date: e.event_date || e.created_at,
+            time: '',
+            venue: e.location || '',
+            location: e.location || '',
+            description: e.description || '',
+            capacity: e.capacity || 0,
+            registered: 0,
+            isPast: e.event_date ? new Date(e.event_date) < new Date() : false,
+          }))
+      : fallbackEvents;
+    return source
+      .filter(e => e.isPast)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [cmsEvents]);
+
   const [filter, setFilter] = useState<string>("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [view, setView] = useState<"photos" | "videos">("photos");
+  const [view, setView] = useState<"photos" | "albums" | "videos">("photos");
+  const [activeAlbumId, setActiveAlbumId] = useState<string | null>(null);
+  const [albumIndex, setAlbumIndex] = useState(0);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 80]);
@@ -57,6 +87,35 @@ const Gallery = () => {
     filter === "all" ? photos : photos.filter((p: any) => p.category === filter),
     [filter, photos]
   );
+
+  const activeAlbum = useMemo(() => {
+    if (!activeAlbumId) return null;
+    const event = pastEvents.find(e => e.id === activeAlbumId);
+    if (!event) return null;
+    return { event, photos: getEventAlbum(event) };
+  }, [activeAlbumId, pastEvents]);
+
+  // Deep-link from Events page: /gallery?album=<eventId>
+  useEffect(() => {
+    const albumParam = searchParams.get('album');
+    if (albumParam && pastEvents.some(e => e.id === albumParam)) {
+      setView('albums');
+      setActiveAlbumId(albumParam);
+      setAlbumIndex(0);
+    }
+  }, [searchParams, pastEvents]);
+
+  const closeAlbum = () => {
+    setActiveAlbumId(null);
+    if (searchParams.get('album')) {
+      searchParams.delete('album');
+      setSearchParams(searchParams, { replace: true });
+    }
+  };
+  const navigateAlbum = useCallback((dir: number) => {
+    if (!activeAlbum) return;
+    setAlbumIndex(i => (i + dir + activeAlbum.photos.length) % activeAlbum.photos.length);
+  }, [activeAlbum]);
 
   const openLightbox = (idx: number) => setLightboxIndex(idx);
   const closeLightbox = () => setLightboxIndex(null);
@@ -67,6 +126,12 @@ const Gallery = () => {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (activeAlbum) {
+        if (e.key === "Escape") closeAlbum();
+        if (e.key === "ArrowLeft") navigateAlbum(-1);
+        if (e.key === "ArrowRight") navigateAlbum(1);
+        return;
+      }
       if (lightboxIndex === null) return;
       if (e.key === "Escape") closeLightbox();
       if (e.key === "ArrowLeft") navigate(-1);
@@ -74,7 +139,7 @@ const Gallery = () => {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [lightboxIndex, navigate]);
+  }, [lightboxIndex, navigate, activeAlbum, navigateAlbum]);
 
   return (
     <main id="main-content">
@@ -89,6 +154,7 @@ const Gallery = () => {
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-sm text-white/50 mt-4">Every photograph is a story. Every story is a life.</motion.p>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="flex justify-center gap-1 mt-8 bg-white/[0.06] backdrop-blur-sm rounded-full p-1 w-fit mx-auto border border-white/[0.08]">
             <button onClick={() => setView("photos")} className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all ${view === "photos" ? "bg-white text-[hsl(var(--foreground))]" : "text-white/60 hover:text-white"}`}><Camera size={14} /> Photos</button>
+            <button onClick={() => setView("albums")} className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all ${view === "albums" ? "bg-white text-[hsl(var(--foreground))]" : "text-white/60 hover:text-white"}`}><FolderOpen size={14} /> Albums</button>
             <button onClick={() => setView("videos")} className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all ${view === "videos" ? "bg-white text-[hsl(var(--foreground))]" : "text-white/60 hover:text-white"}`}><Film size={14} /> Videos</button>
           </motion.div>
         </div>
@@ -128,6 +194,65 @@ const Gallery = () => {
                     </FadeInUp>
                   ))}
                 </div>
+              </div>
+            </section>
+          </motion.div>
+        ) : view === "albums" ? (
+          <motion.div key="albums" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <section className="bg-[hsl(var(--background))] py-16">
+              <div className="max-w-[1200px] mx-auto px-6">
+                <div className="mb-10 text-center">
+                  <span className="inline-block text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--primary))] mb-3">Past Event Albums</span>
+                  <h2 className="text-2xl md:text-3xl font-extrabold text-[hsl(var(--foreground))] tracking-tight">Browse photos from every past event</h2>
+                  <p className="text-sm text-[hsl(var(--muted-foreground))] mt-3 max-w-lg mx-auto">Each folder holds the full visual story from a camp, drive, or community programme.</p>
+                </div>
+                {pastEvents.length === 0 ? (
+                  <div className="text-center py-16 text-[hsl(var(--muted-foreground))] text-sm">No past event albums yet.</div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {pastEvents.map((evt, i) => {
+                      const album = getEventAlbum(evt);
+                      const cover = album[0];
+                      const date = new Date(evt.date);
+                      return (
+                        <FadeInUp key={evt.id} delay={(i % 6) * 0.04}>
+                          <motion.button
+                            whileHover={{ y: -4 }}
+                            transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                            onClick={() => { setActiveAlbumId(evt.id); setAlbumIndex(0); }}
+                            className="group text-left w-full bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow"
+                          >
+                            <div className="relative h-[200px] overflow-hidden">
+                              {/* Stacked-folder effect */}
+                              <div className="absolute inset-x-3 top-0 h-3 rounded-t-xl bg-[hsl(var(--muted))]/60" />
+                              <div className="absolute inset-x-1.5 top-1.5 h-3 rounded-t-xl bg-[hsl(var(--muted))]/80" />
+                              <div className="absolute inset-0 top-3 overflow-hidden rounded-t-xl">
+                                {cover.image ? (
+                                  <img src={cover.image} alt={cover.caption} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" loading="lazy" />
+                                ) : (
+                                  <ImagePlaceholder category={cover.category} className="w-full h-full" />
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/95 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                                    <FolderOpen size={11} /> {album.length} photos
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="p-5">
+                              <h3 className="text-[15px] font-bold text-[hsl(var(--foreground))] tracking-tight line-clamp-1">{evt.title}</h3>
+                              <div className="flex items-center gap-3 mt-2 text-[11px] text-[hsl(var(--muted-foreground))] font-medium">
+                                <span className="inline-flex items-center gap-1"><Calendar size={11} />{date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                {evt.location && <span className="inline-flex items-center gap-1"><MapPin size={11} />{evt.location}</span>}
+                              </div>
+                            </div>
+                          </motion.button>
+                        </FadeInUp>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </section>
           </motion.div>
@@ -190,6 +315,50 @@ const Gallery = () => {
                 <ImagePlaceholder category={filtered[lightboxIndex].category} className="w-[500px] h-[375px] md:w-[700px] md:h-[500px] rounded-xl" />
               )}
               <p className="text-white/80 text-[14px] max-w-lg text-center font-medium">{filtered[lightboxIndex].caption}</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {activeAlbum && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-6"
+            onClick={closeAlbum}
+          >
+            <div className="absolute top-5 left-1/2 -translate-x-1/2 text-center pointer-events-none">
+              <p className="text-white text-[13px] font-bold tracking-tight">{activeAlbum.event.title}</p>
+              <p className="text-white/50 text-[11px] font-medium mt-0.5">{albumIndex + 1} / {activeAlbum.photos.length}</p>
+            </div>
+            <button className="absolute top-5 right-5 text-white/70 p-2.5 hover:bg-white/10 rounded-xl transition-colors z-10" onClick={closeAlbum}><X size={22} /></button>
+            <button aria-label="Previous photo" className="absolute left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm z-10" onClick={(e) => { e.stopPropagation(); navigateAlbum(-1); }}><ChevronLeft size={22} /></button>
+            <button aria-label="Next photo" className="absolute right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm z-10" onClick={(e) => { e.stopPropagation(); navigateAlbum(1); }}><ChevronRight size={22} /></button>
+            <motion.div
+              key={albumIndex}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col items-center justify-center gap-5 max-w-[90vw] max-h-[85vh]"
+              onClick={e => e.stopPropagation()}
+            >
+              {activeAlbum.photos[albumIndex].image ? (
+                <img src={activeAlbum.photos[albumIndex].image} alt={activeAlbum.photos[albumIndex].caption} className="max-w-[85vw] max-h-[68vh] rounded-xl object-contain shadow-2xl" />
+              ) : (
+                <ImagePlaceholder category={activeAlbum.photos[albumIndex].category} className="w-[500px] h-[375px] md:w-[720px] md:h-[480px] rounded-xl" />
+              )}
+              <p className="text-white/85 text-[14px] max-w-xl text-center font-medium">{activeAlbum.photos[albumIndex].caption}</p>
+              <div className="flex items-center gap-2 mt-1">
+                {activeAlbum.photos.map((p, i) => (
+                  <button
+                    key={p.id}
+                    onClick={(e) => { e.stopPropagation(); setAlbumIndex(i); }}
+                    aria-label={`Go to photo ${i + 1}`}
+                    className={`h-1.5 rounded-full transition-all ${i === albumIndex ? 'w-8 bg-white' : 'w-2 bg-white/30 hover:bg-white/50'}`}
+                  />
+                ))}
+              </div>
             </motion.div>
           </motion.div>
         )}

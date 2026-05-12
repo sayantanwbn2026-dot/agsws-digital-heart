@@ -2,11 +2,12 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { events as fallbackEvents, eventTypeLabels, eventTypeColors, type AGSWSEvent } from "@/data/events";
+import { getEventAlbum } from "@/data/eventAlbums";
 import { useCMSList } from "@/hooks/useCMSList";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import PageHero from "@/components/layout/PageHero";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Clock, X, ChevronLeft, ChevronRight, Calendar, Users, ArrowRight, Sparkles } from "lucide-react";
+import { MapPin, Clock, X, ChevronLeft, ChevronRight, Calendar, Users, ArrowRight, Sparkles, Images } from "lucide-react";
 
 const filterTypes = ["all", "medical", "education", "registration", "awareness", "volunteer"] as const;
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -286,6 +287,32 @@ const Events = () => {
                   <p className="flex items-center gap-2"><Users size={14} className="text-[var(--teal)]" />{selectedEvent.capacity} expected attendees</p>
                 </div>
                 <p className="text-[14px] text-[var(--mid)] leading-[1.7] mb-6">{selectedEvent.description}</p>
+                {selectedEvent.isPast && (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-[10px] font-[700] uppercase tracking-[0.12em] text-[var(--teal)]">Event Album</p>
+                      <span className="text-[11px] text-[var(--light)] font-[500]">5 photos</span>
+                    </div>
+                    <div className="grid grid-cols-5 gap-1.5 mb-4">
+                      {getEventAlbum(selectedEvent).map((p) => (
+                        <div key={p.id} className="relative aspect-square rounded-lg overflow-hidden bg-[var(--bg)]">
+                          {p.image ? (
+                            <img src={p.image} alt={p.caption} className="w-full h-full object-cover" loading="lazy" />
+                          ) : (
+                            <ImagePlaceholder category={p.category} className="w-full h-full" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <Link
+                      to={`/gallery?album=${encodeURIComponent(selectedEvent.id)}`}
+                      onClick={() => setSelectedEvent(null)}
+                      className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--teal)] to-[var(--teal-dark)] text-white font-[700] text-[14px] h-[48px] rounded-full hover:shadow-[0_8px_24px_rgba(31,154,168,0.3)] transition-shadow"
+                    >
+                      <Images size={16} /> Open Event Album
+                    </Link>
+                  </div>
+                )}
                 {!selectedEvent.isPast && (
                   <button className="w-full bg-gradient-to-r from-[var(--teal)] to-[var(--teal-dark)] text-white font-[700] text-[14px] h-[48px] rounded-full hover:shadow-[0_8px_24px_rgba(31,154,168,0.3)] transition-shadow">Register for This Event →</button>
                 )}
