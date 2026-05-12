@@ -235,7 +235,7 @@ const Gallery = () => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pastEvents.map((evt, i) => {
-                      const album = getEventAlbum(evt);
+                      const album = photosForEvent(evt);
                       const cover = album[0];
                       const date = new Date(evt.date);
                       return (
