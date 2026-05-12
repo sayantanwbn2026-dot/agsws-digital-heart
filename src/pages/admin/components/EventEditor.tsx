@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Calendar, MapPin, Users, ArrowRight, Search, Image as ImageIcon, Upload, GripVertical } from 'lucide-react';
+import { Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Calendar, MapPin, Users, ArrowRight, Search, Image as ImageIcon, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCMSApi } from '@/hooks/useCMSApi';
 import { notifyCMSContentUpdated } from '@/lib/cms-sync';
