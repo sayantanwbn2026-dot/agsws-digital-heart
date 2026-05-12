@@ -85,7 +85,7 @@ const HeroSection = () => {
       <motion.div style={{ y: contentY, opacity: opacityOut }} className="relative z-10 text-center max-w-[860px] mx-auto px-5 sm:px-6 pt-24 pb-20 sm:py-28 lg:py-32 will-change-transform">
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="inline-block mb-6 sm:mb-8">
           <span className="bg-white/[0.06] backdrop-blur-sm text-white/80 px-5 py-2 rounded-full text-[10px] font-[600] uppercase tracking-[0.12em] border border-white/[0.08]">
-            Kolkata, West Bengal · Est. 2020
+            Kolkata, West Bengal · Est. 2016
           </span>
         </motion.div>
 

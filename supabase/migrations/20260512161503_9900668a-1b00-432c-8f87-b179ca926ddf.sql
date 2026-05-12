@@ -1,0 +1,2 @@
+ALTER TABLE public.cms_event_albums ADD COLUMN IF NOT EXISTS is_cover BOOLEAN NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS idx_cms_event_albums_event_cover ON public.cms_event_albums(event_id) WHERE is_cover = true;

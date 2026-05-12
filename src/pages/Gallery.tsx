@@ -101,6 +101,7 @@ const Gallery = () => {
         image: row.image,
         category: (row.category || 'community') as AlbumPhoto['category'],
         caption: row.caption || '',
+        is_cover: !!row.is_cover,
       });
       map.set(row.event_id, list);
     }
@@ -236,7 +237,7 @@ const Gallery = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pastEvents.map((evt, i) => {
                       const album = photosForEvent(evt);
-                      const cover = album[0];
+                      const cover = album.find((p: any) => p.is_cover) || album[0];
                       const date = new Date(evt.date);
                       return (
                         <FadeInUp key={evt.id} delay={(i % 6) * 0.04}>

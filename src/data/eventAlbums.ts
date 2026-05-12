@@ -5,6 +5,7 @@ export interface AlbumPhoto {
   image?: string;
   category: 'medical' | 'education' | 'community' | 'elderly' | 'child' | 'hospital' | 'classroom';
   caption: string;
+  is_cover?: boolean;
 }
 
 // Curated 5-photo albums for known past events. Any other past event will get

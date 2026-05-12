@@ -70,6 +70,7 @@ export type Database = {
           event_id: string
           id: string
           image: string
+          is_cover: boolean
           sort_order: number
           updated_at: string
         }
@@ -80,6 +81,7 @@ export type Database = {
           event_id: string
           id?: string
           image: string
+          is_cover?: boolean
           sort_order?: number
           updated_at?: string
         }
@@ -90,6 +92,7 @@ export type Database = {
           event_id?: string
           id?: string
           image?: string
+          is_cover?: boolean
           sort_order?: number
           updated_at?: string
         }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Calendar, MapPin, Users, ArrowRight, Search, Image as ImageIcon, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Calendar, MapPin, Users, ArrowRight, Search, Image as ImageIcon, Upload, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCMSApi } from '@/hooks/useCMSApi';
 import { notifyCMSContentUpdated } from '@/lib/cms-sync';
@@ -429,7 +429,7 @@ export default EventEditor;
  * ────────────────────────────────────────────────────────────── */
 const ALBUM_CATEGORIES = ['community', 'medical', 'education', 'elderly', 'child', 'hospital', 'classroom'] as const;
 
-const EventAlbumManager = ({ eventId }: { eventId: string }) => {
+export const EventAlbumManager = ({ eventId }: { eventId: string }) => {
   const { getAll, create, update, remove, uploadImage } = useCMSApi();
   const [photos, setPhotos] = useState<any[]>([]);
   const [busy, setBusy] = useState(false);
@@ -501,6 +501,23 @@ const EventAlbumManager = ({ eventId }: { eventId: string }) => {
     }
   };
 
+  const setCover = async (id: string) => {
+    // Optimistic: only one cover per event
+    setPhotos(prev => prev.map(p => ({ ...p, is_cover: p.id === id })));
+    try {
+      const others = photos.filter(p => p.id !== id && p.is_cover);
+      await Promise.all([
+        update('cms_event_albums', id, { is_cover: true }),
+        ...others.map(o => update('cms_event_albums', o.id, { is_cover: false })),
+      ]);
+      toast.success('Cover image set');
+      notifyCMSContentUpdated();
+    } catch (err: any) {
+      toast.error(err.message || 'Could not set cover');
+      fetchPhotos();
+    }
+  };
+
   const movePhoto = async (id: string, dir: -1 | 1) => {
     const idx = photos.findIndex(p => p.id === id);
     const swap = idx + dir;
@@ -526,6 +543,9 @@ const EventAlbumManager = ({ eventId }: { eventId: string }) => {
         </label>
         <span className="text-[10px] text-muted-foreground">{photos.length} photo{photos.length !== 1 ? 's' : ''} · live in Gallery</span>
       </div>
+      <p className="text-[11px] text-muted-foreground mb-2">
+        Tap the star on any photo to make it the album folder cover. If none is selected, the first photo is used.
+      </p>
 
       {/* Upload dropzone */}
       <label className="relative flex items-center justify-center gap-2 h-20 rounded-xl border-2 border-dashed border-border bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors">
@@ -552,7 +572,7 @@ const EventAlbumManager = ({ eventId }: { eventId: string }) => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
           {photos.map((p, i) => (
-            <div key={p.id} className="rounded-xl border border-border bg-card overflow-hidden flex flex-col">
+            <div key={p.id} className={`rounded-xl border ${p.is_cover ? 'border-amber-400 ring-2 ring-amber-300/40' : 'border-border'} bg-card overflow-hidden flex flex-col`}>
               <div className="relative aspect-[4/3] bg-muted">
                 {p.image ? (
                   <img src={p.image} alt={p.caption || ''} className="w-full h-full object-cover" />
@@ -575,15 +595,27 @@ const EventAlbumManager = ({ eventId }: { eventId: string }) => {
                     title="Move down"
                   >↓</button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => deletePhoto(p.id)}
-                  className="absolute top-1.5 right-1.5 w-7 h-7 rounded-md bg-black/60 hover:bg-destructive text-white flex items-center justify-center"
-                  title="Remove"
-                >
-                  <Trash2 size={12} />
-                </button>
-                <span className="absolute bottom-1.5 left-1.5 text-[10px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded">#{i + 1}</span>
+                <div className="absolute top-1.5 right-1.5 flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setCover(p.id)}
+                    className={`w-7 h-7 rounded-md flex items-center justify-center text-white ${p.is_cover ? 'bg-amber-500 hover:bg-amber-600' : 'bg-black/60 hover:bg-amber-500'}`}
+                    title={p.is_cover ? 'Album cover' : 'Set as album cover'}
+                  >
+                    <Star size={12} fill={p.is_cover ? 'currentColor' : 'none'} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deletePhoto(p.id)}
+                    className="w-7 h-7 rounded-md bg-black/60 hover:bg-destructive text-white flex items-center justify-center"
+                    title="Remove"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+                <span className="absolute bottom-1.5 left-1.5 text-[10px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded">
+                  {p.is_cover ? 'COVER' : `#${i + 1}`}
+                </span>
               </div>
               <div className="p-2 space-y-1.5">
                 <input
