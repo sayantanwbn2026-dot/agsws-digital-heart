@@ -191,10 +191,17 @@ const Events = () => {
   }, [cmsEvents]);
 
   const [filter, setFilter] = useState<string>("all");
-  const [showPast, setShowPast] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<AGSWSEvent | null>(null);
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
   const [calYear, setCalYear] = useState(new Date().getFullYear());
+
+  // Lock body scroll while dialog is open so the modal scrolls instead of the page.
+  useEffect(() => {
+    if (!selectedEvent) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [selectedEvent]);
 
   // Sorting guarantees (frontend safety-net mirroring the backend rules):
   //   • Upcoming  → soonest first (date ASC)
