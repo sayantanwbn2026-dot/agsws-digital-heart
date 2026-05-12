@@ -449,8 +449,12 @@ export const EventAlbumManager = ({ eventId }: { eventId: string }) => {
       setPhotos([]);
     }
     setBusy(false);
-  }, [getAll, eventId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId]);
 
+  // Run once per eventId — getAll from useCMSApi is recreated on every render,
+  // so depending on it would trigger an infinite refetch loop and keep `busy`
+  // permanently true (hiding the photo grid + caption inputs).
   useEffect(() => { fetchPhotos(); }, [fetchPhotos]);
 
   const handleFiles = async (files: FileList | null) => {
