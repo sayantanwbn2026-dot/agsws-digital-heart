@@ -15,6 +15,7 @@ import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEdito
 import SectionEditor from "./components/SectionEditor";
 import PaymentsManager from "./components/PaymentsManager";
 import EventEditor from "./components/EventEditor";
+import EventAlbumsManager from "./components/EventAlbumsManager";
 import { useCMSApi } from "@/hooks/useCMSApi";
 import toast from "react-hot-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -194,6 +195,7 @@ const sections = [
 
   { id: 'stories', label: 'Impact Stories', icon: BookOpen, table: 'cms_stories', fields: storyFields, group: 'Content' },
   { id: 'events', label: 'Events', icon: Calendar, table: 'cms_events', fields: eventFields, isCustom: true, group: 'Content' },
+  { id: 'event_albums', label: 'Event Albums', icon: ImageIcon, table: 'cms_event_albums', fields: [], isCustom: true, group: 'Content' },
   { id: 'blog', label: 'Blog Posts', icon: FileText, table: 'cms_blog_posts', fields: blogFields, group: 'Content' },
   { id: 'gallery', label: 'Gallery', icon: ImageIcon, table: 'cms_gallery', fields: galleryFields, group: 'Content' },
   { id: 'videos', label: 'Gallery Videos', icon: Film, table: 'cms_videos', fields: ([
@@ -1406,6 +1408,7 @@ const AdminDashboard = () => {
   const renderCustomSection = () => {
     if (activeSection === 'landing') return <LandingPageCMS onNavigate={setActiveSection} />;
     if (activeSection === 'events') return <EventEditor />;
+    if (activeSection === 'event_albums') return <EventAlbumsManager />;
     if (activeSection === 'applications') return <ApplicationsManager items={allData.applications || []} onRefresh={fetchAllCounts} />;
     if (activeSection === 'newsletter') return <NewsletterManager items={allData.newsletter || []} />;
     if (activeSection === 'payments') return <PaymentsManager />;
