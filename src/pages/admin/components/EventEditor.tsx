@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Calendar, MapPin, Users, ArrowRight, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, Save, X, Loader2, Eye, EyeOff, Calendar, MapPin, Users, ArrowRight, Search, Image as ImageIcon, Upload, GripVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCMSApi } from '@/hooks/useCMSApi';
 import { notifyCMSContentUpdated } from '@/lib/cms-sync';
@@ -314,6 +314,16 @@ const EventEditor = () => {
                       resolution="800×450px"
                     />
                   </Field>
+
+                  {/* Album manager — only meaningful once the event exists */}
+                  {!isNew && editItem.id && (
+                    <EventAlbumManager eventId={editItem.id} />
+                  )}
+                  {isNew && (
+                    <div className="rounded-xl border border-dashed border-border p-4 text-[11px] text-muted-foreground">
+                      Save the event first to start adding album photos. They'll appear in the public gallery as a folder for this event.
+                    </div>
+                  )}
                 </div>
 
                 {/* Live Preview */}
