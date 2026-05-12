@@ -429,7 +429,7 @@ export default EventEditor;
  * ────────────────────────────────────────────────────────────── */
 const ALBUM_CATEGORIES = ['community', 'medical', 'education', 'elderly', 'child', 'hospital', 'classroom'] as const;
 
-const EventAlbumManager = ({ eventId }: { eventId: string }) => {
+export const EventAlbumManager = ({ eventId }: { eventId: string }) => {
   const { getAll, create, update, remove, uploadImage } = useCMSApi();
   const [photos, setPhotos] = useState<any[]>([]);
   const [busy, setBusy] = useState(false);
