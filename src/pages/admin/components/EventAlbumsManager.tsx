@@ -27,6 +27,7 @@ const EventAlbumsManager = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { refresh(); }, []);
 
   const photosByEvent = useMemo(() => {
