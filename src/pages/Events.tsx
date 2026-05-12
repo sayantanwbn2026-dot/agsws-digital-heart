@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { events as fallbackEvents, eventTypeLabels, eventTypeColors, type AGSWSEvent } from "@/data/events";
 import { useCMSList } from "@/hooks/useCMSList";
-import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import PageHero from "@/components/layout/PageHero";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Clock, X, ChevronLeft, ChevronRight, Calendar, Users, ArrowRight, Sparkles, Images } from "lucide-react";
