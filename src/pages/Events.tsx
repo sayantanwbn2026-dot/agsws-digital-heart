@@ -278,18 +278,19 @@ const Events = () => {
               )}
             </div>
             {past.length > 0 && (
-              <div className="mt-10">
-                <button onClick={() => setShowPast(!showPast)} className="flex items-center gap-2 text-[13px] font-[600] text-[var(--light)] hover:text-[var(--teal)] transition-colors">
-                  {showPast ? "Hide" : `Show ${past.length}`} past events
-                  <motion.span animate={{ rotate: showPast ? 180 : 0 }} transition={{ duration: 0.2 }}><ChevronLeft size={14} className="-rotate-90" /></motion.span>
-                </button>
-                <AnimatePresence>
-                  {showPast && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-4 mt-4 overflow-hidden">
-                      {past.map((evt, i) => (<EventCard key={evt.id} event={evt} onClick={() => setSelectedEvent(evt)} index={i} />))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+              <div className="mt-14">
+                <div className="flex items-end justify-between mb-5">
+                  <div>
+                    <p className="text-[10px] font-[700] uppercase tracking-[0.12em] text-[var(--light)] mb-1">Archive</p>
+                    <h3 className="text-[18px] font-[800] text-[var(--dark)] tracking-[-0.01em]">Past Events</h3>
+                  </div>
+                  <span className="text-[11px] text-[var(--light)] font-[500]">{past.length} completed</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {past.map((evt, i) => (
+                    <EventCard key={evt.id} event={evt} onClick={() => setSelectedEvent(evt)} index={i} compact />
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -303,48 +304,61 @@ const Events = () => {
 
       <AnimatePresence>
         {selectedEvent && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D1B1C]/70 backdrop-blur-md p-4" onClick={() => setSelectedEvent(null)}>
-            <motion.div initial={{ scale: 0.92, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }} transition={{ type: "spring", damping: 28, stiffness: 250 }} className="bg-white rounded-[24px] max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-[0_32px_80px_rgba(0,0,0,0.3)]" onClick={e => e.stopPropagation()}>
-              <ImagePlaceholder category="medical" className="w-full h-[200px] rounded-t-[24px]" />
-              <div className="p-7">
-                <div className="flex items-start justify-between mb-5">
-                  <h2 className="text-[22px] font-[800] text-[var(--dark)] pr-8 tracking-[-0.02em] leading-tight">{selectedEvent.title}</h2>
-                  <button onClick={() => setSelectedEvent(null)} className="w-9 h-9 rounded-full bg-[var(--bg)] hover:bg-[var(--border-color)] flex items-center justify-center transition-colors flex-shrink-0"><X size={16} /></button>
-                </div>
-                <div className="space-y-2.5 text-[13px] text-[var(--mid)] mb-5">
-                  <p className="flex items-center gap-2"><Clock size={14} className="text-[var(--teal)]" />{new Date(selectedEvent.date).toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} • {selectedEvent.time}</p>
-                  <p className="flex items-center gap-2"><MapPin size={14} className="text-[var(--teal)]" />{selectedEvent.venue}, {selectedEvent.location}</p>
-                  <p className="flex items-center gap-2"><Users size={14} className="text-[var(--teal)]" />{selectedEvent.capacity} expected attendees</p>
-                </div>
-                <p className="text-[14px] text-[var(--mid)] leading-[1.7] mb-6">{selectedEvent.description}</p>
-                {selectedEvent.isPast && (
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-[10px] font-[700] uppercase tracking-[0.12em] text-[var(--teal)]">Event Album</p>
-                      <span className="text-[11px] text-[var(--light)] font-[500]">5 photos</span>
-                    </div>
-                    <div className="grid grid-cols-5 gap-1.5 mb-4">
-                      {getEventAlbum(selectedEvent).map((p) => (
-                        <div key={p.id} className="relative aspect-square rounded-lg overflow-hidden bg-[var(--bg)]">
-                          {p.image ? (
-                            <img src={p.image} alt={p.caption} className="w-full h-full object-cover" loading="lazy" />
-                          ) : (
-                            <ImagePlaceholder category={p.category} className="w-full h-full" />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    <Link
-                      to={`/gallery?album=${encodeURIComponent(selectedEvent.id)}`}
-                      onClick={() => setSelectedEvent(null)}
-                      className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--teal)] to-[var(--teal-dark)] text-white font-[700] text-[14px] h-[48px] rounded-full hover:shadow-[0_8px_24px_rgba(31,154,168,0.3)] transition-shadow"
-                    >
-                      <Images size={16} /> Open Event Album
-                    </Link>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D1B1C]/70 backdrop-blur-md p-4 sm:p-6" onClick={() => setSelectedEvent(null)}>
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.96, opacity: 0, y: 10 }}
+              transition={{ type: "spring", damping: 28, stiffness: 250 }}
+              className="bg-white rounded-[24px] w-full max-w-3xl max-h-[88vh] overflow-y-auto overscroll-contain shadow-[0_32px_80px_rgba(0,0,0,0.3)]"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-8 sm:p-10">
+                <div className="flex items-start justify-between gap-4 mb-7">
+                  <div className="flex-1 min-w-0">
+                    <span className={`text-[10px] font-[700] uppercase tracking-[0.12em] inline-block px-2.5 py-1 rounded-full mb-3 ${selectedEvent.isPast ? 'bg-[var(--bg)] text-[var(--light)]' : 'bg-[var(--teal-light)] text-[var(--teal)]'}`}>
+                      {selectedEvent.isPast ? 'Past Event' : 'Upcoming Event'}
+                    </span>
+                    <h2 className="text-[24px] sm:text-[28px] font-[800] text-[var(--dark)] tracking-[-0.02em] leading-[1.15]">{selectedEvent.title}</h2>
                   </div>
-                )}
-                {!selectedEvent.isPast && (
-                  <button className="w-full bg-gradient-to-r from-[var(--teal)] to-[var(--teal-dark)] text-white font-[700] text-[14px] h-[48px] rounded-full hover:shadow-[0_8px_24px_rgba(31,154,168,0.3)] transition-shadow">Register for This Event →</button>
+                  <button onClick={() => setSelectedEvent(null)} className="w-10 h-10 rounded-full bg-[var(--bg)] hover:bg-[var(--border-color)] flex items-center justify-center transition-colors flex-shrink-0"><X size={16} /></button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-7">
+                  <div className="bg-[var(--bg)] rounded-2xl p-4">
+                    <p className="text-[10px] font-[700] uppercase tracking-[0.1em] text-[var(--light)] mb-1.5 flex items-center gap-1.5"><Clock size={11} className="text-[var(--teal)]" /> When</p>
+                    <p className="text-[13px] font-[600] text-[var(--dark)] leading-snug">{new Date(selectedEvent.date).toLocaleDateString("en-IN", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</p>
+                    <p className="text-[12px] text-[var(--mid)] mt-0.5">{selectedEvent.time}</p>
+                  </div>
+                  <div className="bg-[var(--bg)] rounded-2xl p-4">
+                    <p className="text-[10px] font-[700] uppercase tracking-[0.1em] text-[var(--light)] mb-1.5 flex items-center gap-1.5"><MapPin size={11} className="text-[var(--teal)]" /> Where</p>
+                    <p className="text-[13px] font-[600] text-[var(--dark)] leading-snug">{selectedEvent.venue || selectedEvent.location}</p>
+                    {selectedEvent.venue && selectedEvent.location && selectedEvent.venue !== selectedEvent.location && (
+                      <p className="text-[12px] text-[var(--mid)] mt-0.5">{selectedEvent.location}</p>
+                    )}
+                  </div>
+                  <div className="bg-[var(--bg)] rounded-2xl p-4">
+                    <p className="text-[10px] font-[700] uppercase tracking-[0.1em] text-[var(--light)] mb-1.5 flex items-center gap-1.5"><Users size={11} className="text-[var(--teal)]" /> Attendees</p>
+                    <p className="text-[13px] font-[600] text-[var(--dark)] leading-snug">{selectedEvent.capacity}</p>
+                    <p className="text-[12px] text-[var(--mid)] mt-0.5">expected</p>
+                  </div>
+                </div>
+                <p className="text-[14.5px] text-[var(--mid)] leading-[1.75] mb-8 whitespace-pre-line">{selectedEvent.description}</p>
+                {selectedEvent.isPast ? (
+                  <Link
+                    to={`/gallery?album=${encodeURIComponent(selectedEvent.id)}`}
+                    onClick={() => setSelectedEvent(null)}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--teal)] to-[var(--teal-dark)] text-white font-[700] text-[14px] h-[52px] rounded-full hover:shadow-[0_8px_24px_rgba(31,154,168,0.3)] transition-shadow"
+                  >
+                    <Images size={16} /> Open Event Album
+                  </Link>
+                ) : (
+                  <Link
+                    to={`/events/register?event=${encodeURIComponent(selectedEvent.id)}`}
+                    onClick={() => setSelectedEvent(null)}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--teal)] to-[var(--teal-dark)] text-white font-[700] text-[14px] h-[52px] rounded-full hover:shadow-[0_8px_24px_rgba(31,154,168,0.3)] transition-shadow"
+                  >
+                    Register for This Event <ArrowRight size={16} />
+                  </Link>
                 )}
               </div>
             </motion.div>
