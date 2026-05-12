@@ -420,3 +420,191 @@ const EventPreviewModal = ({ event }: { event: any }) => {
 };
 
 export default EventEditor;
+
+/* ─── Album Manager ──────────────────────────────────────────────
+ *  Inline editor for cms_event_albums. Each event owns a list of
+ *  photos with optional caption + category. Realtime hooks on the
+ *  public Gallery pick up changes immediately (cms-realtime).
+ *  Categories mirror the public AlbumPhoto union.
+ * ────────────────────────────────────────────────────────────── */
+const ALBUM_CATEGORIES = ['community', 'medical', 'education', 'elderly', 'child', 'hospital', 'classroom'] as const;
+
+const EventAlbumManager = ({ eventId }: { eventId: string }) => {
+  const { getAll, create, update, remove, uploadImage } = useCMSApi();
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const fetchPhotos = useCallback(async () => {
+    setBusy(true);
+    try {
+      const all = await getAll('cms_event_albums');
+      const arr = Array.isArray(all) ? all : [all];
+      setPhotos(
+        arr
+          .filter((p: any) => p.event_id === eventId)
+          .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+      );
+    } catch {
+      setPhotos([]);
+    }
+    setBusy(false);
+  }, [getAll, eventId]);
+
+  useEffect(() => { fetchPhotos(); }, [fetchPhotos]);
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      // Upload sequentially so server ordering matches selection order.
+      let nextOrder = photos.length;
+      for (const file of Array.from(files)) {
+        const url = await uploadImage(file, `event-albums/${eventId}`);
+        await create('cms_event_albums', {
+          event_id: eventId,
+          image: url,
+          caption: '',
+          category: 'community',
+          sort_order: nextOrder++,
+        });
+      }
+      toast.success(`${files.length} photo${files.length > 1 ? 's' : ''} added`);
+      await fetchPhotos();
+      notifyCMSContentUpdated();
+    } catch (err: any) {
+      toast.error(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const updatePhoto = async (id: string, patch: Record<string, any>) => {
+    setPhotos(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p));
+    try {
+      await update('cms_event_albums', id, patch);
+      notifyCMSContentUpdated();
+    } catch (err: any) {
+      toast.error(err.message || 'Save failed');
+      fetchPhotos();
+    }
+  };
+
+  const deletePhoto = async (id: string) => {
+    if (!confirm('Remove this photo from the album?')) return;
+    try {
+      await remove('cms_event_albums', id);
+      setPhotos(prev => prev.filter(p => p.id !== id));
+      notifyCMSContentUpdated();
+    } catch (err: any) {
+      toast.error(err.message || 'Delete failed');
+    }
+  };
+
+  const movePhoto = async (id: string, dir: -1 | 1) => {
+    const idx = photos.findIndex(p => p.id === id);
+    const swap = idx + dir;
+    if (idx < 0 || swap < 0 || swap >= photos.length) return;
+    const reordered = [...photos];
+    [reordered[idx], reordered[swap]] = [reordered[swap], reordered[idx]];
+    setPhotos(reordered);
+    try {
+      await Promise.all(reordered.map((p, i) =>
+        p.sort_order !== i ? update('cms_event_albums', p.id, { sort_order: i }) : Promise.resolve()
+      ));
+      notifyCMSContentUpdated();
+    } catch {
+      fetchPhotos();
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Event Album
+        </label>
+        <span className="text-[10px] text-muted-foreground">{photos.length} photo{photos.length !== 1 ? 's' : ''} · live in Gallery</span>
+      </div>
+
+      {/* Upload dropzone */}
+      <label className="relative flex items-center justify-center gap-2 h-20 rounded-xl border-2 border-dashed border-border bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors">
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          className="absolute inset-0 opacity-0 cursor-pointer"
+          onChange={(e) => handleFiles(e.target.files)}
+          disabled={uploading}
+        />
+        {uploading ? (
+          <><Loader2 size={14} className="animate-spin text-primary" /><span className="text-xs text-muted-foreground">Uploading…</span></>
+        ) : (
+          <><Upload size={14} className="text-muted-foreground" /><span className="text-xs text-muted-foreground">Drop or click to add photos (multiple supported)</span></>
+        )}
+      </label>
+
+      {/* Photo grid */}
+      {busy ? (
+        <div className="flex items-center justify-center py-6"><Loader2 size={16} className="animate-spin text-primary" /></div>
+      ) : photos.length === 0 ? (
+        <p className="text-[11px] text-muted-foreground mt-3 text-center">No photos yet. Upload the first one above — it'll appear instantly on the public gallery.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+          {photos.map((p, i) => (
+            <div key={p.id} className="rounded-xl border border-border bg-card overflow-hidden flex flex-col">
+              <div className="relative aspect-[4/3] bg-muted">
+                {p.image ? (
+                  <img src={p.image} alt={p.caption || ''} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground"><ImageIcon size={20} /></div>
+                )}
+                <div className="absolute top-1.5 left-1.5 flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => movePhoto(p.id, -1)}
+                    disabled={i === 0}
+                    className="w-7 h-7 rounded-md bg-black/60 text-white text-[11px] flex items-center justify-center disabled:opacity-30 hover:bg-black/80"
+                    title="Move up"
+                  >↑</button>
+                  <button
+                    type="button"
+                    onClick={() => movePhoto(p.id, 1)}
+                    disabled={i === photos.length - 1}
+                    className="w-7 h-7 rounded-md bg-black/60 text-white text-[11px] flex items-center justify-center disabled:opacity-30 hover:bg-black/80"
+                    title="Move down"
+                  >↓</button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => deletePhoto(p.id)}
+                  className="absolute top-1.5 right-1.5 w-7 h-7 rounded-md bg-black/60 hover:bg-destructive text-white flex items-center justify-center"
+                  title="Remove"
+                >
+                  <Trash2 size={12} />
+                </button>
+                <span className="absolute bottom-1.5 left-1.5 text-[10px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded">#{i + 1}</span>
+              </div>
+              <div className="p-2 space-y-1.5">
+                <input
+                  value={p.caption || ''}
+                  onChange={(e) => setPhotos(prev => prev.map(x => x.id === p.id ? { ...x, caption: e.target.value } : x))}
+                  onBlur={(e) => updatePhoto(p.id, { caption: e.target.value })}
+                  placeholder="Caption (optional)"
+                  className="w-full h-8 px-2 rounded-md border border-border bg-background text-[12px] focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <select
+                  value={p.category || 'community'}
+                  onChange={(e) => updatePhoto(p.id, { category: e.target.value })}
+                  className="w-full h-8 px-2 rounded-md border border-border bg-background text-[11px] focus:outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  {ALBUM_CATEGORIES.map(c => (<option key={c} value={c}>{c}</option>))}
+                </select>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
