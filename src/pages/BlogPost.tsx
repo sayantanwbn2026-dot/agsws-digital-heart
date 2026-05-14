@@ -21,7 +21,29 @@ const BlogPost = () => {
   const scaleX = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -60]);
 
-  useSEO(story?.title || "Story", story?.excerpt || "");
+  useSEO(
+    story?.title || "Story",
+    story?.excerpt || "",
+    story
+      ? {
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: story.title,
+            description: story.excerpt,
+            author: { "@type": "Person", name: story.author },
+            datePublished: story.date,
+            articleSection: story.category,
+            publisher: {
+              "@type": "Organization",
+              name: "AGSWS",
+              logo: { "@type": "ImageObject", url: "https://agsws.lovable.app/favicon.ico" },
+            },
+            mainEntityOfPage: `https://agsws.lovable.app/blog/${slug}`,
+          },
+        }
+      : undefined
+  );
 
   const relatedStories = stories.filter(s => s.slug !== slug).slice(0, 3);
   const accent = colorMap[story?.color || "teal"] || "var(--teal)";
