@@ -1,0 +1,37 @@
+# AGSWS — Social Welfare Society
+
+> A Kolkata-based NGO providing medical aid, education support, and GoldenAge elderly care for families across West Bengal. Donations are 80G tax-deductible.
+
+AGSWS runs three core programs — Medical Aid (emergency care, surgeries, medicines), Education Support (school sponsorships for under-resourced children), and GoldenAge Care (community wellness check-ins and emergency liaison for elderly parents, including NRK families). The site supports online donations, parent registration, beneficiary applications, CSR partnerships, and volunteering.
+
+## Pages
+
+- [Home](/): Mission overview, featured causes, and live impact ticker.
+- [About](/about): History, leadership, and operating model.
+- [Initiatives](/initiatives): All AGSWS programs at a glance.
+- [Medical Aid](/initiatives/medical): Hospital and emergency care program details.
+- [Education Support](/initiatives/education): Child sponsorship program details.
+- [Donate – Medical](/donate/medical): Give to medical aid (80G eligible).
+- [Donate – Education](/donate/education): Sponsor a child's school year.
+- [Register a Parent](/register-parent): GoldenAge Care enrollment for elderly parents.
+- [Apply for Support](/apply): Beneficiary application for medical or education aid.
+- [CSR Partnership](/csr): Corporate partnership and CSR proposals.
+- [Volunteer Portal](/volunteer-portal): Join as a volunteer.
+- [Donor Wall](/donor-wall): Recent donors and contribution stories.
+- [Impact Report](/impact): Annual impact, financials, and fund journey.
+- [Transparency](/transparency): Governance, audits, and disclosures.
+- [Events](/events): Upcoming and past events.
+- [Gallery](/gallery): Event photo albums.
+- [Blog](/blog): Stories from the field.
+- [Updates](/updates): Newsletter and WhatsApp field updates.
+- [Resources](/resources): Downloadable guides and forms.
+- [FAQ](/faq): Donations, registration, and tax questions.
+- [Contact](/contact): Office address, phone, and email.
+
+## Optional
+
+- [Track Donation](/track-donation): Look up the journey of a past donation.
+- [Track Registration](/track): Check parent registration status.
+- [Privacy Policy](/privacy)
+- [Terms of Use](/terms)
+- [Refund Policy](/refund)
