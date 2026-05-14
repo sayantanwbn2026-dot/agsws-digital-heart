@@ -3,6 +3,7 @@ import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import DonateButton from "@/components/ui/DonateButton";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
+import { useSEO } from "@/hooks/useSEO";
 
 const causes = [
   { title: "Medical Aid & Hospital Support", desc: "Fund emergency care, surgeries, and medicines for patients in Kolkata.", raised: 320000, goal: 500000, to: "/donate/medical", color: "teal" },
@@ -12,6 +13,7 @@ const causes = [
 
 const NotFound = () => {
   const location = useLocation();
+  useSEO("Page Not Found", "The page you're looking for doesn't exist. Explore AGSWS causes and donate to support medical aid, education, and elderly care.");
   const { openOverlay } = useDonateOverlay();
   const randomCause = useMemo(() => causes[Math.floor(Math.random() * causes.length)], []);
   const pct = Math.round((randomCause.raised / randomCause.goal) * 100);
