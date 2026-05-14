@@ -11,13 +11,28 @@ import PageHero from "@/components/layout/PageHero";
 const categories = ["Donations & Tax", "Parent Registration", "About AGSWS"];
 
 const FAQ = () => {
-  useSEO("FAQ", "Frequently asked questions about AGSWS donations, registration, and services.");
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const { data: cmsFaqs } = useCMSList<any>('cms_faqs', [], { orderBy: { column: 'sort_order' } });
   const faqs = cmsFaqs.length ? cmsFaqs.map((f: any) => ({ question: f.question, answer: f.answer, category: f.category })) : staticFaqs;
 
   const filtered = faqs.filter((f) => f.category === activeCategory);
+
+  useSEO(
+    "FAQ",
+    "Frequently asked questions about AGSWS donations, registration, and services.",
+    {
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.slice(0, 30).map((f: any) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answer },
+        })),
+      },
+    }
+  );
 
   return (
     <main id="main-content">
