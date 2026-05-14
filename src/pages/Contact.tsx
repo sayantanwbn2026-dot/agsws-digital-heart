@@ -50,7 +50,21 @@ const defaultContact = {
 };
 
 const Contact = () => {
-  useSEO("Contact", "Get in touch with AGSWS — contact us or volunteer.");
+  useSEO("Contact", "Get in touch with AGSWS — contact us or volunteer.", {
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "NGO",
+      name: "AGSWS — Social Welfare Society",
+      url: "https://agsws.lovable.app/contact",
+      areaServed: "Kolkata, West Bengal, India",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Kolkata",
+        addressRegion: "West Bengal",
+        addressCountry: "IN",
+      },
+    },
+  });
   const { data: cms } = useCMSSection<typeof defaultContact>('contact_page', defaultContact);
   const volunteerRoles = (cms.volunteer_roles?.length ? cms.volunteer_roles : defaultContact.volunteer_roles)
     .map((r: any) => ({ ...r, icon: iconMap[r.icon] || Heart }));
