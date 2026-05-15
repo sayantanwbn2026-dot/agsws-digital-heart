@@ -810,7 +810,9 @@ export type Database = {
       }
       goldenage_registrations: {
         Row: {
+          alternative_phone: string | null
           amount_cents: number
+          blood_group: string | null
           created_at: string
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
@@ -819,6 +821,7 @@ export type Database = {
           parent_address: string | null
           parent_age: number | null
           parent_name: string
+          plan_label: string | null
           registrant_city: string | null
           registrant_email: string
           registrant_name: string
@@ -831,7 +834,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alternative_phone?: string | null
           amount_cents?: number
+          blood_group?: string | null
           created_at?: string
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
@@ -840,6 +845,7 @@ export type Database = {
           parent_address?: string | null
           parent_age?: number | null
           parent_name: string
+          plan_label?: string | null
           registrant_city?: string | null
           registrant_email: string
           registrant_name: string
@@ -852,7 +858,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alternative_phone?: string | null
           amount_cents?: number
+          blood_group?: string | null
           created_at?: string
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
@@ -861,6 +869,7 @@ export type Database = {
           parent_address?: string | null
           parent_age?: number | null
           parent_name?: string
+          plan_label?: string | null
           registrant_city?: string | null
           registrant_email?: string
           registrant_name?: string

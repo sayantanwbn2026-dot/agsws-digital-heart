@@ -28,6 +28,9 @@ interface DonationBody {
   emergency_contact_name?: string
   emergency_contact_phone?: string
   medical_condition?: string
+  blood_group?: string
+  alternative_phone?: string
+  plan_label?: string
   success_url: string
   cancel_url: string
   environment?: StripeEnv
@@ -69,6 +72,9 @@ Deno.serve(async (req) => {
         emergency_contact_name: body.emergency_contact_name,
         emergency_contact_phone: body.emergency_contact_phone,
         medical_condition: body.medical_condition,
+        blood_group: body.blood_group,
+        alternative_phone: body.alternative_phone,
+        plan_label: body.plan_label,
         amount_cents: amountCents,
       }).select('id, registration_ref').single()
       if (error) throw error
