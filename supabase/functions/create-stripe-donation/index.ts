@@ -72,6 +72,9 @@ Deno.serve(async (req) => {
         emergency_contact_name: body.emergency_contact_name,
         emergency_contact_phone: body.emergency_contact_phone,
         medical_condition: body.medical_condition,
+        blood_group: body.blood_group,
+        alternative_phone: body.alternative_phone,
+        plan_label: body.plan_label,
         amount_cents: amountCents,
       }).select('id, registration_ref').single()
       if (error) throw error
