@@ -1421,8 +1421,53 @@ const AdminDashboard = () => {
     if (activeSection === 'trust_band') return <SectionEditor sectionKey="trust_band" title="Trust Band" description="Trust badges (NGO registration, security, transparency)" fields={[]} listKey="items" listFields={[{ key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }, { key: 'icon', label: 'Icon (ShieldCheck, FileText, Lock, BarChart3)', type: 'text' }, { key: 'link', label: 'Link URL (optional)', type: 'text' }]} />;
     if (activeSection === 'analytics_section') return <SectionEditor sectionKey="analytics" title="Analytics Infographic" description="Chart data, donut value, sidebar stats, and monthly bars" fields={[{ key: 'section_badge', label: 'Badge Text', type: 'text' }, { key: 'section_title', label: 'Title', type: 'text' }, { key: 'section_subtitle', label: 'Subtitle', type: 'textarea' }, { key: 'donut_value', label: 'Donut % Value', type: 'number' }, { key: 'donut_label', label: 'Donut Label', type: 'text' }, { key: 'donut_desc', label: 'Donut Description', type: 'textarea' }]} listKey="chart_data" listFields={[{ key: 'month', label: 'Month (e.g. Jan)', type: 'text' }, { key: 'medical', label: 'Medical Value', type: 'number' }, { key: 'education', label: 'Education Value', type: 'number' }]} />;
     if (activeSection === 'analytics_sidebar') return <SectionEditor sectionKey="analytics" title="Analytics — Sidebar Stats" description="The four stat cards next to the chart (uses same record as Analytics)" fields={[]} listKey="sidebar_stats" listFields={[{ key: 'label', label: 'Label', type: 'text' }, { key: 'value', label: 'Value', type: 'number' }, { key: 'icon', label: 'Icon (Heart, GraduationCap, Users, TrendingUp)', type: 'text' }, { key: 'color', label: 'Color CSS', type: 'text', placeholder: 'var(--teal)' }]} />;
-    if (activeSection === 'register_parent') return <SectionEditor sectionKey="register_parent" title="GoldenAge / Register Parent Page" description="Hero, 4-step wizard labels, trust badges, ₹100 fee copy" fields={[{ key: 'hero_title', label: 'Hero Title', type: 'text' }, { key: 'hero_subtitle', label: 'Hero Subtitle', type: 'textarea' }, { key: 'step1_title', label: 'Step 1 — Heading', type: 'text' }, { key: 'step1_trust_badge', label: 'Step 1 — Trust Badge', type: 'textarea' }, { key: 'step2_title', label: 'Step 2 — Heading', type: 'text' }, { key: 'step2_trust_badge', label: 'Step 2 — Trust Badge', type: 'textarea' }, { key: 'step3_title', label: 'Step 3 — Heading', type: 'text' }, { key: 'step3_subtitle', label: 'Step 3 — Subtitle', type: 'textarea' }, { key: 'document_hint', label: 'Step 3 — Upload Hint', type: 'text' }, { key: 'step4_title', label: 'Step 4 — Heading', type: 'text' }, { key: 'summary_heading', label: 'Step 4 — Summary Heading', type: 'text' }, { key: 'fee_question', label: 'Fee — Question Label', type: 'text' }, { key: 'fee_explanation', label: 'Fee — Explanation', type: 'textarea' }, { key: 'fee_amount', label: 'Fee Amount (₹)', type: 'number' }, { key: 'pay_button_label', label: 'Pay Button Label', type: 'text' }, { key: 'pay_button_loading', label: 'Pay Button — Loading Text', type: 'text' }, { key: 'payment_disclaimer', label: 'Payment Disclaimer', type: 'textarea' }, { key: 'back_label', label: 'Back Button Label', type: 'text' }, { key: 'continue_label', label: 'Continue Button Label', type: 'text' }, { key: 'validation_error', label: 'Validation Error Toast', type: 'text' }, { key: 'checkout_error', label: 'Checkout Error Toast', type: 'text' }]} listKey="steps" listFields={[{ key: 'label', label: 'Step Label', type: 'text' }, { key: 'icon', label: 'Icon (User, Heart, FileText, CreditCard)', type: 'text' }]} />;
-    if (activeSection === 'register_parent_docs') return <SectionEditor sectionKey="register_parent" title="Register Parent — Document Tiles" description="Document tiles shown in Step 3 (uses same record as GoldenAge page)" fields={[]} listKey="documents" listFields={[{ key: 'label', label: 'Document Label', type: 'text' }, { key: 'required', label: 'Required (true/false as 1/0)', type: 'number' }]} />;
+    if (activeSection === 'register_parent') return <SectionEditor
+      sectionKey="register_parent"
+      title="GoldenAge Care — Registration Page"
+      description="Org header, hero, 3-step wizard copy, plans, services, contact numbers"
+      fields={[
+        { key: 'org_name', label: 'Organisation Name', type: 'text' },
+        { key: 'org_tagline', label: 'Organisation Tagline', type: 'text' },
+        { key: 'reg_no', label: 'Registration Number', type: 'text' },
+        { key: 'hero_title', label: 'Hero Title', type: 'text' },
+        { key: 'hero_subtitle', label: 'Hero Subtitle', type: 'textarea' },
+        { key: 'step1_title', label: 'Step 1 — Heading', type: 'text' },
+        { key: 'step1_trust_badge', label: 'Step 1 — Trust Badge', type: 'textarea' },
+        { key: 'step2_title', label: 'Step 2 — Heading', type: 'text' },
+        { key: 'step2_subtitle', label: 'Step 2 — Subtitle', type: 'textarea' },
+        { key: 'document_hint', label: 'Document Upload Hint', type: 'text' },
+        { key: 'step3_title', label: 'Step 3 — Heading', type: 'text' },
+        { key: 'step3_subtitle', label: 'Step 3 — Subtitle', type: 'textarea' },
+        { key: 'services_title', label: 'Services — Section Label', type: 'text' },
+        { key: 'contact_label', label: 'Contact Numbers — Section Label', type: 'text' },
+        { key: 'pay_button_label', label: 'Pay Button Label', type: 'text' },
+        { key: 'pay_button_loading', label: 'Pay Button — Loading Text', type: 'text' },
+        { key: 'payment_disclaimer', label: 'Payment Disclaimer', type: 'textarea' },
+        { key: 'back_label', label: 'Back Button Label', type: 'text' },
+        { key: 'continue_label', label: 'Continue Button Label', type: 'text' },
+        { key: 'validation_error', label: 'Validation Error Toast', type: 'text' },
+        { key: 'checkout_error', label: 'Checkout Error Toast', type: 'text' },
+        { key: 'contact_numbers', label: 'Contact Numbers (24×7)', type: 'string-list' },
+      ]}
+      listKey="steps"
+      listFields={[
+        { key: 'label', label: 'Step Label', type: 'text' },
+        { key: 'icon', label: 'Icon (User, IdCard, CreditCard, Heart, FileText)', type: 'text' },
+      ]}
+      extraLists={[
+        { listKey: 'plans', label: 'Registration Plans', listFields: [
+          { key: 'key', label: 'Plan Key (unique, e.g. 6m)', type: 'text' },
+          { key: 'label', label: 'Plan Label', type: 'text' },
+          { key: 'amount', label: 'Amount (₹)', type: 'number' },
+          { key: 'tagline', label: 'Tagline', type: 'text' },
+          { key: 'highlight', label: 'Highlight (1 = Recommended badge, 0 = no)', type: 'number' },
+        ] },
+        { listKey: 'services', label: 'Services Included', listFields: [
+          { key: 'label', label: 'Patient Type', type: 'text' },
+          { key: 'flow', label: 'Service Flow (e.g. Pickup → Doctor → Drop)', type: 'text' },
+        ] },
+      ]}
+    />;
     if (activeSection === 'scrolling_stories') return <SectionEditor sectionKey="scrolling_stories" title="Scrolling Stories Strip" description="Animated marquee pills on the homepage" fields={[]} listKey="pills" listFields={[{ key: 'name', label: 'Name', type: 'text', placeholder: 'Kalinda, 8' }, { key: 'text', label: 'Text', type: 'text', placeholder: 'got school books' }, { key: 'category', label: 'Category', type: 'text', placeholder: 'education, medical, elderly, child, hospital' }]} />;
     if (activeSection === 'about_mission') return <SectionEditor sectionKey="about_mission" title="About — Mission" description="Mission label, quote, body paragraphs, and founder block" fields={[{ key: 'mission_label', label: 'Section Label', type: 'text' }, { key: 'mission_quote', label: 'Mission Quote', type: 'textarea' }, { key: 'body_p1', label: 'Body Paragraph 1', type: 'textarea' }, { key: 'body_p2', label: 'Body Paragraph 2', type: 'textarea' }, { key: 'founder_initial', label: 'Founder Initial', type: 'text' }, { key: 'founder_name', label: 'Founder Name', type: 'text' }, { key: 'founder_role', label: 'Founder Role', type: 'text' }]} />;
     if (activeSection === 'about_values') return <SectionEditor sectionKey="about_values" title="About — Core Values" description="Three value cards with icon, title, description" fields={[]} listKey="items" listFields={[{ key: 'icon', label: 'Icon (Heart, Target, Eye)', type: 'text' }, { key: 'title', label: 'Title', type: 'text' }, { key: 'desc', label: 'Description', type: 'textarea' }]} />;
