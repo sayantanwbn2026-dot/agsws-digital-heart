@@ -28,6 +28,9 @@ interface DonationBody {
   emergency_contact_name?: string
   emergency_contact_phone?: string
   medical_condition?: string
+  blood_group?: string
+  alternative_phone?: string
+  plan_label?: string
   success_url: string
   cancel_url: string
   environment?: StripeEnv
