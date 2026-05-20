@@ -44,6 +44,7 @@ import EventRegistration from "./pages/EventRegistration";
 import FAQ from "./pages/FAQ";
 import Events from "./pages/Events";
 import Gallery from "./pages/Gallery";
+import Members from "./pages/Members";
 import ImpactReport from "./pages/ImpactReport";
 import Updates from "./pages/Updates";
 import SearchPage from "./pages/Search";
@@ -160,6 +161,7 @@ const AnimatedRoutes = () => {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/events" element={<Events />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/members" element={<Members />} />
           <Route path="/impact" element={<ImpactReport />} />
           <Route path="/updates" element={<Updates />} />
           <Route path="/search" element={<SearchPage />} />
