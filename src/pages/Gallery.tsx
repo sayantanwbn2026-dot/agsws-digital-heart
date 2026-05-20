@@ -75,10 +75,13 @@ const Gallery = () => {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [cmsEvents]);
 
+  const initialAlbumParam = searchParams.get('album');
   const [filter, setFilter] = useState<string>("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [view, setView] = useState<"photos" | "albums" | "videos">("photos");
-  const [activeAlbumId, setActiveAlbumId] = useState<string | null>(null);
+  const [view, setView] = useState<"photos" | "albums" | "videos">(
+    initialAlbumParam ? "albums" : "photos"
+  );
+  const [activeAlbumId, setActiveAlbumId] = useState<string | null>(initialAlbumParam);
   const [albumIndex, setAlbumIndex] = useState(0);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });

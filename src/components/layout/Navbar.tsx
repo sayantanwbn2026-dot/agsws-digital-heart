@@ -42,7 +42,6 @@ const Navbar = () => {
   const initiativeChildren = [
     { label: "Medical Aid", path: "/initiatives/medical", icon: Heart, desc: "Emergency care & hospital support" },
     { label: "Education Support", path: "/initiatives/education", icon: BookOpen, desc: "Scholarships & tutoring programs" },
-    { label: "GoldenAge Care", path: "/register-parent", icon: Users, desc: "Emergency care for elderly parents" },
     { label: "CSR Partnership", path: "/csr", icon: Handshake, desc: "Corporate social responsibility" },
     { label: "Volunteer Portal", path: "/volunteer-portal", icon: Award, desc: "Track hours & get certified" },
   ];
@@ -55,6 +54,7 @@ const Navbar = () => {
       path: "/initiatives",
       children: initiativeChildren,
     },
+    { label: "Members", path: "/members" },
     { label: t("nav.events") || "Events", path: "/events" },
     { label: t("nav.resources") || "Resources", path: "/resources" },
     { label: t("nav.blog") || "Blog", path: "/blog" },
