@@ -1,6 +1,7 @@
 import { useSEO } from "@/hooks/useSEO";
 import PageHero from "@/components/layout/PageHero";
 import FadeInUp from "@/components/ui/FadeInUp";
+import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { motion } from "framer-motion";
 import { useCMSList } from "@/hooks/useCMSList";
 import { team as staticTeam } from "@/data/team";
@@ -15,7 +16,12 @@ type Member = {
 };
 
 const getInitials = (name: string) =>
-  name?.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "AG";
+  name
+    ?.split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "AG";
 
 const Members = () => {
   useSEO(
@@ -35,7 +41,10 @@ const Members = () => {
         image: m.image || m.photo || undefined,
         initials: getInitials(m.name || ""),
       }))
-    : staticTeam.map((m) => ({ ...m, initials: m.initials || getInitials(m.name) }));
+    : staticTeam.map((m) => ({
+        ...m,
+        initials: m.initials || getInitials(m.name),
+      }));
 
   return (
     <main id="main-content">
@@ -49,9 +58,9 @@ const Members = () => {
       />
 
       <section className="bg-[var(--bg)] py-16 lg:py-24">
-        <div className="max-w-[1100px] mx-auto px-[var(--container-px)]">
+        <div className="max-w-[1200px] mx-auto px-[var(--container-px)]">
           <FadeInUp>
-            <div className="flex items-center justify-center gap-2 mb-10">
+            <div className="flex items-center justify-center gap-2 mb-12">
               <span className="w-8 h-[1px] bg-[var(--teal)]/30" />
               <span className="text-[10px] font-[700] uppercase tracking-[0.18em] text-[var(--teal)] flex items-center gap-1.5">
                 <Sparkles size={11} /> Meet the team
@@ -60,48 +69,53 @@ const Members = () => {
             </div>
           </FadeInUp>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-7">
             {members.map((m, i) => (
               <FadeInUp key={`${m.name}-${i}`} delay={(i % 6) * 0.05}>
                 <motion.article
-                  whileHover={{ y: -4 }}
+                  whileHover={{ y: -6 }}
                   transition={{ type: "spring", stiffness: 280, damping: 24 }}
-                  className="group relative bg-white rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden hover:shadow-[var(--shadow-lg)] transition-shadow duration-300"
+                  className="group flex flex-col bg-white rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden hover:shadow-[var(--shadow-lg)] transition-shadow duration-300 h-full"
                 >
-                  <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[var(--teal)] via-[var(--teal-dark)] to-[var(--purple)] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="flex gap-5 sm:gap-6 p-5 sm:p-6">
-                    <div className="flex-shrink-0">
-                      <div className="relative w-[112px] h-[140px] sm:w-[128px] sm:h-[160px] rounded-2xl overflow-hidden bg-gradient-to-br from-[var(--teal-light)] via-white to-[var(--bg)] border border-[var(--border-color)]">
-                        {m.image ? (
-                          <img
-                            src={m.image}
-                            alt={m.name}
-                            loading="lazy"
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-[34px] font-[800] text-[var(--teal)] tracking-tight">
-                              {m.initials}
-                            </span>
-                          </div>
-                        )}
-                        <div className="absolute inset-0 ring-1 ring-inset ring-black/[0.04] rounded-2xl pointer-events-none" />
+                  {/* Portrait Image Area */}
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--bg)]">
+                    {m.image ? (
+                      <img
+                        src={m.image}
+                        alt={m.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--teal-light)] via-white to-[var(--bg)]">
+                        <span className="text-[48px] font-[800] text-[var(--teal)]/20 tracking-tight select-none">
+                          {m.initials}
+                        </span>
                       </div>
-                    </div>
+                    )}
+                    {/* Subtle top-edge glow on hover */}
+                    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--teal)] via-[var(--teal-dark)] to-[var(--purple)] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
 
-                    <div className="flex-1 min-w-0 flex flex-col">
-                      <h3 className="font-[800] text-[18px] sm:text-[19px] text-[var(--dark)] tracking-[-0.01em] leading-tight">
-                        {m.name}
-                      </h3>
-                      <p className="mt-1 text-[10.5px] font-[700] uppercase tracking-[0.12em] text-[var(--teal)]">
-                        {m.role}
-                      </p>
-                      <div className="mt-3 h-[2px] w-10 bg-[var(--teal)]/20 rounded-full" />
-                      <p className="mt-3 text-[13.5px] text-[var(--mid)] leading-[1.7] line-clamp-5">
-                        {m.bio}
-                      </p>
-                    </div>
+                  {/* Content */}
+                  <div className="flex flex-col p-5 sm:p-6 flex-1">
+                    {/* Role Badge */}
+                    <span className="self-start inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-[700] uppercase tracking-[0.1em] bg-[var(--teal-light)] text-[var(--teal)] mb-3">
+                      {m.role}
+                    </span>
+
+                    {/* Name */}
+                    <h3 className="font-[800] text-[17px] sm:text-[18px] text-[var(--dark)] tracking-[-0.01em] leading-tight mb-2">
+                      {m.name}
+                    </h3>
+
+                    {/* Divider */}
+                    <div className="w-8 h-[2px] bg-[var(--teal)]/20 rounded-full mb-3" />
+
+                    {/* Bio — 2 lines max */}
+                    <p className="text-[13px] text-[var(--mid)] leading-[1.65] line-clamp-2">
+                      {m.bio}
+                    </p>
                   </div>
                 </motion.article>
               </FadeInUp>
