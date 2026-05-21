@@ -86,8 +86,8 @@ const DonateMedical = () => {
           gift_recipient_email: data.giftRecipientEmail,
           gift_message: data.giftMessage,
           show_on_wall: data.showOnWall,
-          success_url: `${window.location.origin}/thank-you?cause=medical&amount=${currentAmount}&name=${encodeURIComponent(data.name)}`,
-          cancel_url: window.location.href,
+          success_url: `${window.location.origin}/donation-complete?gateway=medical&amount=${currentAmount}&name=${encodeURIComponent(data.name)}`,
+          cancel_url: `${window.location.origin}/donation-cancelled?gateway=medical&amount=${currentAmount}&name=${encodeURIComponent(data.name)}`,
         },
       });
 
