@@ -1,13 +1,14 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion } from "framer-motion";
-import { Check, Stethoscope, GraduationCap, Printer, Share2, ArrowRight, TrendingUp, Users, ShieldCheck } from "lucide-react";
+import { Check, Stethoscope, GraduationCap, Heart, Printer, Share2, ArrowRight, TrendingUp, Users, ShieldCheck } from "lucide-react";
 import { useEffect, useRef } from "react";
 import FadeInUp from "@/components/ui/FadeInUp";
 
 const gatewayConfig: Record<string, { icon: typeof Stethoscope; color: string; gradient: string; label: string }> = {
   medical: { icon: Stethoscope, color: "var(--teal)", gradient: "from-[var(--teal)] to-[var(--teal-dark)]", label: "Medical Aid" },
   education: { icon: GraduationCap, color: "var(--purple)", gradient: "from-[var(--purple)] to-[#4A48A0]", label: "Education Support" },
+  goldenage: { icon: Heart, color: "#B6A388", gradient: "from-[#B6A388] to-[#8a7861]", label: "GoldenAge Care" },
 };
 
 const DonationComplete = () => {
