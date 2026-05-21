@@ -115,8 +115,8 @@ const DonateEducation = () => {
           gift_recipient_email: data.giftRecipientEmail,
           gift_message: data.giftMessage,
           show_on_wall: data.showOnWall,
-          success_url: `${window.location.origin}/thank-you?cause=education&amount=${currentAmount}&name=${encodeURIComponent(data.name)}`,
-          cancel_url: window.location.href,
+          success_url: `${window.location.origin}/donation-complete?gateway=education&amount=${currentAmount}&name=${encodeURIComponent(data.name)}`,
+          cancel_url: `${window.location.origin}/donation-cancelled?gateway=education&amount=${currentAmount}&name=${encodeURIComponent(data.name)}`,
         },
       });
       if (error) throw error;

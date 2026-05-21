@@ -30,7 +30,7 @@ const StickyDonationRibbon = () => {
           animate={{ y: 0 }}
           exit={{ y: 60 }}
           transition={{ type: "spring", damping: 20, stiffness: 200 }}
-          className="fixed bottom-0 left-0 right-0 z-[998] h-[60px] bg-white border-t-[2px] border-t-[var(--teal)] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center justify-between px-[20px] md:px-[32px]"
+          className="hidden lg:flex fixed bottom-0 left-0 right-0 z-[998] h-[60px] bg-white border-t-[2px] border-t-[var(--teal)] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] items-center justify-between px-[20px] md:px-[32px]"
         >
           <div className="flex items-center">
             <span className="font-['Inter'] font-[600] text-[14px] text-[var(--dark)]">
