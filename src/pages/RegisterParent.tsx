@@ -128,8 +128,8 @@ const RegisterParent = () => {
           alternative_phone: v.altPhone || undefined,
           blood_group: v.bloodGroup,
           plan_label: selectedPlan.label,
-          success_url: `${window.location.origin}/thank-you?cause=goldenage&amount=${selectedPlan.amount}&name=${encodeURIComponent(v.fullName)}`,
-          cancel_url: window.location.href,
+          success_url: `${window.location.origin}/donation-complete?gateway=goldenage&amount=${selectedPlan.amount}&name=${encodeURIComponent(v.fullName)}`,
+          cancel_url: `${window.location.origin}/donation-cancelled?gateway=goldenage&amount=${selectedPlan.amount}&name=${encodeURIComponent(v.fullName)}`,
         },
       });
       if (error) throw error;
