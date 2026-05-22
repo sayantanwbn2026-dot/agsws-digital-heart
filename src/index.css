@@ -835,6 +835,22 @@ body::before {
 .cms-shell [aria-label="Drag to reorder"] { color: var(--cms-text-dim); }
 .cms-shell [aria-label="Drag to reorder"]:hover { color: var(--cms-text-mid); }
 
+/* Disable global floating-label system inside the CMS — labels stay block-level */
+.cms-shell div:has(> label + input) > label,
+.cms-shell div:has(> label + textarea) > label,
+.cms-shell div:has(> label + select) > label,
+.cms-shell div:has(> input + label) > label,
+.cms-shell div:has(> textarea + label) > label,
+.cms-shell div:has(> select + label) > label {
+  position: static !important;
+  transform: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  pointer-events: auto !important;
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
 /* Image upload dropzone — tighter, less colorful */
 .cms-shell .border-dashed { border-color: var(--cms-border-strong) !important; }
 .cms-shell .border-dashed:hover { border-color: var(--cms-text-dim) !important; }
