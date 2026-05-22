@@ -1,9 +1,10 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion } from "framer-motion";
-import { Check, Stethoscope, GraduationCap, Heart, Printer, Share2, ArrowRight, TrendingUp, Users, ShieldCheck } from "lucide-react";
+import { Check, Stethoscope, GraduationCap, Heart, Printer, Share2, ArrowRight, TrendingUp, Users, ShieldCheck, Download } from "lucide-react";
 import { useEffect, useRef } from "react";
 import FadeInUp from "@/components/ui/FadeInUp";
+import { jsPDF } from "jspdf";
 
 const gatewayConfig: Record<string, { icon: typeof Stethoscope; color: string; gradient: string; label: string }> = {
   medical: { icon: Stethoscope, color: "var(--teal)", gradient: "from-[var(--teal)] to-[var(--teal-dark)]", label: "Medical Aid" },
@@ -32,6 +33,96 @@ const DonationComplete = () => {
 
   const referralUrl = `${window.location.origin}/donate/${gateway}?ref=${name.split(" ")[0].toLowerCase()}${new Date().getFullYear()}`;
   const whatsappShareText = encodeURIComponent(`I just donated ₹${amountNum.toLocaleString("en-IN")} to AGSWS — a Kolkata NGO providing medical aid and education support.\n\nJoin me: ${referralUrl}`);
+
+  const downloadReceipt = () => {
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const W = doc.internal.pageSize.getWidth();
+    const M = 48;
+    const today = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    const receiptNo = `AGSWS-${(paymentId || Date.now().toString()).slice(-10).toUpperCase()}`;
+
+    // Header band
+    doc.setFillColor(31, 154, 168);
+    doc.rect(0, 0, W, 90, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("AGSWS", M, 42);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Donation Receipt", M, 62);
+    doc.setFontSize(9);
+    doc.text(`Receipt #: ${receiptNo}`, W - M, 42, { align: "right" });
+    doc.text(`Date: ${today}`, W - M, 58, { align: "right" });
+
+    // Body
+    doc.setTextColor(20, 20, 20);
+    let y = 140;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text(`Thank you, ${name}.`, M, y);
+    y += 22;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(80, 80, 80);
+    const intro = doc.splitTextToSize(
+      "We gratefully acknowledge receipt of your contribution towards AGSWS. Your generosity directly supports families in Kolkata through medical aid, education, and GoldenAge Care.",
+      W - M * 2
+    );
+    doc.text(intro, M, y);
+    y += intro.length * 14 + 18;
+
+    // Box
+    doc.setDrawColor(220, 220, 220);
+    doc.roundedRect(M, y, W - M * 2, 130, 8, 8);
+    const rows: [string, string][] = [
+      ["Donor Name", name],
+      ["Cause", config.label],
+      ["Payment ID", paymentId || "Processing"],
+      ["Date", today],
+      ["Amount", `INR ${amountNum.toLocaleString("en-IN")}`],
+    ];
+    let ry = y + 24;
+    rows.forEach(([k, v]) => {
+      doc.setTextColor(120, 120, 120);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.text(k.toUpperCase(), M + 18, ry);
+      doc.setTextColor(20, 20, 20);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text(String(v), W - M - 18, ry, { align: "right" });
+      ry += 22;
+    });
+    y += 150;
+
+    // 80G note
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(20, 20, 20);
+    doc.text("Tax Exemption (80G)", M, y);
+    y += 16;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    const note = doc.splitTextToSize(
+      "Donations to AGSWS are eligible for tax deduction under Section 80G of the Income Tax Act, 1961. A signed 80G certificate will be emailed separately within 7 working days.",
+      W - M * 2
+    );
+    doc.text(note, M, y);
+    y += note.length * 14 + 30;
+
+    // Footer
+    doc.setDrawColor(230, 230, 230);
+    doc.line(M, y, W - M, y);
+    y += 22;
+    doc.setFontSize(9);
+    doc.setTextColor(120, 120, 120);
+    doc.text("AGSWS — Kolkata, West Bengal, India", M, y);
+    doc.text("support@agsws.org  ·  agsws.org", W - M, y, { align: "right" });
+
+    doc.save(`AGSWS-Receipt-${receiptNo}.pdf`);
+  };
 
   const impactItems = gateway === "medical" 
     ? [{ label: "Medicines Funded", value: `${Math.ceil(amountNum / 500)} months` }, { label: "Patients Supported", value: `${Math.max(1, Math.floor(amountNum / 2000))}` }, { label: "Cause", value: "Medical Aid" }]
@@ -90,11 +181,14 @@ const DonationComplete = () => {
             </div>
             <p className="text-[12px] sm:text-[13px] text-[var(--mid)] mb-4 sm:mb-5 leading-[1.6]">A confirmation receipt has been emailed to you. You can also print this page for your records.</p>
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2.5 sm:gap-3">
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => window.print()} className="h-[46px] sm:h-[44px] px-6 bg-[var(--yellow)] text-[var(--dark)] font-[600] text-[13px] rounded-full shadow-[var(--shadow-yellow)] flex items-center justify-center gap-2">
-                <Printer size={14} /> Print Receipt
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={downloadReceipt} className="h-[46px] sm:h-[44px] px-6 bg-[var(--yellow)] text-[var(--dark)] font-[600] text-[13px] rounded-full shadow-[var(--shadow-yellow)] flex items-center justify-center gap-2">
+                <Download size={14} /> Download Receipt
               </motion.button>
+              <button onClick={() => window.print()} className="h-[46px] sm:h-[44px] px-6 border-[1.5px] border-[var(--border-color)] text-[var(--dark)] font-[600] text-[13px] rounded-full flex items-center justify-center gap-2 hover:bg-[var(--bg)] transition-all">
+                <Printer size={14} /> Print
+              </button>
               <a href={`https://wa.me/?text=${whatsappShareText}`} target="_blank" rel="noopener noreferrer" className="h-[46px] sm:h-[44px] px-6 border-[1.5px] border-[#25D366] text-[#25D366] font-[600] text-[13px] rounded-full flex items-center justify-center gap-2 hover:bg-[#25D366] hover:text-white transition-all">
-                <Share2 size={14} /> Share on WhatsApp
+                <Share2 size={14} /> Share
               </a>
             </div>
           </div>
