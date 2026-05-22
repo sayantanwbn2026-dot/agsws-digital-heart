@@ -77,7 +77,7 @@ const AdminLogin = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@agsws.org"
-                className="w-full h-12 px-4 rounded-xl border border-border bg-background text-sm focus:outline-none transition-all"
+                className="no-float w-full h-12 px-4 rounded-xl border border-border bg-background text-sm focus:outline-none transition-all"
                 required
               />
             </div>
@@ -89,7 +89,7 @@ const AdminLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full h-12 px-4 pr-12 rounded-xl border border-border bg-background text-sm focus:outline-none transition-all"
+                  className="no-float w-full h-12 px-4 pr-12 rounded-xl border border-border bg-background text-sm focus:outline-none transition-all"
                   required
                 />
                 <button
