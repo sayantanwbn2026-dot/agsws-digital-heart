@@ -782,8 +782,8 @@ body::before {
     max-width: 84vw;
     transform: translateX(-102%);
     transition: transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 24px 64px -24px rgba(31,29,26,0.28);
-    z-index: 60;
+    box-shadow: 0 24px 64px -24px rgba(31,29,26,0.28) !important;
+    z-index: 60 !important;
   }
   .cms-shell.cms-mobile-open .cms-sidebar {
     transform: translateX(0);
