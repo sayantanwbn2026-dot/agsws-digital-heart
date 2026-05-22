@@ -598,101 +598,145 @@ body::before {
 }
 
 /* =========================================
-   PART 15 — CMS SHELL (Linear / Notion style)
+   PART 15 — CMS SHELL (Paper & Ink · SaaS)
    Scoped to .cms-shell on the admin pages.
+   Palette: warm off-white paper + ink + teal accent.
+   Type: Sora (display) + Manrope (UI/body).
 ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+
 .cms-shell {
-  /* Neutral, low-contrast palette inspired by Linear & Notion. We reuse
-     the public-site shadcn tokens but flatten accents to graphite so the
-     admin stops feeling like a marketing page. */
-  --cms-bg:        #FAFAFA;
+  /* Paper & Ink — warm, editorial neutrals with a single teal accent */
+  --cms-bg:        #F5F3EE;
   --cms-surface:   #FFFFFF;
-  --cms-surface-2: #F5F5F4;
-  --cms-border:    #E7E5E4;
-  --cms-border-strong: #D6D3D1;
-  --cms-text:      #1C1917;
-  --cms-text-mid:  #57534E;
-  --cms-text-dim:  #A8A29E;
-  --cms-accent:    #18181B;          /* near-black accent like Linear */
-  --cms-accent-soft: rgba(24,24,27,0.06);
-  --cms-focus:     rgba(24,24,27,0.18);
+  --cms-surface-2: #EFEBE3;
+  --cms-surface-3: #E8E4DD;
+  --cms-border:    #E2DDD2;
+  --cms-border-strong: #C9C2B3;
+  --cms-text:      #1F1D1A;
+  --cms-text-mid:  #6B6760;
+  --cms-text-dim:  #A39E92;
+  --cms-accent:    #1F9AA8;          /* AGSWS teal */
+  --cms-accent-hover: #197F8A;
+  --cms-accent-soft: rgba(31,154,168,0.10);
+  --cms-accent-tint: rgba(31,154,168,0.06);
+  --cms-focus:     rgba(31,154,168,0.28);
   --cms-success:   #15803D;
   --cms-warn:      #B45309;
   --cms-danger:    #B91C1C;
 
   background: var(--cms-bg);
   color: var(--cms-text);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  font-feature-settings: "cv11", "ss01", "ss03";
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
 }
 
-/* Dense, flat surface */
-.cms-shell .cms-surface { background: var(--cms-surface); border: 1px solid var(--cms-border); border-radius: 10px; }
+/* Spacious, paper-like surfaces */
+.cms-shell .cms-surface { background: var(--cms-surface); border: 1px solid var(--cms-border); border-radius: 14px; }
 .cms-shell .cms-surface-flat { background: var(--cms-surface); border-bottom: 1px solid var(--cms-border); }
 
-/* Typography overrides — tighter headings inside CMS only */
-.cms-shell h1, .cms-shell h2, .cms-shell h3, .cms-shell h4 { color: var(--cms-text); max-width: none; letter-spacing: -0.012em; }
-.cms-shell p, .cms-shell li, .cms-shell span { line-height: 1.5; max-width: none; }
+/* Display / UI typography — Sora for headings, Manrope for body */
+.cms-shell h1, .cms-shell h2, .cms-shell h3, .cms-shell h4 {
+  font-family: 'Sora', 'Manrope', sans-serif;
+  color: var(--cms-text);
+  max-width: none;
+  letter-spacing: -0.022em;
+  font-weight: 600;
+}
+.cms-shell p, .cms-shell li, .cms-shell span, .cms-shell label, .cms-shell button, .cms-shell input, .cms-shell textarea, .cms-shell select {
+  font-family: 'Manrope', sans-serif;
+}
+.cms-shell p, .cms-shell li, .cms-shell span { line-height: 1.55; max-width: none; }
 .cms-shell .text-foreground { color: var(--cms-text) !important; }
 .cms-shell .text-muted-foreground { color: var(--cms-text-mid) !important; }
 
-/* Override shadcn primary inside the CMS so the admin feels neutral */
+/* Map shadcn primary tokens onto the teal accent inside the CMS */
 .cms-shell .text-primary { color: var(--cms-accent) !important; }
 .cms-shell .bg-primary { background: var(--cms-accent) !important; color: #fff !important; }
 .cms-shell .bg-primary\/10 { background: var(--cms-accent-soft) !important; }
-.cms-shell .bg-primary\/5 { background: rgba(24,24,27,0.035) !important; }
-.cms-shell .border-primary\/20 { border-color: rgba(24,24,27,0.14) !important; }
-.cms-shell .border-primary\/30 { border-color: rgba(24,24,27,0.2) !important; }
-.cms-shell .ring-primary\/20 { --tw-ring-color: rgba(24,24,27,0.18) !important; }
-.cms-shell .focus\:ring-primary\/20:focus { --tw-ring-color: rgba(24,24,27,0.18) !important; }
+.cms-shell .bg-primary\/5 { background: var(--cms-accent-tint) !important; }
+.cms-shell .border-primary\/20 { border-color: rgba(31,154,168,0.22) !important; }
+.cms-shell .border-primary\/30 { border-color: rgba(31,154,168,0.32) !important; }
+.cms-shell .ring-primary\/20 { --tw-ring-color: var(--cms-focus) !important; }
+.cms-shell .focus\:ring-primary\/20:focus { --tw-ring-color: var(--cms-focus) !important; }
 .cms-shell .text-primary-foreground { color: #fff !important; }
 .cms-shell .hover\:text-primary:hover { color: var(--cms-accent) !important; }
-.cms-shell .hover\:border-primary\/30:hover { border-color: rgba(24,24,27,0.2) !important; }
+.cms-shell .hover\:border-primary\/30:hover { border-color: rgba(31,154,168,0.32) !important; }
 
-/* Borders & cards — flatter */
+/* Borders & cards — paper-warm, slightly raised */
 .cms-shell .border-border { border-color: var(--cms-border) !important; }
 .cms-shell .bg-card { background: var(--cms-surface) !important; }
 .cms-shell .bg-background { background: var(--cms-bg) !important; }
 .cms-shell .bg-muted { background: var(--cms-surface-2) !important; }
-.cms-shell .bg-muted\/30 { background: rgba(245,245,244,0.45) !important; }
-.cms-shell .bg-muted\/50 { background: rgba(245,245,244,0.65) !important; }
-.cms-shell .bg-muted\/60 { background: rgba(245,245,244,0.75) !important; }
-.cms-shell .bg-muted\/80 { background: rgba(245,245,244,0.92) !important; }
+.cms-shell .bg-muted\/30 { background: rgba(232,228,221,0.45) !important; }
+.cms-shell .bg-muted\/50 { background: rgba(232,228,221,0.65) !important; }
+.cms-shell .bg-muted\/60 { background: rgba(232,228,221,0.78) !important; }
+.cms-shell .bg-muted\/80 { background: rgba(232,228,221,0.92) !important; }
 
 /* Subtle button hover */
-.cms-shell button { transition: background-color 100ms ease, color 100ms ease, border-color 100ms ease; }
+.cms-shell button { transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease, transform 140ms ease; }
 
-/* Sidebar specific */
-.cms-sidebar { background: var(--cms-surface); border-right: 1px solid var(--cms-border); }
-.cms-sidebar nav button { font-weight: 500; }
-.cms-sidebar .cms-nav-active { background: var(--cms-accent-soft); color: var(--cms-text); }
+/* Sidebar — paper surface, ink active state with teal indicator */
+.cms-sidebar {
+  background: var(--cms-surface);
+  border-right: 1px solid var(--cms-border);
+  box-shadow: 1px 0 0 rgba(0,0,0,0.01);
+}
+.cms-sidebar nav button {
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+}
+.cms-sidebar .cms-nav-active {
+  background: var(--cms-accent-soft) !important;
+  color: var(--cms-accent) !important;
+  position: relative;
+}
+.cms-sidebar .cms-nav-active::before {
+  content: '';
+  position: absolute;
+  left: -2px; top: 6px; bottom: 6px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--cms-accent);
+}
 .cms-sidebar .cms-nav-group-label {
+  font-family: 'Sora', sans-serif;
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--cms-text-dim);
-  padding: 12px 12px 6px;
+  padding: 14px 12px 6px;
 }
 
-/* Top bar */
-.cms-topbar { background: var(--cms-surface); border-bottom: 1px solid var(--cms-border); height: 48px; }
+/* Top bar — taller, more breathing room */
+.cms-topbar {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid var(--cms-border);
+  height: 60px;
+}
+.cms-topbar .cms-breadcrumb-sep { color: var(--cms-text-dim); }
 
 /* Tables/rows hover */
 .cms-shell .row-hover:hover { background: var(--cms-surface-2); }
 
-/* Inputs */
+/* Inputs — softer, more spacious */
 .cms-shell input, .cms-shell select, .cms-shell textarea {
   background: var(--cms-surface);
   border: 1px solid var(--cms-border);
   color: var(--cms-text);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 .cms-shell input:focus, .cms-shell select:focus, .cms-shell textarea:focus {
   outline: none;
-  border-color: var(--cms-border-strong);
-  box-shadow: 0 0 0 3px var(--cms-focus);
+  border-color: var(--cms-accent);
+  box-shadow: 0 0 0 4px var(--cms-focus);
 }
 
 /* Kbd-like chip */
@@ -708,15 +752,61 @@ body::before {
 
 /* ─── Editor surface polish (modals, rows, toolbars) ─── */
 
-/* Cards/containers inside the CMS feel flatter: thin border, no chunky shadow */
-.cms-shell .shadow-sm,
+/* Cards — soft paper shadow, generous radii */
+.cms-shell .shadow-sm { box-shadow: 0 1px 0 rgba(31,29,26,0.04) !important; }
 .cms-shell .shadow,
-.cms-shell .shadow-md { box-shadow: none !important; }
-.cms-shell .shadow-2xl { box-shadow: 0 12px 32px -12px rgba(24,24,27,0.18), 0 2px 6px rgba(24,24,27,0.06) !important; }
+.cms-shell .shadow-md { box-shadow: 0 1px 2px rgba(31,29,26,0.04), 0 1px 0 rgba(31,29,26,0.03) !important; }
+.cms-shell .shadow-2xl { box-shadow: 0 24px 48px -20px rgba(31,29,26,0.20), 0 2px 6px rgba(31,29,26,0.06) !important; }
 
-/* Rounded corners — Linear/Notion uses slightly tighter radii */
-.cms-shell .rounded-xl { border-radius: 10px !important; }
-.cms-shell .rounded-2xl { border-radius: 12px !important; }
+/* Rounded corners — editorial / paper feel */
+.cms-shell .rounded-xl { border-radius: 14px !important; }
+.cms-shell .rounded-2xl { border-radius: 18px !important; }
+
+/* Buttons — primary teal, refined hover */
+.cms-shell button.bg-primary:hover { background: var(--cms-accent-hover) !important; }
+
+/* =========================================
+   Mobile drawer — sidebar slides in from left
+========================================= */
+.cms-shell .cms-mobile-trigger { display: none; }
+.cms-shell .cms-backdrop { display: none; }
+
+@media (max-width: 1023px) {
+  .cms-shell .cms-mobile-trigger { display: inline-flex; }
+
+  .cms-sidebar {
+    position: fixed !important;
+    top: 0; left: 0; bottom: 0;
+    height: 100dvh !important;
+    width: 280px !important;
+    max-width: 84vw;
+    transform: translateX(-102%);
+    transition: transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 24px 64px -24px rgba(31,29,26,0.28);
+    z-index: 60;
+  }
+  .cms-shell.cms-mobile-open .cms-sidebar {
+    transform: translateX(0);
+  }
+  .cms-shell.cms-mobile-open .cms-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(31,29,26,0.45);
+    backdrop-filter: blur(2px);
+    z-index: 55;
+    animation: cms-fade-in 200ms ease;
+  }
+  @keyframes cms-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .cms-topbar { height: 56px; padding-left: 12px !important; padding-right: 12px !important; }
+  .cms-shell main { padding: 16px !important; }
+}
+
+@media (min-width: 1024px) {
+  .cms-shell main { padding: 32px 40px !important; }
+  .cms-topbar { padding-left: 28px !important; padding-right: 28px !important; }
+}
 
 /* Modal backdrop lighter, less blur */
 .cms-shell .fixed.inset-0.bg-black\/50 { background: rgba(24,24,27,0.32) !important; }
