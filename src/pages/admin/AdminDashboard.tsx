@@ -8,7 +8,7 @@ import {
   TrendingUp, Eye, Mail, ClipboardList, CreditCard,
   BarChart3, PieChart, Activity, Download, ExternalLink,
   AlertTriangle, CheckCircle, Clock, RefreshCw, FileDown,
-  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home, MapPin, Film
+  Globe, Shield, FolderOpen, Search, CalendarClock, FileSearch, Upload, Home, MapPin, Film, Menu, X
 } from "lucide-react";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, Legend, AreaChart, Area } from "recharts";
 import CMSContentEditor, { type FieldConfig } from "./components/CMSContentEditor";
@@ -1356,6 +1356,7 @@ const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<str
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [allData, setAllData] = useState<Record<string, any[]>>({});
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
@@ -1627,7 +1628,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="cms-shell min-h-screen flex">
+    <div className={`cms-shell min-h-screen flex ${mobileOpen ? 'cms-mobile-open' : ''}`}>
+      {/* Mobile backdrop */}
+      <div className="cms-backdrop" onClick={() => setMobileOpen(false)} aria-hidden="true" />
       {/* Sidebar */}
       <motion.aside
         animate={{ width: collapsed ? 68 : 260 }}
@@ -1643,9 +1646,18 @@ const AdminDashboard = () => {
             </div>
           )}
           {collapsed && <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center mx-auto"><Database size={12} className="text-primary-foreground" /></div>}
-          <button onClick={() => setCollapsed(!collapsed)} className={`p-1 rounded-md hover:bg-muted transition-colors text-muted-foreground ${collapsed ? 'mx-auto mt-2' : ''}`}>
-            {collapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="lg:hidden p-1 rounded-md hover:bg-muted transition-colors text-muted-foreground"
+              aria-label="Close menu"
+            >
+              <X size={16} />
+            </button>
+            <button onClick={() => setCollapsed(!collapsed)} className={`hidden lg:inline-flex p-1 rounded-md hover:bg-muted transition-colors text-muted-foreground ${collapsed ? 'mx-auto mt-2' : ''}`}>
+              {collapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}
+            </button>
+          </div>
         </div>
 
         {/* Sidebar search */}
@@ -1677,7 +1689,7 @@ const AdminDashboard = () => {
               return (
                 <button
                   key={section.id}
-                  onClick={() => setActiveSection(section.id)}
+                  onClick={() => { setActiveSection(section.id); setMobileOpen(false); }}
                   className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[12.5px] font-medium transition-colors ${
                     isActive
                       ? 'cms-nav-active'
@@ -1738,28 +1750,35 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="cms-topbar flex items-center justify-between px-5 sticky top-0 z-10">
-          <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+          <div className="flex items-center gap-2 text-[12px] text-muted-foreground min-w-0">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="cms-mobile-trigger items-center justify-center w-9 h-9 -ml-1 rounded-lg hover:bg-muted text-foreground"
+              aria-label="Open menu"
+            >
+              <Menu size={18} />
+            </button>
             {(currentSection as any).group && (
               <>
-                <span>{(currentSection as any).group}</span>
-                <span className="text-muted-foreground/60">/</span>
+                <span className="hidden sm:inline">{(currentSection as any).group}</span>
+                <span className="hidden sm:inline cms-breadcrumb-sep">/</span>
               </>
             )}
-            <span className="text-foreground font-medium">{currentSection.label}</span>
+            <span className="text-foreground font-semibold text-[13px] sm:text-[13px] truncate" style={{ fontFamily: 'Sora, sans-serif' }}>{currentSection.label}</span>
             {currentSection.table && (
-              <span className="cms-kbd ml-2">{currentSection.table}</span>
+              <span className="cms-kbd ml-2 hidden md:inline">{currentSection.table}</span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <a
               href="/?preview=1"
               target="_blank"
               rel="noopener"
               title="Open the live site with drafts and unpublished items visible"
-              className="flex items-center gap-1.5 h-7 px-2.5 rounded-md text-[11.5px] font-semibold text-white hover:opacity-90 transition-opacity"
-              style={{ background: 'linear-gradient(90deg, hsl(187 68% 32%), hsl(242 35% 42%))' }}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-[12px] font-semibold text-white hover:opacity-90 transition-opacity shadow-sm"
+              style={{ background: 'linear-gradient(135deg, #1F9AA8, #197F8A)' }}
             >
-              <Eye size={12} /> Preview Site
+              <Eye size={13} /> <span className="hidden sm:inline">Preview Site</span>
             </a>
             {previewUrls[activeSection] && (
               <a
@@ -1767,14 +1786,14 @@ const AdminDashboard = () => {
                 target="_blank"
                 rel="noopener"
                 title="Open this page with drafts and unpublished items visible"
-                className="flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[11.5px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                className="hidden md:flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
               >
-                <Eye size={12} /> Preview Page
+                <Eye size={13} /> Preview Page
               </a>
             )}
             {!currentSection.isOverview && !currentSection.singleRow && !currentSection.isCustom && allData[activeSection]?.length > 0 && (
-              <button onClick={() => exportToCSV(allData[activeSection], activeSection)} className="flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-border text-[11.5px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
-                <Download size={12} /> Export
+              <button onClick={() => exportToCSV(allData[activeSection], activeSection)} className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border text-[12px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                <Download size={13} /> Export
               </button>
             )}
           </div>
