@@ -13,6 +13,7 @@ import PageHero from "@/components/layout/PageHero";
 import toast from "react-hot-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { createStripeCheckoutRedirect } from "@/lib/stripeCheckout";
+import { PremiumInput, PremiumTextarea } from "@/components/ui/PremiumFormElements";
 
 const donorSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -199,22 +200,12 @@ const DonateEducation = () => {
             <AnimatePresence>
               {currentAmount > 0 && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-8">
-                      {([["name", "Full Name", "text"], ["email", "Email Address", "email"]] as const).map(([name, label, type]) => (
-                        <div key={name}>
-                          <label className="text-sm font-medium text-[var(--dark)] mb-1 block">{label}</label>
-                          <input placeholder=" " {...register(name)} type={type} className={`w-full h-12 px-4 border rounded-lg bg-white outline-none transition-all focus:border-[var(--purple)] focus:ring-2 focus:ring-[var(--purple)]/15 ${errors[name] ? "border-[#DC2626]" : "border-[var(--border-color)]"}`} />
-                          {errors[name] && <p className="text-xs text-[#DC2626] mt-1">{String(errors[name]?.message)}</p>}
-                        </div>
-                      ))}
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <PremiumInput label="Full Name" required placeholder="Your full name" {...register("name")} error={errors.name?.message as string} />
+                      <PremiumInput label="Email Address" required type="email" placeholder="you@example.com" {...register("email")} error={errors.email?.message as string} />
                     </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-[var(--dark)] mb-1 block">Phone Number</label>
-                      <input placeholder=" " {...register("phone")} type="tel" className={`w-full h-12 px-4 border rounded-lg bg-white outline-none transition-all focus:border-[var(--purple)] focus:ring-2 focus:ring-[var(--purple)]/15 ${errors.phone ? "border-[#DC2626]" : "border-[var(--border-color)]"}`} />
-                      {errors.phone && <p className="text-xs text-[#DC2626] mt-1">{String(errors.phone?.message)}</p>}
-                    </div>
+                    <PremiumInput label="Phone Number" required type="tel" placeholder="+91 98XXXXXXXX" {...register("phone")} error={errors.phone?.message as string} />
 
                     <label className="flex items-center gap-3 cursor-pointer py-3 mt-2">
                       <input placeholder=" " {...register("showOnWall")} type="checkbox" className="w-[18px] h-[18px] rounded border-[1.5px] border-[var(--border-color)] text-[var(--purple)] focus:ring-[var(--purple)]" />
@@ -229,13 +220,13 @@ const DonateEducation = () => {
 
                     <AnimatePresence>
                       {isGift && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-4 border border-[var(--border-color)] bg-white rounded-xl p-6 overflow-hidden">
-                          <p className="text-[13px] font-bold text-[var(--purple)] uppercase tracking-wider mb-2">Gift recipient details</p>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-8">
-                            <input {...register("giftRecipientName")} placeholder="Recipient's Name" className="w-full h-12 px-4 border border-[var(--border-color)] rounded-lg bg-white outline-none focus:border-[var(--purple)] focus:ring-2 focus:ring-[var(--purple)]/15" />
-                            <input {...register("giftRecipientEmail")} placeholder="Recipient's Email" type="email" className="w-full h-12 px-4 border border-[var(--border-color)] rounded-lg bg-white outline-none focus:border-[var(--purple)] focus:ring-2 focus:ring-[var(--purple)]/15" />
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-5 border border-[var(--border-color)] bg-white rounded-2xl p-6 overflow-hidden">
+                          <p className="text-[11px] font-[700] text-[var(--purple)] uppercase tracking-[0.12em]">Gift recipient details</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <PremiumInput label="Recipient's Name" placeholder="Their full name" {...register("giftRecipientName")} />
+                            <PremiumInput label="Recipient's Email" type="email" placeholder="their@email.com" {...register("giftRecipientEmail")} />
                           </div>
-                          <textarea {...register("giftMessage")} placeholder="Personal message (optional)" maxLength={200} rows={3} className="w-full p-4 border border-[var(--border-color)] rounded-lg bg-white outline-none focus:border-[var(--purple)] focus:ring-2 focus:ring-[var(--purple)]/15 resize-none" />
+                          <PremiumTextarea label="Personal Message (Optional)" placeholder="Add a note for the recipient…" maxLength={200} rows={3} {...register("giftMessage")} />
                         </motion.div>
                       )}
                     </AnimatePresence>
