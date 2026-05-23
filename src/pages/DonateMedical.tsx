@@ -162,7 +162,8 @@ const DonateMedical = () => {
                     min={1}
                     value={customAmount}
                     onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(null); }}
-                    className="no-float w-full h-[52px] pl-10 pr-4 bg-white border-[1.5px] border-[var(--border-color)] rounded-[14px] text-[18px] font-[600] font-['Inter'] text-[var(--dark)] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] hover:border-[var(--mid)]/40 focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.10),inset_0_1px_0_rgba(0,0,0,0.02)] outline-none transition-all duration-300 placeholder:text-[var(--light)]/60 placeholder:font-[400] placeholder:text-[14px]"
+                    style={{ paddingLeft: 40, paddingRight: 16 }}
+                    className="no-float w-full h-[52px] bg-white border-[1.5px] border-[var(--border-color)] rounded-[14px] text-[18px] font-[600] font-['Inter'] text-[var(--dark)] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] hover:border-[var(--mid)]/40 focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.10),inset_0_1px_0_rgba(0,0,0,0.02)] outline-none transition-all duration-300 placeholder:text-[var(--light)]/60 placeholder:font-[400] placeholder:text-[14px]"
                     placeholder="Enter amount"
                   />
                 </div>
