@@ -12,6 +12,7 @@ import PageHero from "@/components/layout/PageHero";
 import toast from "react-hot-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { createStripeCheckoutRedirect } from "@/lib/stripeCheckout";
+import { PremiumInput, PremiumTextarea } from "@/components/ui/PremiumFormElements";
 
 const donorSchema = z.object({
   name: z.string().min(2, "Name is required"),
