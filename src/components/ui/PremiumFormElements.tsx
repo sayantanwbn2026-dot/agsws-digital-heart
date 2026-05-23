@@ -12,10 +12,11 @@ export const PremiumInput = React.forwardRef<
       {props.required && <span className="text-[#DC2626] ml-0.5">*</span>}
     </label>
     <div className="relative">
-      {icon && <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--light)] group-focus-within:text-[var(--teal)] transition-colors duration-200 pointer-events-none">{icon}</span>}
+      {icon && <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--light)] group-focus-within:text-[var(--teal)] transition-colors duration-200 pointer-events-none z-10">{icon}</span>}
       <input
         ref={ref}
         {...props}
+        style={{ ...(icon ? { paddingLeft: 44 } : null), ...(props.style || {}) }}
         className={cn(
           // Slightly tighter height + softer inner shadow for a more
           // refined, premium feel without changing layout sizing.
@@ -25,7 +26,6 @@ export const PremiumInput = React.forwardRef<
           "focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.10),inset_0_1px_0_rgba(0,0,0,0.02)]",
           "placeholder:text-[var(--light)]/60",
           error && "border-[#DC2626] focus:border-[#DC2626] focus:shadow-[0_0_0_4px_rgba(220,38,38,0.10)]",
-          icon && "pl-11",
           className
         )}
       />
