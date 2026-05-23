@@ -172,12 +172,22 @@ const DonateEducation = () => {
               </div>
 
               <div className="mb-8">
-                <label className="text-[14px] text-[var(--mid)] mb-2 block font-medium">Or enter custom amount</label>
-                <div className="relative">
-                  <span className="absolute left-[14px] top-1/2 -translate-y-1/2 text-[16px] font-[600] font-['Inter'] text-[var(--purple)]">₹</span>
-                  <input type="number" value={customAmount} onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(null); }}
-                    className="w-full h-[52px] pl-[28px] pr-[16px] border-[1.5px] border-[var(--border-color)] rounded-[var(--radius-md)] text-[18px] font-[500] font-['Inter'] text-[var(--dark)] focus:border-[var(--purple)] focus:shadow-[0_0_0_3px_rgba(31,154,168,0.12)] outline-none transition-all no-float"
-                    placeholder="Enter amount" />
+                <label className="text-[11px] font-[600] uppercase tracking-[0.12em] text-[var(--mid)] mb-2 block">
+                  Or enter custom amount
+                </label>
+                <div className="relative group">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[16px] font-[600] font-['Inter'] text-[var(--purple)] pointer-events-none select-none">
+                    ₹
+                  </span>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    value={customAmount}
+                    onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(null); }}
+                    className="no-float w-full h-[52px] pl-10 pr-4 bg-white border-[1.5px] border-[var(--border-color)] rounded-[14px] text-[18px] font-[600] font-['Inter'] text-[var(--dark)] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] hover:border-[var(--mid)]/40 focus:border-[var(--purple)] focus:shadow-[0_0_0_4px_rgba(168,85,247,0.12),inset_0_1px_0_rgba(0,0,0,0.02)] outline-none transition-all duration-300 placeholder:text-[var(--light)]/60 placeholder:font-[400] placeholder:text-[14px]"
+                    placeholder="Enter amount"
+                  />
                 </div>
               </div>
             </FadeInUp>
