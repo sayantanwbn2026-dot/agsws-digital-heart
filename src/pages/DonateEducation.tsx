@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { createStripeCheckoutRedirect } from "@/lib/stripeCheckout";
 import { PremiumInput, PremiumTextarea } from "@/components/ui/PremiumFormElements";
+import { sanitizeINRInput, formatINR, validateINRAmount, INR_MAX } from "@/lib/inrAmount";
 
 const donorSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -95,7 +96,8 @@ const DonateEducation = () => {
   }, [setValue]);
 
   const onSubmit = async (data: DonorFormData) => {
-    if (!currentAmount || currentAmount < 1) { toast.error("Please select or enter a donation amount."); return; }
+    const check = validateINRAmount(currentAmount);
+    if (!check.ok) { toast.error(check.message || "Please select or enter a valid amount."); return; }
     const checkoutRedirect = createStripeCheckoutRedirect();
     setIsSubmitting(true);
     try {
@@ -181,16 +183,22 @@ const DonateEducation = () => {
                     ₹
                   </span>
                   <input
-                    type="number"
+                    type="text"
                     inputMode="numeric"
-                    min={1}
-                    value={customAmount}
-                    onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(null); }}
+                    pattern="[0-9]*"
+                    autoComplete="off"
+                    maxLength={7}
+                    value={customAmount ? formatINR(customAmount) : ""}
+                    onChange={(e) => { setCustomAmount(sanitizeINRInput(e.target.value)); setSelectedAmount(null); }}
                     style={{ paddingLeft: 40, paddingRight: 16 }}
                     className="no-float w-full h-[52px] bg-white border-[1.5px] border-[var(--border-color)] rounded-[14px] text-[18px] font-[600] font-['Inter'] text-[var(--dark)] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] hover:border-[var(--mid)]/40 focus:border-[var(--purple)] focus:shadow-[0_0_0_4px_rgba(168,85,247,0.12),inset_0_1px_0_rgba(0,0,0,0.02)] outline-none transition-all duration-300 placeholder:text-[var(--light)]/60 placeholder:font-[400] placeholder:text-[14px]"
                     placeholder="Enter amount"
+                    aria-label="Custom donation amount in rupees"
                   />
                 </div>
+                {customAmount && parseInt(customAmount) >= INR_MAX && (
+                  <p className="text-[11px] text-[var(--mid)] mt-1.5">Maximum donation is ₹{formatINR(INR_MAX)}.</p>
+                )}
               </div>
             </FadeInUp>
 
