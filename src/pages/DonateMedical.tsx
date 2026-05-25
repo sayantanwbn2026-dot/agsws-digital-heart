@@ -175,8 +175,6 @@ const DonateMedical = () => {
                 {customAmount && parseInt(customAmount) >= INR_MAX && (
                   <p className="text-[11px] text-[var(--mid)] mt-1.5">Maximum donation is ₹{formatINR(INR_MAX)}.</p>
                 )}
-                <div className="hidden">
-                </div>
               </div>
             </FadeInUp>
 
