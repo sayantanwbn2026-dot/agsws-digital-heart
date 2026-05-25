@@ -374,6 +374,22 @@ body {
   .container { padding: 0 16px; }
 }
 
+/* Global mobile safety net (390 / 430 / 768).
+ * Prevents horizontal scroll caused by stray fixed-width children, makes
+ * media fluid, and ensures interactive controls meet the 44px tap-target
+ * baseline. Applied site-wide so individual pages do not need to repeat it. */
+html, body { overflow-x: hidden; }
+img, video, svg { max-width: 100%; height: auto; }
+@media (max-width: 640px) {
+  /* Side-by-side groupings that use `flex` without responsive collapse get
+   * a sensible fallback to column layout on small phones. Opt out per node
+   * with the `mobile-row` utility below when an inline row is required. */
+  .stack-mobile { flex-direction: column !important; }
+  /* Tap targets — buttons and link-buttons stay above the 44px floor. */
+  button:not(.btn-tight), a[role="button"]:not(.btn-tight) { min-height: 44px; }
+}
+.mobile-row { flex-direction: row !important; }
+
 /* Section spacing */
 .section {
   padding: var(--section-y) 0;
