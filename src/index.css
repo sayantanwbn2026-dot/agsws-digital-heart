@@ -335,47 +335,10 @@ body {
     100% { transform: translateX(0); }
   }
 
-  /* Floating label system — only for inputs WITHOUT .no-float */
-  div:has(> label + input:not(.no-float)), div:has(> label + textarea:not(.no-float)), div:has(> label + select:not(.no-float)),
-  div:has(> input:not(.no-float) + label), div:has(> textarea:not(.no-float) + label), div:has(> select:not(.no-float) + label) {
-    position: relative;
-    margin-top: 14px;
-    margin-bottom: 24px;
-  }
-
-  div:has(> input:not(.no-float)) > label, div:has(> textarea:not(.no-float)) > label, div:has(> select:not(.no-float)) > label {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 14px;
-    font-size: 14px;
-    color: var(--light);
-    pointer-events: none;
-    transition: all 180ms ease;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent;
-  }
-
-  div:has(> textarea:not(.no-float)) > label {
-    top: 24px;
-  }
-
-  div:has(> input:not(.no-float):focus) > label, 
-  div:has(> textarea:not(.no-float):focus) > label, 
-  div:has(> select:not(.no-float):focus) > label,
-  div:has(> input:not(.no-float):not(:placeholder-shown)) > label, 
-  div:has(> textarea:not(.no-float):not(:placeholder-shown)) > label,
-  div:has(> select:not(.no-float):not([value=""])) > label {
-    top: -10px !important;
-    transform: translateY(0) !important;
-    left: 10px !important;
-    font-size: 11px !important;
-    color: var(--teal) !important;
-    background: var(--white) !important;
-    padding: 0 4px !important;
-    z-index: 10;
-  }
+  /* Floating-label system removed intentionally.
+   * All form labels across the site now stay block-level above their input,
+   * which eliminates the previous label/placeholder overlap bug. The legacy
+   * `.no-float` class is preserved as a no-op for backwards compatibility. */
 
   select {
     appearance: none;
