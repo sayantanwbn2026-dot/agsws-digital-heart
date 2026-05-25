@@ -136,7 +136,7 @@ const AnimatedRoutes = () => {
         transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="will-change-transform"
       >
-        <Routes location={location} key={location.pathname}>
+        <Routes location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/initiatives" element={<Initiatives />} />
