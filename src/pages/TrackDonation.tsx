@@ -70,13 +70,24 @@ const TrackDonation = () => {
 
       <section className="bg-background py-16">
         <div className="max-w-[480px] mx-auto px-6">
-          <div className="flex gap-2">
-            <input value={paymentId} onChange={(e) => setPaymentId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} placeholder="e.g. pay_XXXXXXXXXX" className="global-card flex-1 h-[52px] px-4 text-base font-medium focus:ring-2 focus:ring-teal/15 outline-none" />
-            <button onClick={() => handleSearch()} disabled={loading} className="h-[52px] px-6 bg-teal text-primary-foreground font-semibold rounded-lg flex items-center gap-2 disabled:opacity-60">
+          <label htmlFor="track-donation-id" className="text-[11px] font-[600] uppercase tracking-[0.12em] text-[var(--mid)] mb-2 block">
+            Payment ID
+          </label>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              id="track-donation-id"
+              value={paymentId}
+              onChange={(e) => setPaymentId(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="e.g. pay_XXXXXXXXXX"
+              autoComplete="off"
+              className="no-float flex-1 h-[52px] px-4 text-[15px] font-[500] bg-white border-[1.5px] border-[var(--border-color)] rounded-[14px] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.10)] outline-none transition-all"
+            />
+            <button onClick={() => handleSearch()} disabled={loading} className="h-[52px] px-6 bg-[var(--teal)] text-white font-[600] rounded-[14px] flex items-center justify-center gap-2 disabled:opacity-60 hover:bg-[var(--teal-dark)] transition-colors">
               {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />} {loading ? "Tracking…" : "Track"}
             </button>
           </div>
-          <p className="text-xs text-text-light mt-2">Try: pay_ABC123XYZ or pay_DEF456UVW</p>
+          <p className="text-[11px] text-[var(--light)] mt-2">Try: pay_ABC123XYZ or pay_DEF456UVW</p>
         </div>
 
         <AnimatePresence mode="wait">
