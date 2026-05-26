@@ -960,7 +960,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      donations_wall: {
+        Row: {
+          amount_cents: number | null
+          cause: string | null
+          created_at: string | null
+          currency: string | null
+          donor_name: string | null
+          id: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          cause?: string | null
+          created_at?: string | null
+          currency?: string | null
+          donor_name?: string | null
+          id?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          amount_cents?: number | null
+          cause?: string | null
+          created_at?: string | null
+          currency?: string | null
+          donor_name?: string | null
+          id?: string | null
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
