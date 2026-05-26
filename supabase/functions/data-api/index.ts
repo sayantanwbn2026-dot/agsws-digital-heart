@@ -283,7 +283,7 @@ Deno.serve(async (req) => {
 
     // Admin-only: returns a short-lived signed URL for an application doc
     if (action === 'admin-application-doc-url' && req.method === 'GET') {
-      if (!requireAdmin(req)) return json({ error: 'Unauthorized' }, 401)
+      if (!(await requireAdmin(req))) return json({ error: 'Unauthorized' }, 401)
       const path = url.searchParams.get('path') || ''
       if (!path) return json({ error: 'Missing path' }, 400)
       const { data, error } = await supabase.storage
@@ -295,7 +295,7 @@ Deno.serve(async (req) => {
 
     // ====== ADMIN ======
     if (action === 'admin-donations' && req.method === 'GET') {
-      if (!requireAdmin(req)) return json({ error: 'Unauthorized' }, 401)
+      if (!(await requireAdmin(req))) return json({ error: 'Unauthorized' }, 401)
       const gateway = (url.searchParams.get('gateway') || '').toLowerCase()
       let q = supabase.from('donations').select('*').order('created_at', { ascending: false }).limit(500)
       if (gateway === 'education') q = q.eq('cause', 'education')
@@ -306,7 +306,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'admin-registrations' && req.method === 'GET') {
-      if (!requireAdmin(req)) return json({ error: 'Unauthorized' }, 401)
+      if (!(await requireAdmin(req))) return json({ error: 'Unauthorized' }, 401)
       const { data, error } = await supabase
         .from('goldenage_registrations')
         .select('*')
