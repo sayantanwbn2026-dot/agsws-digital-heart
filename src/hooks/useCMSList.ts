@@ -76,13 +76,15 @@ export function useCMSList<T>(
     const handler = () => fetchData()
     window.addEventListener(CMS_UPDATE_EVENT, handler)
     window.addEventListener('agsws-preview-changed', handler)
-    window.addEventListener('storage', (e) => {
+    const storageHandler = (e: StorageEvent) => {
       if (e.key === 'agsws_cms_last_updated') handler()
-    })
+    }
+    window.addEventListener('storage', storageHandler)
     const unsub = subscribeRealtime(table, handler)
     return () => {
       window.removeEventListener(CMS_UPDATE_EVENT, handler)
       window.removeEventListener('agsws-preview-changed', handler)
+      window.removeEventListener('storage', storageHandler)
       unsub()
     }
   }, [fetchData, table])

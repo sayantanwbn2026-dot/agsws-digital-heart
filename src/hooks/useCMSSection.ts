@@ -43,18 +43,11 @@ export function useCMSSection<T>(sectionKey: string, fallback: T): { data: T; lo
       if (e.key === 'agsws_cms_last_updated') handler()
     }
     window.addEventListener('storage', storageHandler)
-    // Re-fetch when tab regains focus (covers admin → home tab switch)
-    const focusHandler = () => fetchData()
-    const visibilityHandler = () => { if (document.visibilityState === 'visible') fetchData() }
-    window.addEventListener('focus', focusHandler)
-    document.addEventListener('visibilitychange', visibilityHandler)
     const unsub = subscribeRealtime('cms_sections', handler)
     return () => {
       window.removeEventListener(CMS_UPDATE_EVENT, handler)
       window.removeEventListener('agsws-preview-changed', handler)
       window.removeEventListener('storage', storageHandler)
-      window.removeEventListener('focus', focusHandler)
-      document.removeEventListener('visibilitychange', visibilityHandler)
       unsub()
     }
   }, [fetchData])
