@@ -56,9 +56,11 @@ const Updates = () => {
       }))
     : updates;
 
+  const [subscribing, setSubscribing] = useState(false);
   const handleEmailSub = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || subscribing) return;
+    setSubscribing(true);
     try {
       const { error } = await (supabase.from('newsletter_subscriptions' as any) as any)
         .insert({ email, name: name || null, source: 'updates-page' });
@@ -71,6 +73,8 @@ const Updates = () => {
       setEmail(""); setName("");
     } catch (err: any) {
       toast.error(err?.message || "Subscription failed. Try again.");
+    } finally {
+      setSubscribing(false);
     }
   };
 
@@ -102,7 +106,7 @@ const Updates = () => {
               <form onSubmit={handleEmailSub} className="space-y-3">
                 <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" className="no-float" />
                 <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Email address" required className="no-float" />
-                <button type="submit" className="w-full bg-[var(--yellow)] text-[var(--dark)] font-semibold py-2.5 rounded-full text-sm hover:shadow-[var(--shadow-yellow)] transition-shadow">Subscribe →</button>
+                <button type="submit" disabled={subscribing} className="w-full bg-[var(--yellow)] text-[var(--dark)] font-semibold py-2.5 rounded-full text-sm hover:shadow-[var(--shadow-yellow)] transition-shadow disabled:opacity-60">{subscribing ? "Subscribing…" : "Subscribe →"}</button>
               </form>
               <p className="text-[11px] text-[var(--light)] mt-3 text-center">{copy.subscribers_label}</p>
             </div>

@@ -15,6 +15,7 @@ const TrackDonation = () => {
   const [searched, setSearched] = useState(false);
 
   const handleSearch = async (overrideId?: string) => {
+    if (loading) return; // prevent duplicate submissions
     const id = (overrideId ?? paymentId).trim();
     if (!id) return;
     setLoading(true);

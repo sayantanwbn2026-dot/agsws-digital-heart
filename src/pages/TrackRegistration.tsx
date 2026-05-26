@@ -37,6 +37,7 @@ const TrackRegistration = () => {
   const [searched, setSearched] = useState(false);
 
   const handleSearch = async (overrideId?: string) => {
+    if (loading) return; // prevent duplicate submissions
     const id = (overrideId ?? regId).trim().toUpperCase();
     if (!id) { setError("Please enter your Registration ID."); setSearched(true); return; }
     setLoading(true);
