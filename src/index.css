@@ -833,3 +833,7 @@ body::before {
 /* Image upload dropzone — tighter, less colorful */
 .cms-shell .border-dashed { border-color: var(--cms-border-strong) !important; }
 .cms-shell .border-dashed:hover { border-color: var(--cms-text-dim) !important; }
+
+/* Hide scrollbars but keep scrolling */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
