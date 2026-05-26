@@ -46,13 +46,7 @@ const DonateEducation = () => {
 
   useEffect(() => {
     let cancelled = false;
-    (supabase.from("donations" as any) as any)
-      .select("donor_name, amount_cents, currency, cause, created_at, metadata")
-      .eq("status", "succeeded")
-      .eq("show_on_wall", true)
-      .ilike("cause", "%education%")
-      .order("created_at", { ascending: false })
-      .limit(4)
+    (supabase.rpc("get_donations_wall" as any, { cause_filter: "education", row_limit: 4 }) as any)
       .then(({ data }: any) => {
         if (cancelled || !data?.length) return;
         const fmt = (cents: number, ccy: string) =>

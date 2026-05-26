@@ -963,7 +963,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_donations_wall: {
+        Args: { cause_filter?: string; row_limit?: number }
+        Returns: {
+          amount_cents: number
+          cause: string
+          created_at: string
+          currency: string
+          donor_name: string
+          id: string
+          metadata: Json
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
