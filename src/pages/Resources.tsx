@@ -41,19 +41,21 @@ const Resources = () => {
   return (
     <main id="main-content">
       <PageHero title="Resources & Reports" label="Transparency" size="sm" breadcrumb={[{ label: "Home", href: "/" }, { label: "Resources" }]} />
-      <div className="global-card sticky top-[72px] z-30">
-        <div className="max-w-[1200px] mx-auto px-6 flex flex-wrap items-center gap-3">
-          {categories.map((cat) => (
-            <button key={cat} onClick={() => setActiveFilter(cat)} className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeFilter === cat ? "bg-teal text-primary-foreground" : "bg-background text-text-mid border border-border hover:bg-teal-light"}`}>{cat}</button>
-          ))}
-          <div className="relative ml-auto">
+      <div className="sticky top-[64px] sm:top-[72px] z-30 bg-white/95 backdrop-blur border-b border-border">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex gap-2 overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 scrollbar-none">
+            {categories.map((cat) => (
+              <button key={cat} onClick={() => setActiveFilter(cat)} className={`whitespace-nowrap px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${activeFilter === cat ? "bg-teal text-primary-foreground" : "bg-background text-text-mid border border-border hover:bg-teal-light"}`}>{cat}</button>
+            ))}
+          </div>
+          <div className="relative sm:ml-auto w-full sm:w-auto">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="global-card h-10 pl-9 pr-4 text-sm outline-none focus: w-48" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search resources..." className="w-full sm:w-56 h-10 pl-9 pr-4 text-sm rounded-full bg-background border border-border outline-none focus:border-teal" />
           </div>
         </div>
       </div>
-      <section className="bg-background py-16">
-        <StaggerContainer staggerDelay={0.06} className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6">
+      <section className="bg-background py-8 sm:py-16">
+        <StaggerContainer staggerDelay={0.06} className="max-w-[1200px] mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6">
           {filtered.map((res: any) => (
             <div key={res.title} className={`bg-card border border-border border-l-4 ${colorBorder[res.color] || "border-l-teal"} rounded-lg p-6 shadow-brand-sm hover:shadow-brand-md transition-shadow`}>
               <div className="flex items-start justify-between mb-3">
