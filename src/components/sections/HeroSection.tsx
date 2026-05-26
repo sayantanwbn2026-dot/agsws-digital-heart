@@ -37,7 +37,7 @@ const defaultHero = {
 const HeroSection = () => {
   const sectionRef = useRef(null);
   const { openOverlay } = useDonateOverlay();
-  const { data: hero } = useCMSData<typeof defaultHero>('cms_hero', defaultHero);
+  const { data: hero, loading: heroLoading } = useCMSData<typeof defaultHero>('cms_hero', defaultHero);
   const { data: cmsStats } = useCMSList<any>('cms_stats', [], { orderBy: { column: 'sort_order' } });
   const heroStats = (cmsStats.length ? cmsStats.slice(0, 3).map((s: any) => ({ value: s.value, label: s.label })) : fallbackHeroStats);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
@@ -46,7 +46,12 @@ const HeroSection = () => {
   const opacityOut = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
   // Split headline into words, detect "Compassion" for special styling
-  const headlineWords = (hero.headline || defaultHero.headline).split(/\s+/);
+  // Until CMS hero loads, render an invisible placeholder of the same shape so
+  // the page doesn't flash the fallback copy and then swap to the real copy.
+  const activeHeadline = heroLoading ? '' : (hero.headline || defaultHero.headline);
+  const activeSubtitle = heroLoading ? '' : (hero.subtitle || defaultHero.subtitle);
+  const activeCta      = heroLoading ? '' : (hero.cta_text || defaultHero.cta_text);
+  const headlineWords = activeHeadline.split(/\s+/).filter(Boolean);
   const compassionIndex = headlineWords.findIndex(w => w.toLowerCase().replace(/[.,!]/g, '') === 'compassion');
 
   return (
@@ -89,7 +94,7 @@ const HeroSection = () => {
           </span>
         </motion.div>
 
-        <h1 className="display-hero text-white mb-6 max-w-[800px] mx-auto">
+        <h1 className="display-hero text-white mb-6 max-w-[800px] mx-auto min-h-[1.1em]">
           {headlineWords.map((word, i) => {
             if (i === compassionIndex) {
               return <span key={i} className="inline-block mr-3"><CompassionText /></span>;
@@ -100,13 +105,13 @@ const HeroSection = () => {
           })}
         </h1>
 
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="text-[clamp(14px,1.6vw,17px)] font-[400] text-white/65 max-w-[540px] mx-auto mb-8 sm:mb-10 leading-[1.8] px-1">
-          {hero.subtitle || defaultHero.subtitle}
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="text-[clamp(14px,1.6vw,17px)] font-[400] text-white/65 max-w-[540px] mx-auto mb-8 sm:mb-10 leading-[1.8] px-1 min-h-[2.5em]">
+          {activeSubtitle}
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.5 }} className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mb-10 sm:mb-12 w-full max-w-sm sm:max-w-none mx-auto">
           <motion.button onClick={openOverlay} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="px-8 sm:px-9 py-4 text-[14px] font-[700] bg-[var(--yellow)] text-[var(--dark)] rounded-full shadow-[0_4px_16px_rgba(242,183,5,0.25)] hover:shadow-[0_8px_32px_rgba(242,183,5,0.4)] transition-shadow flex items-center justify-center gap-2">
-            {hero.cta_text || defaultHero.cta_text} <ArrowRight size={16} />
+            {activeCta || 'Donate Now'} <ArrowRight size={16} />
           </motion.button>
           <Link to="/apply" className="px-8 sm:px-9 py-4 text-[14px] font-[600] text-white/90 border border-white/[0.15] rounded-full hover:bg-white/[0.06] hover:border-white/[0.25] transition-all text-center">
             Apply for Support
