@@ -56,9 +56,11 @@ const Updates = () => {
       }))
     : updates;
 
+  const [subscribing, setSubscribing] = useState(false);
   const handleEmailSub = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || subscribing) return;
+    setSubscribing(true);
     try {
       const { error } = await (supabase.from('newsletter_subscriptions' as any) as any)
         .insert({ email, name: name || null, source: 'updates-page' });
@@ -71,6 +73,8 @@ const Updates = () => {
       setEmail(""); setName("");
     } catch (err: any) {
       toast.error(err?.message || "Subscription failed. Try again.");
+    } finally {
+      setSubscribing(false);
     }
   };
 
