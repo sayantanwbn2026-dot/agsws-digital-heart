@@ -19,28 +19,56 @@ const supabase = createClient(
 
 const ADMIN_EMAIL = Deno.env.get('CMS_ADMIN_EMAIL') || ''
 
-function isValidAdminToken(token: string): boolean {
-  if (!token) return false
+// HMAC-SHA256 signed token verification (matches cms-auth issuance)
+const TOKEN_TTL_MS = 12 * 60 * 60 * 1000
+const TOKEN_SECRET = Deno.env.get('CMS_TOKEN_SECRET') || Deno.env.get('CMS_ADMIN_PASSWORD') || ''
+
+const b64urlDecode = (s: string) => {
+  s = s.replace(/-/g, '+').replace(/_/g, '/')
+  const pad = s.length % 4 ? 4 - (s.length % 4) : 0
+  const bin = atob(s + '='.repeat(pad))
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+  return out
+}
+
+let _key: CryptoKey | null = null
+async function getKey() {
+  if (_key) return _key
+  _key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(TOKEN_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['verify'],
+  )
+  return _key
+}
+
+async function isValidAdminToken(token: string): Promise<boolean> {
+  if (!token || !TOKEN_SECRET || !ADMIN_EMAIL) return false
+  const parts = token.split('.')
+  if (parts.length !== 2) return false
   try {
-    const decoded = atob(token)
+    const payloadBytes = b64urlDecode(parts[0])
+    const sigBytes = b64urlDecode(parts[1])
+    const key = await getKey()
+    const ok = await crypto.subtle.verify('HMAC', key, sigBytes, payloadBytes)
+    if (!ok) return false
+    const decoded = new TextDecoder().decode(payloadBytes)
     const [tokenEmail, tsStr] = decoded.split(':')
     const ts = Number(tsStr)
-    const ageMs = Date.now() - ts
-    return (
-      tokenEmail === ADMIN_EMAIL &&
-      Number.isFinite(ts) &&
-      ageMs >= 0 &&
-      ageMs < 12 * 60 * 60 * 1000
-    )
+    const age = Date.now() - ts
+    return tokenEmail === ADMIN_EMAIL && Number.isFinite(ts) && age >= 0 && age < TOKEN_TTL_MS
   } catch {
     return false
   }
 }
 
-function requireAdmin(req: Request): boolean {
+async function requireAdmin(req: Request): Promise<boolean> {
   const auth = req.headers.get('authorization') || ''
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : ''
-  return isValidAdminToken(token)
+  return await isValidAdminToken(token)
 }
 
 function buildDonationStages(row: any) {
