@@ -357,8 +357,8 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
         ))}
       </div>
 
-      <div className="filter-row flex flex-wrap gap-2 items-center">
-        <div className="relative flex-1 min-w-[220px] max-w-md">
+      <div className="filter-row grid gap-2 items-stretch" style={{ gridTemplateColumns: 'minmax(220px,1fr) auto auto auto auto' }}>
+        <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
@@ -398,7 +398,7 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
             Clear
           </button>
         )}
-        <button onClick={() => exportToCSV(items, 'applications')} className="ml-auto flex items-center gap-1.5 px-3 h-9 bg-muted rounded-lg text-xs font-medium text-foreground hover:bg-muted/80 transition-colors">
+        <button onClick={() => exportToCSV(items, 'applications')} className="flex items-center gap-1.5 px-3 h-9 bg-muted rounded-lg text-xs font-medium text-foreground hover:bg-muted/80 transition-colors justify-self-end">
           <FileDown size={13} /> Export CSV
         </button>
       </div>
