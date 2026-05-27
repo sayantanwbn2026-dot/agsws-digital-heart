@@ -867,10 +867,25 @@ body::before {
   padding: 8px 12px !important;
   font-size: 13px !important;
   line-height: 1.4 !important;
-  width: 100%;
   border-radius: 10px !important;
   font-family: 'Manrope', 'Inter', sans-serif !important;
 }
+
+/* Default text inputs/textarea to full-width (form fields), but leave
+   selects free to size to content unless explicitly w-full */
+.cms-shell input[type="text"],
+.cms-shell input[type="email"],
+.cms-shell input[type="tel"],
+.cms-shell input[type="number"],
+.cms-shell input[type="url"],
+.cms-shell input[type="password"],
+.cms-shell input[type="search"],
+.cms-shell input[type="date"],
+.cms-shell input[type="time"],
+.cms-shell textarea { width: 100%; }
+
+.cms-shell select { width: auto; max-width: 100%; }
+.cms-shell select.w-full { width: 100% !important; }
 
 .cms-shell textarea {
   min-height: 80px !important;
