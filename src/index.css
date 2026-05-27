@@ -837,3 +837,70 @@ body::before {
 /* Hide scrollbars but keep scrolling */
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* =========================================
+   PART 16 — CMS FORM-CONTROL OVERRIDES
+   The global @layer base form reset at the top of this file forces
+   inputs/selects/textareas to height:48px, padding:0 14px, width:100%
+   with !important. Inside the admin shell those rules cause icon
+   overlap (placeholder hides behind absolute-positioned <Search/>
+   icons) and make every <select> wrap to a new full-width row.
+   The block below scopes a tighter, utility-friendly reset to
+   `.cms-shell` only — Tailwind padding/width utilities can now win
+   so admin filter rows, search inputs, and dense forms render
+   correctly on desktop and mobile.
+========================================= */
+.cms-shell input[type="text"],
+.cms-shell input[type="email"],
+.cms-shell input[type="tel"],
+.cms-shell input[type="number"],
+.cms-shell input[type="url"],
+.cms-shell input[type="password"],
+.cms-shell input[type="search"],
+.cms-shell input[type="date"],
+.cms-shell input[type="time"],
+.cms-shell input:not([type]),
+.cms-shell select,
+.cms-shell textarea {
+  height: auto !important;
+  min-height: 36px !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  width: 100%;
+  border-radius: 10px !important;
+  font-family: 'Manrope', 'Inter', sans-serif !important;
+}
+
+.cms-shell textarea {
+  min-height: 80px !important;
+  padding: 10px 12px !important;
+  line-height: 1.55 !important;
+}
+
+/* Selects keep their native caret room but lose the 40px global pad */
+.cms-shell select {
+  padding-right: 32px !important;
+  background-position: right 10px center !important;
+  background-size: 12px !important;
+}
+
+/* Let Tailwind left-padding utilities win for icon-prefixed inputs
+   (sidebar search, applications search, etc.) */
+.cms-shell input[class*="pl-6"]  { padding-left: 24px !important; }
+.cms-shell input[class*="pl-8"]  { padding-left: 32px !important; }
+.cms-shell input[class*="pl-9"]  { padding-left: 36px !important; }
+.cms-shell input[class*="pl-10"] { padding-left: 40px !important; }
+.cms-shell input[class*="pr-12"] { padding-right: 48px !important; }
+
+/* Selects that should not stretch (inline filter rows) */
+.cms-shell select.w-auto,
+.cms-shell .filter-row select { width: auto !important; }
+
+/* Compact admin inputs (h-7/h-8 overrides — sidebar search etc.) */
+.cms-shell input.h-7  { min-height: 28px !important; height: 28px !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+.cms-shell input.h-8  { min-height: 32px !important; height: 32px !important; padding-top: 0 !important; padding-bottom: 0 !important; }
+
+/* Topbar / breadcrumb table chip — prevent it from absorbing extra
+   right-side space when the section label is short */
+.cms-shell .cms-kbd { white-space: nowrap; }
