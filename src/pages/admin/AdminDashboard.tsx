@@ -357,21 +357,21 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-2 items-center">
-        <div className="relative flex-1 min-w-[200px]">
+      <div className="filter-row grid gap-2 items-stretch" style={{ gridTemplateColumns: 'minmax(220px,1fr) auto auto auto auto' }}>
+        <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name, email, ref, event…"
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full pl-9 pr-3 rounded-lg border border-border bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </div>
         <select
           value={typeFilter}
           onChange={e => setTypeFilter(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="w-auto px-3 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
         >
           <option value="all">All types</option>
           {types.map(t => (
@@ -382,7 +382,7 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
           <select
             value={eventFilter}
             onChange={e => setEventFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 max-w-[220px]"
+            className="w-auto px-3 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 max-w-[240px]"
           >
             <option value="all">All events</option>
             {eventOptions.map(ev => (
@@ -393,12 +393,12 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
         {(search || filter !== 'all' || typeFilter !== 'all' || eventFilter !== 'all') && (
           <button
             onClick={() => { setSearch(''); setFilter('all'); setTypeFilter('all'); setEventFilter('all'); }}
-            className="px-3 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground"
+            className="px-3 h-9 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60"
           >
             Clear
           </button>
         )}
-        <button onClick={() => exportToCSV(items, 'applications')} className="flex items-center gap-1.5 px-3 py-2 bg-muted rounded-lg text-xs font-medium text-foreground hover:bg-muted/80 transition-colors">
+        <button onClick={() => exportToCSV(items, 'applications')} className="flex items-center gap-1.5 px-3 h-9 bg-muted rounded-lg text-xs font-medium text-foreground hover:bg-muted/80 transition-colors justify-self-end">
           <FileDown size={13} /> Export CSV
         </button>
       </div>
@@ -486,11 +486,12 @@ const ApplicationsManager = ({ items, onRefresh }: { items: any[]; onRefresh: ()
                       placeholder="Add internal notes..."
                       className="no-float w-full px-3 py-2 rounded-lg border border-border bg-background text-xs resize-none h-16 focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
-                    <button onClick={() => handleNoteSave(app.id)} className="mt-1 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-md">Save Notes</button>
+                    <button onClick={() => handleNoteSave(app.id)} className="mt-2 px-3 h-7 bg-primary text-primary-foreground text-[10px] font-bold rounded-md uppercase tracking-wide">Save Notes</button>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase self-center mr-1">Status:</span>
                     {['pending', 'reviewing', 'waitlisted', 'approved', 'rejected'].map(s => (
-                      <button key={s} onClick={() => handleStatusChange(app.id, s)} className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors ${app.status === s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>{s}</button>
+                      <button key={s} onClick={() => handleStatusChange(app.id, s)} className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold capitalize transition-colors ${app.status === s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>{s}</button>
                     ))}
                   </div>
                 </motion.div>
