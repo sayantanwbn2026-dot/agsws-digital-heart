@@ -92,13 +92,13 @@ Deno.serve(async (req) => {
       const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : ''
       if (!token) {
         return new Response(JSON.stringify({ valid: false }), {
-          status: 401,
+          status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
       const valid = await verifyToken(token, adminEmail)
       return new Response(JSON.stringify({ valid }), {
-        status: valid ? 200 : 401,
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
