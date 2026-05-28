@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { dedupedJsonFetch, invalidateDedupe } from '@/lib/request-dedupe';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -24,7 +25,7 @@ export function useCMSApi() {
       const url = `${SUPABASE_URL}/functions/v1/cms-api?${params}`;
       const token = getToken();
 
-      const res = await fetch(url, {
+      const requestInit: RequestInit = {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -32,10 +33,16 @@ export function useCMSApi() {
           'apikey': ANON_KEY,
         },
         body: body ? JSON.stringify(body) : undefined,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Request failed');
+      };
+      const data = method === 'GET'
+        ? await dedupedJsonFetch(`admin-cms:${table}:${id ?? 'all'}`, url, requestInit, { ttlMs: 12000 })
+        : await fetch(url, requestInit).then(async (res) => {
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.error || 'Request failed');
+            invalidateDedupe(`admin-cms:${table}:`);
+            invalidateDedupe('cms-');
+            return json;
+          });
       return data;
     } catch (err: any) {
       throw err;
