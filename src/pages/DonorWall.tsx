@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import FadeInUp from "@/components/ui/FadeInUp";
 import PageHero from "@/components/layout/PageHero";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { Heart, BookOpen, Users, TrendingUp } from "lucide-react";
 import { useCMSSection } from "@/hooks/useCMSSection";
 import { dedupedJsonFetch } from "@/lib/request-dedupe";
