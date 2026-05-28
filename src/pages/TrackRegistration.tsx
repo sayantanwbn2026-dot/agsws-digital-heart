@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, CheckCircle, User, Heart, Shield, Phone, AlertCircle, Loader2 } from "lucide-react";
+import { dedupedJsonFetch } from "@/lib/request-dedupe";
 
 const stepIcons = [CheckCircle, User, Heart, Shield];
 
@@ -35,22 +36,23 @@ const TrackRegistration = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const lookupInFlight = useRef<string | null>(null);
 
   const handleSearch = async (overrideId?: string) => {
-    if (loading) return; // prevent duplicate submissions
     const id = (overrideId ?? regId).trim().toUpperCase();
+    if (lookupInFlight.current === id) return; // prevent duplicate submissions
     if (!id) { setError("Please enter your Registration ID."); setSearched(true); return; }
+    lookupInFlight.current = id;
     setLoading(true);
     setError("");
     setResult(null);
     setSearched(true);
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=track-registration&id=${encodeURIComponent(id)}`;
-      const res = await fetch(url, {
+      const data = await dedupedJsonFetch<any>(`track-registration:${id}`, url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-      });
-      const data = await res.json();
-      if (!res.ok || data.error) {
+      }, { ttlMs: 12000 });
+      if (data.error) {
         setError("Registration ID not found. Please check the ID in your confirmation email.");
       } else {
         setResult(data);
@@ -62,8 +64,10 @@ const TrackRegistration = () => {
       }
     } catch {
       setError("Connection error. Please try again.");
+    } finally {
+      lookupInFlight.current = null;
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Auto-trigger lookup when arriving with a deep-link or cached ref.

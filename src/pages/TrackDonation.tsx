@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { dedupedJsonFetch } from "@/lib/request-dedupe";
 
 const TrackDonation = () => {
   useSEO("Track Donation", "Track where your AGSWS donation goes.");
@@ -13,22 +14,23 @@ const TrackDonation = () => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const lookupInFlight = useRef<string | null>(null);
 
   const handleSearch = async (overrideId?: string) => {
-    if (loading) return; // prevent duplicate submissions
     const id = (overrideId ?? paymentId).trim();
+    if (lookupInFlight.current === id) return; // prevent duplicate submissions
     if (!id) return;
+    lookupInFlight.current = id;
     setLoading(true);
     setError(false);
     setResult(null);
     setSearched(true);
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=track-donation&payment_id=${encodeURIComponent(id)}`;
-      const res = await fetch(url, {
+      const data = await dedupedJsonFetch<any>(`track-donation:${id}`, url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-      });
-      const data = await res.json();
-      if (!res.ok || data.error) {
+      }, { ttlMs: 12000 });
+      if (data.error) {
         setError(true);
       } else {
         const stages = data.journey_stages ?? data.stages ?? [];
@@ -46,8 +48,10 @@ const TrackDonation = () => {
       }
     } catch {
       setError(true);
+    } finally {
+      lookupInFlight.current = null;
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Auto-lookup when arriving via deep-link or from cached ref.
