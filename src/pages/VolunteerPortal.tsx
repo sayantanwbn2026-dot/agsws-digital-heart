@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Award, AlertCircle, ArrowRight, User } from "lucide-react";
 import PageHero from "@/components/layout/PageHero";
 import { useCMSSection } from "@/hooks/useCMSSection";
+import { dedupedJsonFetch } from "@/lib/request-dedupe";
 
 const defaultVol = {
   card_heading: "Find Your Profile",
@@ -25,25 +26,29 @@ const VolunteerPortal = () => {
   const [searched, setSearched] = useState(false);
 
   const [loading, setLoading] = useState(false);
+  const lookupInFlight = useRef<string | null>(null);
 
   const handleSearch = async () => {
-    if (!volId.trim()) return;
+    const id = volId.trim().toUpperCase();
+    if (!id || lookupInFlight.current === id) return;
+    lookupInFlight.current = id;
     setSearched(true);
     setLoading(true);
     setError(false);
     setResult(null);
     try {
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=track-volunteer&id=${encodeURIComponent(volId.trim().toUpperCase())}`;
-      const res = await fetch(url, {
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=track-volunteer&id=${encodeURIComponent(id)}`;
+      const data = await dedupedJsonFetch<any>(`track-volunteer:${id}`, url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-      });
-      const data = await res.json();
-      if (!res.ok || data?.error) setError(true);
+      }, { ttlMs: 12000 });
+      if (data?.error) setError(true);
       else setResult(data);
     } catch {
       setError(true);
+    } finally {
+      lookupInFlight.current = null;
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
