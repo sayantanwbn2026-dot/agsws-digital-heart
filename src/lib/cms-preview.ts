@@ -1,3 +1,5 @@
+import { dedupedJsonFetch, invalidateDedupe } from './request-dedupe';
+
 // CMS Preview Mode utilities.
 //
 // When preview mode is active, the public site fetches CMS data through the
@@ -17,8 +19,6 @@
 // the public/published view (the fetch will 401 and we use the public data).
 
 const PREVIEW_KEY = 'agsws_cms_preview';
-
-import { dedupedJsonFetch, invalidateDedupe } from './request-dedupe';
 
 export function isPreviewMode(): boolean {
   if (typeof window === 'undefined') return false;

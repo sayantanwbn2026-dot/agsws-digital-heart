@@ -1,7 +1,7 @@
+import { dedupedJsonFetch } from '@/lib/request-dedupe';
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-import { dedupedJsonFetch } from '@/lib/request-dedupe';
 
 function getToken() {
   return localStorage.getItem('agsws_admin_token') ?? '';
