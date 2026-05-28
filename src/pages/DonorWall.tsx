@@ -3,9 +3,10 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import FadeInUp from "@/components/ui/FadeInUp";
 import PageHero from "@/components/layout/PageHero";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { Heart, BookOpen, Users, TrendingUp } from "lucide-react";
 import { useCMSSection } from "@/hooks/useCMSSection";
+import { dedupedJsonFetch } from "@/lib/request-dedupe";
 
 const iconMap: Record<string, any> = { Heart, BookOpen, Users, TrendingUp };
 
@@ -52,10 +53,9 @@ const DonorWall = () => {
       const params = new URLSearchParams({ limit: "50" });
       if (gw) params.set("gateway", gw);
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/data-api?action=donor-wall&${params}`;
-      const res = await fetch(url, {
+      const json = await dedupedJsonFetch<any[]>(`donor-wall:${gw ?? 'all'}`, url, {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-      });
-      const json = await res.json();
+      }, { ttlMs: 12000 });
       if (Array.isArray(json)) setEntries(json);
     } catch (e) {
       console.error("[donor-wall]", e);

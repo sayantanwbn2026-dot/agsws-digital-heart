@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { CMS_UPDATE_EVENT } from '@/lib/cms-sync'
 import { isPreviewMode, previewFetchTable } from '@/lib/cms-preview'
 import { subscribeRealtime } from '@/lib/cms-realtime'
+import { dedupeRequest, stableStringify } from '@/lib/request-dedupe'
 
 interface Options {
   filter?: { column: string; value: any }
@@ -17,10 +18,12 @@ export function useCMSList<T>(
 ) {
   const [data, setData] = useState<T[]>(fallback)
   const [loading, setLoading] = useState(true)
+  const optionsKey = stableStringify(options ?? {})
 
   const fetchData = useCallback(() => {
+    const requestKey = `cms-list:${table}:${optionsKey}:${isPreviewMode() ? 'preview' : 'public'}`
     if (isPreviewMode()) {
-      previewFetchTable(table).then((rows) => {
+      dedupeRequest<T[] | null>(requestKey, () => previewFetchTable<T>(table), { ttlMs: 5000 }).then((rows) => {
         if (rows) {
           let result = rows as any[]
           if (options?.filter) {
@@ -61,11 +64,11 @@ export function useCMSList<T>(
       query = query.limit(options.limit)
     }
 
-    query.then(({ data: rows }: any) => {
+    dedupeRequest<any[]>(requestKey, () => query.then(({ data: rows }: any) => rows ?? []), { ttlMs: 5000 }).then((rows) => {
       if (rows?.length) setData(rows as T[])
       setLoading(false)
     })
-  }, [table])
+  }, [table, optionsKey])
 
   useEffect(() => {
     fetchData()

@@ -3,27 +3,31 @@ import { supabase } from '@/integrations/supabase/client'
 import { CMS_UPDATE_EVENT } from '@/lib/cms-sync'
 import { isPreviewMode, previewFetchTable } from '@/lib/cms-preview'
 import { subscribeRealtime } from '@/lib/cms-realtime'
+import { dedupeRequest } from '@/lib/request-dedupe'
 
 export function useCMSData<T>(table: string, fallback: T) {
   const [data, setData] = useState<T>(fallback)
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(() => {
+    const requestKey = `cms-data:${table}:${isPreviewMode() ? 'preview' : 'public'}`
     if (isPreviewMode()) {
-      previewFetchTable(table).then((rows) => {
+      dedupeRequest<T[] | null>(requestKey, () => previewFetchTable<T>(table), { ttlMs: 5000 }).then((rows) => {
         if (rows && rows.length) setData(rows[0] as T)
         setLoading(false)
       })
       return
     }
-    (supabase.from(table as any) as any)
+    dedupeRequest<T | null>(requestKey, () => (supabase.from(table as any) as any)
       .select('*')
       .limit(1)
       .single()
       .then(({ data: row }: any) => {
-        if (row) setData(row as T)
-        setLoading(false)
-      })
+        return row as T | null
+      }), { ttlMs: 5000 }).then((row) => {
+      if (row) setData(row as T)
+      setLoading(false)
+    })
   }, [table])
 
   useEffect(() => {

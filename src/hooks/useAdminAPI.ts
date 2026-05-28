@@ -1,3 +1,5 @@
+import { dedupedJsonFetch } from '@/lib/request-dedupe';
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -34,7 +36,7 @@ export function useAdminAPI() {
   ) => {
     const token = getToken();
     const targetUrl = rewriteUrl(url);
-    const res = await fetch(targetUrl, {
+    const requestInit: RequestInit = {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +44,11 @@ export function useAdminAPI() {
         'apikey': ANON_KEY,
       },
       body: body ? JSON.stringify(body) : undefined,
-    });
+    };
+    if (method === 'GET') {
+      return dedupedJsonFetch(`admin-api:${targetUrl}`, targetUrl, requestInit, { ttlMs: 8000 });
+    }
+    const res = await fetch(targetUrl, requestInit);
     return res.json();
   };
 
