@@ -1,8 +1,12 @@
 export const CMS_UPDATE_EVENT = 'agsws-cms-updated';
 export const CMS_UPDATE_KEY = 'agsws_cms_last_updated';
 
+import { invalidateDedupe } from './request-dedupe';
+
 export function notifyCMSContentUpdated() {
   const timestamp = String(Date.now());
+
+  invalidateDedupe('cms-');
 
   try {
     localStorage.setItem(CMS_UPDATE_KEY, timestamp);
