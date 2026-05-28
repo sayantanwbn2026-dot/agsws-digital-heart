@@ -12,7 +12,7 @@ export function useCMSSection<T>(sectionKey: string, fallback: T): { data: T; lo
   const fetchData = useCallback(() => {
     const requestKey = `cms-section:${sectionKey}:${isPreviewMode() ? 'preview' : 'public'}`
     if (isPreviewMode()) {
-      dedupeRequest<any[] | null>(requestKey, () => previewFetchTable('cms_sections'), { ttlMs: 15000 }).then((rows) => {
+      dedupeRequest<any[] | null>(requestKey, () => previewFetchTable('cms_sections'), { ttlMs: 5000 }).then((rows) => {
         const row = rows?.find((r: any) => r.section_key === sectionKey)
         if (row?.content && typeof row.content === 'object') {
           setData({ ...(fallback as any), ...row.content } as T)
@@ -28,7 +28,7 @@ export function useCMSSection<T>(sectionKey: string, fallback: T): { data: T; lo
       .maybeSingle()
       .then(({ data: row }: any) => {
         return row
-      }), { ttlMs: 15000 }).then((row) => {
+      }), { ttlMs: 5000 }).then((row) => {
       if (row?.content && typeof row.content === 'object') {
         // Merge fetched content over fallback so missing keys keep defaults
         setData({ ...(fallback as any), ...row.content } as T)

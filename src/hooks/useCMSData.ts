@@ -12,7 +12,7 @@ export function useCMSData<T>(table: string, fallback: T) {
   const fetchData = useCallback(() => {
     const requestKey = `cms-data:${table}:${isPreviewMode() ? 'preview' : 'public'}`
     if (isPreviewMode()) {
-      dedupeRequest<T[] | null>(requestKey, () => previewFetchTable<T>(table), { ttlMs: 15000 }).then((rows) => {
+      dedupeRequest<T[] | null>(requestKey, () => previewFetchTable<T>(table), { ttlMs: 5000 }).then((rows) => {
         if (rows && rows.length) setData(rows[0] as T)
         setLoading(false)
       })
@@ -24,7 +24,7 @@ export function useCMSData<T>(table: string, fallback: T) {
       .single()
       .then(({ data: row }: any) => {
         return row as T | null
-      }), { ttlMs: 15000 }).then((row) => {
+      }), { ttlMs: 5000 }).then((row) => {
       if (row) setData(row as T)
       setLoading(false)
     })

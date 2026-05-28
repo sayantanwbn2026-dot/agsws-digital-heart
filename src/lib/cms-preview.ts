@@ -75,7 +75,7 @@ export async function previewFetchTable<T = any>(table: string): Promise<T[] | n
         'Authorization': `Bearer ${token}`,
         'apikey': ANON_KEY,
       },
-    }, { ttlMs: 15000 });
+    }, { ttlMs: 5000 });
     return Array.isArray(data) ? data : [data];
   } catch {
     return null;

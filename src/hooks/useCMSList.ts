@@ -23,7 +23,7 @@ export function useCMSList<T>(
   const fetchData = useCallback(() => {
     const requestKey = `cms-list:${table}:${optionsKey}:${isPreviewMode() ? 'preview' : 'public'}`
     if (isPreviewMode()) {
-      dedupeRequest<T[] | null>(requestKey, () => previewFetchTable<T>(table), { ttlMs: 15000 }).then((rows) => {
+      dedupeRequest<T[] | null>(requestKey, () => previewFetchTable<T>(table), { ttlMs: 5000 }).then((rows) => {
         if (rows) {
           let result = rows as any[]
           if (options?.filter) {
@@ -64,7 +64,7 @@ export function useCMSList<T>(
       query = query.limit(options.limit)
     }
 
-    dedupeRequest<any[]>(requestKey, () => query.then(({ data: rows }: any) => rows ?? []), { ttlMs: 15000 }).then((rows) => {
+    dedupeRequest<any[]>(requestKey, () => query.then(({ data: rows }: any) => rows ?? []), { ttlMs: 5000 }).then((rows) => {
       if (rows?.length) setData(rows as T[])
       setLoading(false)
     })
