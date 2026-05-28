@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Save, Loader2, Plus, Trash2, GripVertical, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { useCMSApi } from '@/hooks/useCMSApi';
 import { notifyCMSContentUpdated } from '@/lib/cms-sync';
+import { dedupedJsonFetch, invalidateDedupe } from '@/lib/request-dedupe';
 import toast from 'react-hot-toast';
 
 interface FieldDef {
@@ -41,10 +42,9 @@ const SectionEditor = ({ sectionKey, title, description, fields, listKey, listFi
     setFetching(true);
     try {
       const token = localStorage.getItem('agsws_admin_token') ?? '';
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/cms-api?table=cms_sections`, {
+      const data = await dedupedJsonFetch<any[]>('admin-cms:cms_sections:all', `${SUPABASE_URL}/functions/v1/cms-api?table=cms_sections`, {
         headers: { 'Authorization': `Bearer ${token}`, 'apikey': ANON_KEY },
-      });
-      const data = await res.json();
+      }, { ttlMs: 12000 });
       const row = Array.isArray(data) ? data.find((r: any) => r.section_key === sectionKey) : null;
       if (row) setContent(row.content || {});
     } catch {}
@@ -73,6 +73,8 @@ const SectionEditor = ({ sectionKey, title, description, fields, listKey, listFi
           const err = await upd.json().catch(() => ({}));
           throw new Error(err.error || `Update failed (${upd.status})`);
         }
+        invalidateDedupe('admin-cms:cms_sections:');
+        invalidateDedupe('cms-');
       } else {
         const ins = await fetch(`${SUPABASE_URL}/functions/v1/cms-api?table=cms_sections`, {
           method: 'POST',
@@ -83,6 +85,8 @@ const SectionEditor = ({ sectionKey, title, description, fields, listKey, listFi
           const err = await ins.json().catch(() => ({}));
           throw new Error(err.error || `Create failed (${ins.status})`);
         }
+        invalidateDedupe('admin-cms:cms_sections:');
+        invalidateDedupe('cms-');
       }
       toast.success('Section saved');
       notifyCMSContentUpdated();
