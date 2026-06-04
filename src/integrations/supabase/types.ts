@@ -745,6 +745,69 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_volunteers: {
+        Row: {
+          activities_json: string
+          certificate_password: string | null
+          created_at: string
+          email: string | null
+          hours_admin: number
+          hours_education: number
+          hours_field: number
+          hours_medical: number
+          id: string
+          is_published: boolean
+          name: string
+          phone: string | null
+          role: string | null
+          since: string | null
+          sort_order: number
+          total_hours: number
+          updated_at: string
+          volunteer_id: string
+        }
+        Insert: {
+          activities_json?: string
+          certificate_password?: string | null
+          created_at?: string
+          email?: string | null
+          hours_admin?: number
+          hours_education?: number
+          hours_field?: number
+          hours_medical?: number
+          id?: string
+          is_published?: boolean
+          name: string
+          phone?: string | null
+          role?: string | null
+          since?: string | null
+          sort_order?: number
+          total_hours?: number
+          updated_at?: string
+          volunteer_id: string
+        }
+        Update: {
+          activities_json?: string
+          certificate_password?: string | null
+          created_at?: string
+          email?: string | null
+          hours_admin?: number
+          hours_education?: number
+          hours_field?: number
+          hours_medical?: number
+          id?: string
+          is_published?: boolean
+          name?: string
+          phone?: string | null
+          role?: string | null
+          since?: string | null
+          sort_order?: number
+          total_hours?: number
+          updated_at?: string
+          volunteer_id?: string
+        }
+        Relationships: []
+      }
       donations: {
         Row: {
           amount_cents: number
