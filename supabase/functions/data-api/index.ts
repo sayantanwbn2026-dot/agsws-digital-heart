@@ -245,7 +245,7 @@ Deno.serve(async (req) => {
         .eq('application_ref', ref)
         .maybeSingle()
       if (error) return json({ error: error.message }, 500)
-      if (!data) return json({ error: 'Not found' }, 404)
+      if (!data) return json({ error: 'Not found' })
       return json({
         ref: data.application_ref,
         name: data.applicant_name,
