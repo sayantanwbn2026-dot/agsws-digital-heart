@@ -59,6 +59,10 @@ export async function dedupedJsonFetch<T>(
     const res = await fetch(url, init);
     const data = await res.json().catch(() => null);
     if (!res.ok) {
+      const message = typeof (data as any)?.error === 'string' ? (data as any).error : '';
+      if (res.status === 404 && message.toLowerCase() === 'not found') {
+        return data as T;
+      }
       const error = new Error((data as any)?.error || `Request failed (${res.status})`);
       (error as any).status = res.status;
       (error as any).data = data;
