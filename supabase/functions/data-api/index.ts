@@ -167,7 +167,7 @@ Deno.serve(async (req) => {
         .or(`stripe_payment_intent.eq.${ref},stripe_session_id.eq.${ref},id.eq.${isUuid(ref) ? ref : '00000000-0000-0000-0000-000000000000'}`)
         .maybeSingle()
       if (error) return json({ error: error.message }, 500)
-      if (!data) return json({ error: 'Not found' }, 404)
+      if (!data) return json({ error: 'Not found' })
       return json({
         amount: Math.round((data.amount_cents || 0) / 100),
         gateway: data.cause,
@@ -186,7 +186,7 @@ Deno.serve(async (req) => {
         .eq('registration_ref', ref)
         .maybeSingle()
       if (error) return json({ error: error.message }, 500)
-      if (!data) return json({ error: 'Not found' }, 404)
+      if (!data) return json({ error: 'Not found' })
       const status = data.status === 'paid' ? 'Active' : data.status === 'pending' ? 'Pending' : 'Closed'
       const completedCount = data.status === 'paid' ? 2 : data.status === 'pending' ? 1 : 0
       const STEP_META = [
@@ -221,7 +221,7 @@ Deno.serve(async (req) => {
         .eq('application_ref', ref)
         .maybeSingle()
       if (error) return json({ error: error.message }, 500)
-      if (!data) return json({ error: 'Not found' }, 404)
+      if (!data) return json({ error: 'Not found' })
       const fd = (data.form_data || {}) as any
       return json({
         ref: data.application_ref,
