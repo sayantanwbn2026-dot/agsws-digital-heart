@@ -214,24 +214,63 @@ Deno.serve(async (req) => {
     if (action === 'track-volunteer' && req.method === 'GET') {
       const ref = (url.searchParams.get('id') || '').trim()
       if (!ref) return json({ error: 'Missing id' }, 400)
+      const upper = ref.toUpperCase()
       const { data, error } = await supabase
-        .from('support_applications')
-        .select('application_ref, applicant_name, email, phone, status, form_data, created_at')
-        .eq('type', 'volunteer')
-        .eq('application_ref', ref)
+        .from('cms_volunteers')
+        .select('id, volunteer_id, name, role, since, total_hours, hours_field, hours_medical, hours_education, hours_admin, activities_json, certificate_password, is_published, created_at')
+        .ilike('volunteer_id', upper)
         .maybeSingle()
       if (error) return json({ error: error.message }, 500)
-      if (!data) return json({ error: 'Not found' })
-      const fd = (data.form_data || {}) as any
+      if (!data || !data.is_published) return json({ error: 'Not registered' })
+      let activities: any[] = []
+      try { const p = JSON.parse(data.activities_json || '[]'); if (Array.isArray(p)) activities = p } catch {}
+      const categories = {
+        field: data.hours_field || 0,
+        medical: data.hours_medical || 0,
+        education: data.hours_education || 0,
+        admin: data.hours_admin || 0,
+      }
+      const total = data.total_hours
+        || (categories.field + categories.medical + categories.education + categories.admin)
       return json({
-        ref: data.application_ref,
-        name: data.applicant_name,
-        role: fd.role_interest || 'Volunteer',
-        since: new Date(data.created_at).getFullYear().toString(),
-        status: data.status,
-        totalHours: Number(fd.total_hours || 0),
-        categories: fd.categories || { field: 0, medical: 0, education: 0, admin: 0 },
-        activities: Array.isArray(fd.activities) ? fd.activities : [],
+        ref: data.volunteer_id,
+        name: data.name,
+        role: data.role || 'Volunteer',
+        since: data.since || new Date(data.created_at).getFullYear().toString(),
+        status: 'active',
+        totalHours: total,
+        categories,
+        activities,
+        hasCertificatePassword: !!(data.certificate_password && String(data.certificate_password).length > 0),
+      })
+    }
+
+    if (action === 'request-certificate' && req.method === 'POST') {
+      const body = await req.json().catch(() => ({}))
+      const id = String(body.id || '').trim().toUpperCase()
+      const password = String(body.password || '')
+      if (!id || !password) return json({ error: 'Missing id or password' }, 400)
+      const { data, error } = await supabase
+        .from('cms_volunteers')
+        .select('volunteer_id, name, role, since, total_hours, hours_field, hours_medical, hours_education, hours_admin, certificate_password, is_published, created_at')
+        .ilike('volunteer_id', id)
+        .maybeSingle()
+      if (error) return json({ error: error.message }, 500)
+      if (!data || !data.is_published) return json({ error: 'Volunteer not found' })
+      if (!data.certificate_password) return json({ error: 'Certificate password not yet set for this volunteer. Please contact AGSWS.' })
+      if (String(data.certificate_password) !== password) return json({ error: 'Incorrect certificate password' })
+      const totalHours = data.total_hours
+        || ((data.hours_field || 0) + (data.hours_medical || 0) + (data.hours_education || 0) + (data.hours_admin || 0))
+      return json({
+        ok: true,
+        certificate: {
+          ref: data.volunteer_id,
+          name: data.name,
+          role: data.role || 'Volunteer',
+          since: data.since || new Date(data.created_at).getFullYear().toString(),
+          totalHours,
+          issuedOn: new Date().toISOString(),
+        },
       })
     }
 
