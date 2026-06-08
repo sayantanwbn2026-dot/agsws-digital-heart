@@ -48,6 +48,7 @@ Deno.serve(async (req) => {
       // Best-effort admin notification
       try {
         await supabaseAdmin.functions.invoke('send-email', {
+          headers: { 'x-internal-key': Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '' },
           body: {
             type: 'admin-application',
             to: 'admin',
