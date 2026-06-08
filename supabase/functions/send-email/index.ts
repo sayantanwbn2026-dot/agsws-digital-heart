@@ -11,6 +11,29 @@ const corsHeaders = {
 const RESEND_GATEWAY = 'https://connector-gateway.lovable.dev/resend'
 const FROM = 'AGSWS <onboarding@resend.dev>'
 const ADMIN_EMAIL = Deno.env.get('CMS_ADMIN_EMAIL') || 'admin@agsws.org'
+const INTERNAL_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+
+// Types that are safe to invoke from public/unauthenticated browser flows.
+// Anything sensitive (admin notifications, donation receipts, gift cards) must
+// be triggered server-side via an edge function that includes the internal key.
+const PUBLIC_ALLOWED_TYPES = new Set([
+  'newsletter-welcome',
+  'application-confirmation',
+  'event-confirmation',
+])
+
+function esc(v: unknown): string {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function isValidEmail(e: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e.length <= 254
+}
 
 const TEAL = '#1F9AA8'
 const YELLOW = '#F2B705'
@@ -73,9 +96,9 @@ function giftCardHTML(d: any) {
           <h1 style="color:#1a1a1a;margin:0;font-size:24px;font-weight:800">A gift in your honour</h1>
         </div>
         <div style="padding:36px">
-          <p style="color:#475569;font-size:15px">Dear ${d.gift_recipient_name},</p>
-          <p style="color:#475569;font-size:15px"><strong>${d.donor_name}</strong> has made a donation of <strong style="color:${TEAL}">${fmtINR(d.amount_cents)}</strong> to AGSWS in your honour.</p>
-          ${d.gift_message ? `<blockquote style="border-left:3px solid ${TEAL};padding:8px 0 8px 16px;margin:16px 0;color:#1F9AA8;font-style:italic">"${d.gift_message}"</blockquote>` : ''}
+          <p style="color:#475569;font-size:15px">Dear ${esc(d.gift_recipient_name)},</p>
+          <p style="color:#475569;font-size:15px"><strong>${esc(d.donor_name)}</strong> has made a donation of <strong style="color:${TEAL}">${fmtINR(d.amount_cents)}</strong> to AGSWS in your honour.</p>
+          ${d.gift_message ? `<blockquote style="border-left:3px solid ${TEAL};padding:8px 0 8px 16px;margin:16px 0;color:#1F9AA8;font-style:italic">"${esc(d.gift_message)}"</blockquote>` : ''}
           <p style="color:#475569;font-size:14px">Thank you for being part of this kindness.</p>
         </div>
       </div>
@@ -168,6 +191,23 @@ Deno.serve(async (req) => {
 
   try {
     const { type, to, data } = await req.json()
+
+    // Internal callers (other edge functions) pass the service-role key in this
+    // header. They're trusted for sensitive types (admin-*, donation receipts,
+    // gift cards). Public/browser callers can only use a small allowlist of
+    // confirmation emails sent to their own address.
+    const internalKey = req.headers.get('x-internal-key') || ''
+    const isInternal = !!INTERNAL_KEY && internalKey === INTERNAL_KEY
+
+    if (!isInternal) {
+      if (!PUBLIC_ALLOWED_TYPES.has(String(type))) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      }
+      if (to === 'admin' || typeof to !== 'string' || !isValidEmail(to)) {
+        return new Response(JSON.stringify({ error: 'Invalid recipient' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      }
+    }
+
     let html = ''
     let subject = ''
     let recipient = to === 'admin' ? ADMIN_EMAIL : to
