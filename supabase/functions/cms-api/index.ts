@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
+import { verifyToken } from '../cms-auth/index.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +13,14 @@ const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 )
 
+const ADMIN_EMAIL = Deno.env.get('CMS_ADMIN_EMAIL') || ''
+
+const ALLOWED_UPLOAD_TYPES = new Set([
+  'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'application/pdf'
+])
+const ALLOWED_UPLOAD_EXT = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'pdf'])
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+
 // Tables that don't have sort_order column
 const NO_SORT_ORDER = ['cms_site_settings', 'cms_hero', 'cms_payment_config', 'cms_sections', 'newsletter_subscriptions', 'support_applications', 'donations', 'goldenage_registrations']
 const DIRECT_TABLES = new Set(['donations', 'goldenage_registrations'])
@@ -21,8 +30,10 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  const authHeader = req.headers.get('authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
+  const authHeader = req.headers.get('authorization') || ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : ''
+  const validAdmin = ADMIN_EMAIL ? await verifyToken(token, ADMIN_EMAIL) : false
+  if (!validAdmin) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -51,12 +62,28 @@ Deno.serve(async (req) => {
         })
       }
 
-      const ext = file.name.split('.').pop()
-      const path = `${folder}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`
+      const ext = (file.name.split('.').pop() || '').toLowerCase()
+      if (!ALLOWED_UPLOAD_TYPES.has(file.type)) {
+        return new Response(JSON.stringify({ error: 'Unsupported file type' }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      if (!ALLOWED_UPLOAD_EXT.has(ext)) {
+        return new Response(JSON.stringify({ error: 'Unsupported file extension' }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      if (file.size > MAX_UPLOAD_BYTES) {
+        return new Response(JSON.stringify({ error: 'File exceeds 10 MB' }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      const safeFolder = String(folder).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40) || 'general'
+      const path = `${safeFolder}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`
       
       const { data, error } = await supabaseAdmin.storage
         .from('cms-uploads')
-        .upload(path, file, { cacheControl: '3600', upsert: false })
+        .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type })
       
       if (error) throw error
 
