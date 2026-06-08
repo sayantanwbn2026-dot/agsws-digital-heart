@@ -322,19 +322,7 @@ const ApplyForSupport = () => {
         },
       }).catch((e) => console.error('[applicant email]', e));
 
-      supabase.functions.invoke('send-email', {
-        body: {
-          type: 'admin-application',
-          to: 'admin',
-          data: {
-            application_ref: ref,
-            applicant_name: params.applicant_name,
-            email: params.email,
-            phone: params.phone,
-            type: params.type,
-          },
-        },
-      }).catch((e) => console.error('[admin email]', e));
+      // Admin notification is sent server-side by the public-submit edge function.
 
       setSubmitted({ ref, type: params.type, email: params.email });
       toast.success('Application submitted — check your email');

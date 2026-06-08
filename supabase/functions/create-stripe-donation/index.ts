@@ -33,7 +33,6 @@ interface DonationBody {
   plan_label?: string
   success_url: string
   cancel_url: string
-  environment?: StripeEnv
 }
 
 Deno.serve(async (req) => {
@@ -51,7 +50,8 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Amount out of range' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    const env: StripeEnv = body.environment || 'sandbox'
+    // Stripe environment is determined server-side; clients cannot force sandbox/live.
+    const env: StripeEnv = Deno.env.get('STRIPE_ENV') === 'live' ? 'live' : 'sandbox'
     const stripe = createStripeClient(env)
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)

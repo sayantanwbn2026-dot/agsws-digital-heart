@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
       if (row) {
         try {
           await supabase.functions.invoke('send-email', {
+            headers: { 'x-internal-key': Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '' },
             body: {
               type: cause === 'goldenage' ? 'goldenage-confirmation' : 'donation-receipt',
               to: row.donor_email || row.registrant_email,
@@ -55,6 +56,7 @@ Deno.serve(async (req) => {
         if (row.is_gift && row.gift_recipient_email) {
           try {
             await supabase.functions.invoke('send-email', {
+              headers: { 'x-internal-key': Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '' },
               body: { type: 'gift-card', to: row.gift_recipient_email, data: row },
             })
           } catch (e) { console.error('[gift email]', e) }
@@ -63,6 +65,7 @@ Deno.serve(async (req) => {
         // Admin notification
         try {
           await supabase.functions.invoke('send-email', {
+            headers: { 'x-internal-key': Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '' },
             body: { type: 'admin-donation', to: 'admin', data: row },
           })
         } catch (e) { console.error('[admin email]', e) }
