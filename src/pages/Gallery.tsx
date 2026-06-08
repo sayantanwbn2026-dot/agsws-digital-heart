@@ -145,6 +145,29 @@ const Gallery = () => {
     setAlbumIndex(i => (i + dir + activeAlbum.photos.length) % activeAlbum.photos.length);
   }, [activeAlbum]);
 
+  // Preload neighboring album photos so navigation feels instant and the
+  // image doesn't pop / flicker while the next one downloads.
+  useEffect(() => {
+    if (!activeAlbum) return;
+    const n = activeAlbum.photos.length;
+    if (n === 0) return;
+    [-1, 1].forEach((d) => {
+      const next = activeAlbum.photos[(albumIndex + d + n) % n];
+      if (next?.image) { const img = new Image(); img.src = next.image; }
+    });
+  }, [activeAlbum, albumIndex]);
+
+  // Lock body scroll while the album/lightbox overlay is open so the modal
+  // stays perfectly centered in the viewport and the page behind doesn't
+  // shift the layout.
+  useEffect(() => {
+    const open = activeAlbum !== null || lightboxIndex !== null;
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [activeAlbum, lightboxIndex]);
+
   const openLightbox = (idx: number) => setLightboxIndex(idx);
   const closeLightbox = () => setLightboxIndex(null);
   const navigate = useCallback((dir: number) => {
