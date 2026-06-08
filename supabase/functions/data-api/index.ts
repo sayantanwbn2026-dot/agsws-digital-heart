@@ -280,7 +280,7 @@ Deno.serve(async (req) => {
       if (!ref) return json({ error: 'Missing id' }, 400)
       const { data, error } = await supabase
         .from('support_applications')
-        .select('application_ref, applicant_name, type, status, created_at, updated_at, admin_notes')
+        .select('application_ref, applicant_name, type, status, created_at, updated_at')
         .eq('application_ref', ref)
         .maybeSingle()
       if (error) return json({ error: error.message }, 500)
@@ -290,7 +290,6 @@ Deno.serve(async (req) => {
         name: data.applicant_name,
         type: data.type,
         status: data.status,
-        admin_notes: data.admin_notes || '',
         created_at: data.created_at,
         updated_at: data.updated_at,
         stages: buildApplicationStages(data),
