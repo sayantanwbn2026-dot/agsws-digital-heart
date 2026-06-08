@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
-import { verifyToken } from '../cms-auth/index.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,6 +13,50 @@ const supabaseAdmin = createClient(
 )
 
 const ADMIN_EMAIL = Deno.env.get('CMS_ADMIN_EMAIL') || ''
+const TOKEN_TTL_MS = 12 * 60 * 60 * 1000
+const TOKEN_SECRET = Deno.env.get('CMS_TOKEN_SECRET') || Deno.env.get('CMS_ADMIN_PASSWORD') || ''
+
+const b64urlDecode = (s: string) => {
+  s = s.replace(/-/g, '+').replace(/_/g, '/')
+  const pad = s.length % 4 ? 4 - (s.length % 4) : 0
+  const bin = atob(s + '='.repeat(pad))
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+  return out
+}
+
+let _key: CryptoKey | null = null
+async function getKey() {
+  if (_key) return _key
+  _key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(TOKEN_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['verify'],
+  )
+  return _key
+}
+
+async function verifyToken(token: string, expectedEmail: string): Promise<boolean> {
+  if (!token || !expectedEmail || !TOKEN_SECRET) return false
+  const parts = token.split('.')
+  if (parts.length !== 2) return false
+  try {
+    const payloadBytes = b64urlDecode(parts[0])
+    const sigBytes = b64urlDecode(parts[1])
+    const key = await getKey()
+    const ok = await crypto.subtle.verify('HMAC', key, sigBytes, payloadBytes)
+    if (!ok) return false
+    const decoded = new TextDecoder().decode(payloadBytes)
+    const [tokenEmail, tsStr] = decoded.split(':')
+    const ts = Number(tsStr)
+    const age = Date.now() - ts
+    return tokenEmail === expectedEmail && Number.isFinite(ts) && age >= 0 && age < TOKEN_TTL_MS
+  } catch {
+    return false
+  }
+}
 
 const ALLOWED_UPLOAD_TYPES = new Set([
   'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'application/pdf'
