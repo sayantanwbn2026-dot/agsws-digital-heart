@@ -216,6 +216,9 @@ export type Database = {
           cta_text: string
           headline: string
           id: string
+          live_activity_enabled: boolean
+          live_activity_message: string | null
+          live_activity_time_label: string | null
           section_key: string
           subtitle: string
           updated_at: string
@@ -227,6 +230,9 @@ export type Database = {
           cta_text?: string
           headline?: string
           id?: string
+          live_activity_enabled?: boolean
+          live_activity_message?: string | null
+          live_activity_time_label?: string | null
           section_key?: string
           subtitle?: string
           updated_at?: string
@@ -238,6 +244,9 @@ export type Database = {
           cta_text?: string
           headline?: string
           id?: string
+          live_activity_enabled?: boolean
+          live_activity_message?: string | null
+          live_activity_time_label?: string | null
           section_key?: string
           subtitle?: string
           updated_at?: string
