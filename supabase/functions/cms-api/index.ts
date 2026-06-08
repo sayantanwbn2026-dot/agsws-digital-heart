@@ -148,6 +148,11 @@ Deno.serve(async (req) => {
 
     if (req.method === 'POST') {
       const body = await req.json()
+      if (table === 'cms_volunteers' && body && typeof body.certificate_password === 'string' && body.certificate_password.length > 0) {
+        const { data: hashed, error: hErr } = await supabaseAdmin.rpc('hash_password', { _password: body.certificate_password })
+        if (hErr) throw hErr
+        body.certificate_password = hashed
+      }
       const { data, error } = await supabaseAdmin.from(table).insert(body).select().single()
       if (error) throw error
       return new Response(JSON.stringify(data), {
@@ -161,6 +166,19 @@ Deno.serve(async (req) => {
       delete body.id
       delete body.created_at
       delete body.updated_at
+      if (table === 'cms_volunteers') {
+        if (typeof body.certificate_password === 'string' && body.certificate_password.length > 0) {
+          // Don't re-hash an already-hashed value (admins sometimes resubmit the form unchanged)
+          if (!body.certificate_password.startsWith('$2')) {
+            const { data: hashed, error: hErr } = await supabaseAdmin.rpc('hash_password', { _password: body.certificate_password })
+            if (hErr) throw hErr
+            body.certificate_password = hashed
+          }
+        } else if (body.certificate_password === '' || body.certificate_password === null) {
+          // Treat empty string as "no change" to avoid wiping an existing password by accident
+          delete body.certificate_password
+        }
+      }
       const { data, error } = await supabaseAdmin.from(table).update(body).eq('id', id).select().single()
       if (error) throw error
       return new Response(JSON.stringify(data), {
