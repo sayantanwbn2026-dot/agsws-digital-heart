@@ -375,7 +375,8 @@ const Gallery = () => {
         {activeAlbum && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-6"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-6 overflow-hidden"
             onClick={closeAlbum}
           >
             <div className="absolute top-5 left-1/2 -translate-x-1/2 text-center pointer-events-none">
@@ -385,22 +386,43 @@ const Gallery = () => {
             <button className="absolute top-5 right-5 text-white/70 p-2.5 hover:bg-white/10 rounded-xl transition-colors z-10" onClick={closeAlbum}><X size={22} /></button>
             <button aria-label="Previous photo" className="absolute left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm z-10" onClick={(e) => { e.stopPropagation(); navigateAlbum(-1); }}><ChevronLeft size={22} /></button>
             <button aria-label="Next photo" className="absolute right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm z-10" onClick={(e) => { e.stopPropagation(); navigateAlbum(1); }}><ChevronRight size={22} /></button>
-            <motion.div
-              key={albumIndex}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col items-center justify-center gap-5 max-w-[90vw] max-h-[85vh]"
+            <div
+              className="relative flex flex-col items-center justify-center gap-5 w-[min(90vw,1100px)] max-h-[85vh]"
               onClick={e => e.stopPropagation()}
             >
-              {activeAlbum.photos[albumIndex].image ? (
-                <img src={activeAlbum.photos[albumIndex].image} alt={activeAlbum.photos[albumIndex].caption} className="max-w-[85vw] max-h-[68vh] rounded-xl object-contain shadow-2xl" />
-              ) : (
-                <ImagePlaceholder category={activeAlbum.photos[albumIndex].category} className="w-[500px] h-[375px] md:w-[720px] md:h-[480px] rounded-xl" />
-              )}
-              <p className="text-white/85 text-[14px] max-w-xl text-center font-medium">{activeAlbum.photos[albumIndex].caption}</p>
-              <div className="flex items-center gap-2 mt-1">
+              {/* Fixed-aspect stage — image cross-fades inside without shifting layout */}
+              <div className="relative w-full h-[68vh] flex items-center justify-center">
+                <AnimatePresence mode="sync" initial={false}>
+                  {(() => {
+                    const photo = activeAlbum.photos[albumIndex];
+                    const k = photo.image || `placeholder-${albumIndex}`;
+                    return (
+                      <motion.div
+                        key={k}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        {photo.image ? (
+                          <img
+                            src={photo.image}
+                            alt={photo.caption}
+                            decoding="async"
+                            className="max-w-full max-h-full rounded-xl object-contain shadow-2xl select-none"
+                            draggable={false}
+                          />
+                        ) : (
+                          <ImagePlaceholder category={photo.category} className="w-[500px] h-[375px] md:w-[720px] md:h-[480px] rounded-xl" />
+                        )}
+                      </motion.div>
+                    );
+                  })()}
+                </AnimatePresence>
+              </div>
+              <p className="text-white/85 text-[14px] max-w-xl text-center font-medium min-h-[1.25em]">{activeAlbum.photos[albumIndex].caption}</p>
+              <div className="flex items-center gap-2 mt-1 flex-wrap justify-center max-w-full">
                 {activeAlbum.photos.map((p, i) => (
                   <button
                     key={p.id}
@@ -410,7 +432,7 @@ const Gallery = () => {
                   />
                 ))}
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
