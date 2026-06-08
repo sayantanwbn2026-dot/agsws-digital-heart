@@ -136,6 +136,8 @@ const Blog = () => {
               </FadeInUp>
             ))}
           </div>
+          </>
+          )}
         </div>
       </section>
     </main>
