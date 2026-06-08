@@ -25,12 +25,15 @@ const categoryColors: Record<string, string> = {
 
 const Blog = () => {
   useSEO("Blog", "AGSWS stories of impact — real stories from the field.");
-  const { data: cmsBlog } = useCMSList<any>('cms_blog_posts', [], {
+  const { data: cmsBlog, loading: blogLoading } = useCMSList<any>('cms_blog_posts', [], {
     filter: { column: 'is_published', value: true },
     orderBy: { column: 'published_at', ascending: false }
   });
 
   const blogPosts: any[] = useMemo(() => {
+    // Suppress the static fallback list while the CMS query is in-flight so
+    // visitors don't see stale demo posts swap out a second later.
+    if (blogLoading) return [];
     if (cmsBlog.length > 0) {
       // Featured posts first, then by published_at desc — matches LatestStories on Home.
       const ordered = [...cmsBlog].sort(
@@ -49,7 +52,7 @@ const Blog = () => {
       }));
     }
     return stories.map(s => ({ ...s, image: '' }));
-  }, [cmsBlog]);
+  }, [cmsBlog, blogLoading]);
 
   const featured = blogPosts[0];
   const rest = blogPosts.slice(1);

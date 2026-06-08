@@ -156,9 +156,13 @@ const Events = () => {
   useSEO("Events & Campaigns", "Medical camps, school programmes, and community drives in Kolkata by AGSWS.");
   // Pull events ordered by event_date descending (newest first). Past vs upcoming
   // is then derived from the date locally so the same query feeds both sections.
-  const { data: cmsEvents } = useCMSList<any>('cms_events', [], { orderBy: { column: 'event_date', ascending: false } });
+  const { data: cmsEvents, loading: eventsLoading } = useCMSList<any>('cms_events', [], { orderBy: { column: 'event_date', ascending: false } });
 
   const events: AGSWSEvent[] = useMemo(() => {
+    // While we're still fetching from the CMS, render nothing instead of
+    // flashing the hard-coded fallback list. Once loading resolves, use
+    // fallback ONLY if the CMS legitimately has no rows.
+    if (eventsLoading) return [];
     if (cmsEvents.length === 0) return fallbackEvents;
     // Defensive de-duplication: if the same title + event_date appears twice,
     // keep the earliest-created copy. Prevents the UI from listing duplicate
@@ -187,7 +191,7 @@ const Events = () => {
       registered: 0,
       isPast: e.event_date ? new Date(e.event_date) < new Date() : false,
     }));
-  }, [cmsEvents]);
+  }, [cmsEvents, eventsLoading]);
 
   const [filter, setFilter] = useState<string>("all");
   const [selectedEvent, setSelectedEvent] = useState<AGSWSEvent | null>(null);
