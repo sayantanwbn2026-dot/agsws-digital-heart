@@ -258,7 +258,12 @@ Deno.serve(async (req) => {
       if (error) return json({ error: error.message }, 500)
       if (!data || !data.is_published) return json({ error: 'Volunteer not found' })
       if (!data.certificate_password) return json({ error: 'Certificate password not yet set for this volunteer. Please contact AGSWS.' })
-      if (String(data.certificate_password) !== password) return json({ error: 'Incorrect certificate password' })
+      const { data: ok, error: vErr } = await supabase.rpc('verify_volunteer_password', {
+        _volunteer_id: id,
+        _password: password,
+      })
+      if (vErr) return json({ error: vErr.message }, 500)
+      if (!ok) return json({ error: 'Incorrect certificate password' })
       const totalHours = data.total_hours
         || ((data.hours_field || 0) + (data.hours_medical || 0) + (data.hours_education || 0) + (data.hours_admin || 0))
       return json({
