@@ -1038,6 +1038,11 @@ export type Database = {
           metadata: Json
         }[]
       }
+      hash_password: { Args: { _password: string }; Returns: string }
+      verify_volunteer_password: {
+        Args: { _password: string; _volunteer_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
