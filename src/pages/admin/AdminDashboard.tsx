@@ -28,6 +28,9 @@ const heroFields: FieldConfig[] = [
   { key: 'cta_text', label: 'CTA Button Text', type: 'text' },
   { key: 'cta_link', label: 'CTA Button Link', type: 'text' },
   { key: 'background_image', label: 'Background Image', type: 'image', resolution: '1920×800px', imageFolder: 'hero' },
+  { key: 'live_activity_enabled', label: 'Show Live Activity Ticker', type: 'boolean' },
+  { key: 'live_activity_message', label: 'Live Activity Message', type: 'text', placeholder: 'e.g. Anjali from Pune donated ₹1,000 to Medical Aid' },
+  { key: 'live_activity_time_label', label: 'Live Activity Time Label', type: 'text', placeholder: 'Just now' },
 ];
 
 const statsFields: FieldConfig[] = [

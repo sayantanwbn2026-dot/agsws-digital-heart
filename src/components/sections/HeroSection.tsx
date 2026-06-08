@@ -32,6 +32,9 @@ const defaultHero = {
   cta_text: 'Donate Now',
   cta_link: '/donate',
   background_image: null as string | null,
+  live_activity_enabled: true,
+  live_activity_message: 'Anjali from Pune donated ₹1,000 to Medical Aid',
+  live_activity_time_label: 'Just now',
 };
 
 const HeroSection = () => {
@@ -144,20 +147,24 @@ const HeroSection = () => {
         </motion.div>
       </motion.div>
 
-      {/* Live donation ticker */}
-      <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.6, duration: 0.6 }} className="absolute bottom-28 left-6 z-20 hidden lg:block">
-        <div className="bg-white/[0.06] backdrop-blur-xl rounded-2xl p-4 max-w-[260px] border border-white/[0.08]">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
-            </span>
-            <span className="text-[10px] text-white/40 font-[500]">Live Activity</span>
+      {/* Live donation ticker (CMS-driven) */}
+      {!heroLoading && hero.live_activity_enabled && (hero.live_activity_message || '').trim() && (
+        <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.6, duration: 0.6 }} className="absolute bottom-28 left-6 z-20 hidden lg:block">
+          <div className="bg-white/[0.06] backdrop-blur-xl rounded-2xl p-4 max-w-[260px] border border-white/[0.08]">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
+              </span>
+              <span className="text-[10px] text-white/40 font-[500]">Live Activity</span>
+            </div>
+            <p className="text-[12px] font-[500] text-white/80 leading-relaxed">{hero.live_activity_message}</p>
+            {hero.live_activity_time_label && (
+              <p className="text-[10px] text-white/30 mt-1">{hero.live_activity_time_label}</p>
+            )}
           </div>
-          <p className="text-[12px] font-[500] text-white/80 leading-relaxed">Anjali from Pune donated ₹1,000 to Medical Aid</p>
-          <p className="text-[10px] text-white/30 mt-1">Just now</p>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2">
         <span className="text-[10px] text-white/30 font-[500] uppercase tracking-[0.14em]">Scroll</span>

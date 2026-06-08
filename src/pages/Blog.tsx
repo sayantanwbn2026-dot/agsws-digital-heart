@@ -25,12 +25,15 @@ const categoryColors: Record<string, string> = {
 
 const Blog = () => {
   useSEO("Blog", "AGSWS stories of impact — real stories from the field.");
-  const { data: cmsBlog } = useCMSList<any>('cms_blog_posts', [], {
+  const { data: cmsBlog, loading: blogLoading } = useCMSList<any>('cms_blog_posts', [], {
     filter: { column: 'is_published', value: true },
     orderBy: { column: 'published_at', ascending: false }
   });
 
   const blogPosts: any[] = useMemo(() => {
+    // Suppress the static fallback list while the CMS query is in-flight so
+    // visitors don't see stale demo posts swap out a second later.
+    if (blogLoading) return [];
     if (cmsBlog.length > 0) {
       // Featured posts first, then by published_at desc — matches LatestStories on Home.
       const ordered = [...cmsBlog].sort(
@@ -49,15 +52,13 @@ const Blog = () => {
       }));
     }
     return stories.map(s => ({ ...s, image: '' }));
-  }, [cmsBlog]);
+  }, [cmsBlog, blogLoading]);
 
   const featured = blogPosts[0];
   const rest = blogPosts.slice(1);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
-
-  if (!featured) return null;
 
   return (
     <main id="main-content">
@@ -75,6 +76,12 @@ const Blog = () => {
 
       <section className="bg-[hsl(var(--background))] py-16 md:py-20">
         <div className="max-w-[1200px] mx-auto px-6">
+          {blogLoading ? (
+            <div className="min-h-[420px] flex items-center justify-center text-[hsl(var(--muted-foreground))] text-sm">Loading stories…</div>
+          ) : !featured ? (
+            <div className="min-h-[420px] flex items-center justify-center text-[hsl(var(--muted-foreground))] text-sm">No stories published yet.</div>
+          ) : (
+          <>
           <FadeInUp>
             <Link to={`/blog/${featured.slug}`} className="group block">
               <div className="relative rounded-2xl overflow-hidden bg-[hsl(var(--card))] border border-[hsl(var(--border))] shadow-sm hover:shadow-lg transition-shadow duration-500">
@@ -129,6 +136,8 @@ const Blog = () => {
               </FadeInUp>
             ))}
           </div>
+          </>
+          )}
         </div>
       </section>
     </main>
