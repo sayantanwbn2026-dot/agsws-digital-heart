@@ -4,6 +4,7 @@ import { useSEO } from "@/hooks/useSEO";
 import { events as fallbackEvents, eventTypeLabels, eventTypeColors, type AGSWSEvent } from "@/data/events";
 import { useCMSList } from "@/hooks/useCMSList";
 import PageHero from "@/components/layout/PageHero";
+import ModalPortal from "@/components/ui/ModalPortal";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Clock, X, ChevronLeft, ChevronRight, Calendar, Users, ArrowRight, Sparkles, Images } from "lucide-react";
 
@@ -32,6 +33,7 @@ const EventCard = ({ event, onClick, index, compact = false }: { event: AGSWSEve
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.04, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
         whileHover={{ y: -3 }}
+        data-spotlight
         className="group relative w-full text-left bg-white rounded-2xl border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden p-4 flex items-center gap-4 hover:shadow-[var(--shadow-lg)] transition-shadow"
       >
         <div className={`flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br ${typeGradients[event.type] || typeGradients.medical} flex flex-col items-center justify-center text-white`}>
@@ -53,7 +55,8 @@ const EventCard = ({ event, onClick, index, compact = false }: { event: AGSWSEve
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover={{ y: -5 }}
-      className={`group relative bg-white rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden transition-shadow duration-300 hover:shadow-[var(--shadow-lg)] ${event.isPast ? "opacity-60" : ""}`}
+      data-spotlight
+      className={`group relative bg-white rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden transition-shadow duration-300 hover:shadow-[var(--shadow-lg)] ${event.isPast ? "opacity-60" : ""}`}
     >
       <div className={`h-1 bg-gradient-to-r ${typeGradients[event.type] || typeGradients.medical}`} />
       <div className="p-6">
@@ -115,7 +118,7 @@ const MiniCalendar = ({ month, year, events: evts, onChangeMonth }: {
   }).map(e => new Date(e.date).getDate()));
 
   return (
-    <div className="bg-white rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6">
+    <div className="bg-white rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6">
       <div className="flex items-center justify-between mb-5">
         <button onClick={() => onChangeMonth(-1)} className="w-8 h-8 rounded-lg hover:bg-[var(--bg)] flex items-center justify-center transition-colors"><ChevronLeft size={16} /></button>
         <span className="font-[700] text-[14px] text-[var(--dark)]">{months[month]} {year}</span>
@@ -198,12 +201,18 @@ const Events = () => {
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
   const [calYear, setCalYear] = useState(new Date().getFullYear());
 
-  // Lock body scroll while dialog is open so the modal scrolls instead of the page.
+  // Lock scroll while the dialog is open so the modal scrolls instead of the
+  // page. We pause Lenis too — with smooth-scroll running, `overflow:hidden`
+  // alone doesn't stop wheel/touch momentum behind the overlay.
   useEffect(() => {
     if (!selectedEvent) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    window.lenis?.stop();
+    return () => {
+      document.body.style.overflow = prev;
+      window.lenis?.start();
+    };
   }, [selectedEvent]);
 
   // Sorting guarantees (frontend safety-net mirroring the backend rules):
@@ -259,7 +268,7 @@ const Events = () => {
         </div>
       </div>
       <div className="sticky top-[56px] z-30 bg-white/80 backdrop-blur-lg border-b border-[var(--border-color)]">
-        <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] py-3 flex gap-2 overflow-x-auto no-scrollbar">
+        <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] py-3 flex gap-2 overflow-x-auto no-scrollbar [mask-image:linear-gradient(to_right,black_90%,transparent)] sm:[mask-image:none]">
           {filterTypes.map(f => (
             <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-full text-[12px] font-[600] whitespace-nowrap transition-all duration-200 ${filter === f ? "bg-[var(--teal)] text-white shadow-[0_4px_12px_rgba(31,154,168,0.25)]" : "bg-[var(--bg)] text-[var(--mid)] border border-[var(--border-color)] hover:border-[var(--teal)] hover:text-[var(--teal)]"}`}>
               {f === "all" ? "All Events" : eventTypeLabels[f]}
@@ -305,15 +314,16 @@ const Events = () => {
         </div>
       </section>
 
+      <ModalPortal>
       <AnimatePresence>
         {selectedEvent && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D1B1C]/70 backdrop-blur-md p-4 sm:p-6" onClick={() => setSelectedEvent(null)}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9990] flex items-center justify-center bg-[#0D1B1C]/70 backdrop-blur-md p-4 sm:p-6" onClick={() => setSelectedEvent(null)}>
             <motion.div
               initial={{ scale: 0.94, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.96, opacity: 0, y: 10 }}
               transition={{ type: "spring", damping: 28, stiffness: 250 }}
-              className="bg-white rounded-[24px] w-full max-w-3xl max-h-[88vh] overflow-y-auto overscroll-contain shadow-[0_32px_80px_rgba(0,0,0,0.3)]"
+              className="bg-white rounded-[14px] w-full max-w-3xl max-h-[88vh] overflow-y-auto overscroll-contain shadow-[0_32px_80px_rgba(0,0,0,0.3)]"
               onClick={e => e.stopPropagation()}
             >
               <div className="p-8 sm:p-10">
@@ -368,6 +378,7 @@ const Events = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </ModalPortal>
     </main>
   );
 };

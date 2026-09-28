@@ -51,22 +51,22 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         teal: {
-          DEFAULT: "hsl(var(--teal))",
-          light: "hsl(var(--teal-light))",
-          dark: "hsl(var(--teal-dark))",
+          DEFAULT: "var(--teal)",
+          light: "var(--teal-light)",
+          dark: "var(--teal-dark)",
         },
         yellow: {
-          DEFAULT: "hsl(var(--yellow))",
-          light: "hsl(var(--yellow-light))",
+          DEFAULT: "var(--yellow)",
+          light: "var(--yellow-light)",
         },
         purple: {
-          DEFAULT: "hsl(var(--purple))",
-          light: "hsl(var(--purple-light))",
+          DEFAULT: "var(--purple)",
+          light: "var(--purple-light)",
         },
-        beige: "hsl(var(--beige))",
-        "text-dark": "hsl(var(--text-dark))",
-        "text-mid": "hsl(var(--text-mid))",
-        "text-light": "hsl(var(--text-light))",
+        beige: "var(--beige)",
+        "text-dark": "var(--dark)",
+        "text-mid": "var(--mid)",
+        "text-light": "var(--light)",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -78,11 +78,15 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      // Tighter, coherent radius scale. Previously `xl` was 24px — larger than
+      // Tailwind's default `2xl` (16px) — which made the steps non-monotonic.
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        xl: "24px",
+        md: "calc(var(--radius) - 2px)",
+        lg: "var(--radius)",
+        xl: "10px",
+        "2xl": "12px",
+        "3xl": "16px",
       },
       keyframes: {
         "accordion-down": {

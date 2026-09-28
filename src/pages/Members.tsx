@@ -75,7 +75,8 @@ const Members = () => {
                 <motion.article
                   whileHover={{ y: -6 }}
                   transition={{ type: "spring", stiffness: 280, damping: 24 }}
-                  className="group flex flex-col bg-white rounded-[14px] sm:rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden hover:shadow-[var(--shadow-lg)] transition-shadow duration-300 h-full"
+                  data-spotlight
+                  className="group flex flex-col bg-white rounded-[10px] sm:rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden hover:shadow-[var(--shadow-lg)] transition-shadow duration-300 h-full"
                 >
                   {/* Portrait Image Area */}
                   <div className="relative aspect-[3/4] w-full overflow-hidden bg-[var(--bg)]">

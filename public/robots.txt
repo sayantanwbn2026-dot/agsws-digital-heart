@@ -12,5 +12,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /system/health
+Disallow: /donation-complete
+Disallow: /donation-cancelled
+Disallow: /thank-you
 
-Sitemap: https://agsws.lovable.app/sitemap.xml
+Sitemap: https://agsws.org/sitemap.xml

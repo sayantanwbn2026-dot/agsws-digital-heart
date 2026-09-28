@@ -1,11 +1,12 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Shield, ChevronDown, Heart, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDonateOverlay } from "@/contexts/DonateOverlayContext";
 import { useCMSData } from "@/hooks/useCMSData";
 import { useCMSList } from "@/hooks/useCMSList";
 import KPIStatCard from "@/components/ui/KPIStatCard";
+import Magnetic from "@/components/ui/Magnetic";
 
 const CompassionText = () => {
   const letters = "Compassion".split("");
@@ -37,6 +38,18 @@ const defaultHero = {
   live_activity_time_label: 'Just now',
 };
 
+/** Last CMS hero copy this browser saw — used to reserve the headline's exact
+ *  footprint while the fresh copy loads, so the centred hero doesn't jump. */
+const HERO_COPY_KEY = "agsws-hero-copy";
+const readCachedCopy = (): { headline?: string; subtitle?: string } | null => {
+  try {
+    const raw = localStorage.getItem(HERO_COPY_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 const HeroSection = () => {
   const sectionRef = useRef(null);
   const { openOverlay } = useDonateOverlay();
@@ -51,8 +64,25 @@ const HeroSection = () => {
   // Split headline into words, detect "Compassion" for special styling
   // Until CMS hero loads, render an invisible placeholder of the same shape so
   // the page doesn't flash the fallback copy and then swap to the real copy.
-  const activeHeadline = heroLoading ? '' : (hero.headline || defaultHero.headline);
-  const activeSubtitle = heroLoading ? '' : (hero.subtitle || defaultHero.subtitle);
+  // While the CMS copy loads, lay out a same-shaped placeholder with
+  // `visibility: hidden` — it holds the real space without being seen. An empty
+  // headline collapsed the vertically-centred block, then the real 2–4 line
+  // headline arrived and shoved everything ~80px (the page's main CLS source).
+  const [cachedCopy] = useState(readCachedCopy);
+  useEffect(() => {
+    if (heroLoading) return;
+    try {
+      localStorage.setItem(HERO_COPY_KEY, JSON.stringify({ headline: hero.headline, subtitle: hero.subtitle }));
+    } catch {
+      /* storage blocked — the default copy is a close enough placeholder */
+    }
+  }, [heroLoading, hero.headline, hero.subtitle]);
+  const activeHeadline = heroLoading
+    ? (cachedCopy?.headline || defaultHero.headline)
+    : (hero.headline || defaultHero.headline);
+  const activeSubtitle = heroLoading
+    ? (cachedCopy?.subtitle || defaultHero.subtitle)
+    : (hero.subtitle || defaultHero.subtitle);
   const activeCta      = heroLoading ? '' : (hero.cta_text || defaultHero.cta_text);
   const headlineWords = activeHeadline.split(/\s+/).filter(Boolean);
   const compassionIndex = headlineWords.findIndex(w => w.toLowerCase().replace(/[.,!]/g, '') === 'compassion');
@@ -62,7 +92,7 @@ const HeroSection = () => {
       <motion.div style={{ y: bgY }} className="absolute inset-0 will-change-transform">
         {hero.background_image ? (
           <>
-            <img src={hero.background_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={hero.background_image} alt="" className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" decoding="async" />
             <div className="absolute inset-0 bg-black/60" />
           </>
         ) : (
@@ -90,51 +120,54 @@ const HeroSection = () => {
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
       }} />
 
-      <motion.div style={{ y: contentY, opacity: opacityOut }} className="relative z-10 text-center max-w-[860px] mx-auto px-5 sm:px-6 pt-24 pb-20 sm:py-28 lg:py-32 will-change-transform">
+      <motion.div style={{ y: contentY, opacity: opacityOut }} className="relative z-10 text-center max-w-[860px] mx-auto px-5 sm:px-6 pt-32 pb-20 sm:py-28 lg:py-32 will-change-transform">
         <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="inline-block mb-6 sm:mb-8">
           <span className="bg-white/[0.06] backdrop-blur-sm text-white/80 px-5 py-2 rounded-full text-[10px] font-[600] uppercase tracking-[0.12em] border border-white/[0.08]">
             Kolkata, West Bengal · Est. 2016
           </span>
         </motion.div>
 
-        <h1 className="display-hero text-white mb-6 max-w-[800px] mx-auto min-h-[1.1em]">
+        <h1 key={heroLoading ? "placeholder" : "live"} className={`display-hero text-white mb-6 max-w-[800px] mx-auto min-h-[1.1em] ${heroLoading ? "invisible" : ""}`}>
           {headlineWords.map((word, i) => {
             if (i === compassionIndex) {
               return <span key={i} className="inline-block mr-3"><CompassionText /></span>;
             }
             return (
-              <motion.span key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07, duration: 0.45 }} className="inline-block mr-3">{word}</motion.span>
+              <motion.span key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, duration: 0.45 }} className="inline-block mr-3">{word}</motion.span>
             );
           })}
         </h1>
 
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }} className="text-[clamp(14px,1.6vw,17px)] font-[400] text-white/65 max-w-[540px] mx-auto mb-8 sm:mb-10 leading-[1.8] px-1 min-h-[2.5em]">
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25, duration: 0.45 }} className={`text-[clamp(14px,1.6vw,17px)] font-[400] text-white/65 max-w-[540px] mx-auto mb-8 sm:mb-10 leading-[1.8] px-1 min-h-[2.5em] ${heroLoading ? "invisible" : ""}`}>
           {activeSubtitle}
         </motion.p>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.5 }} className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mb-10 sm:mb-12 w-full max-w-sm sm:max-w-none mx-auto">
-          <motion.button onClick={openOverlay} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="px-8 sm:px-9 py-4 text-[14px] font-[700] bg-[var(--yellow)] text-[var(--dark)] rounded-full shadow-[0_4px_16px_rgba(242,183,5,0.25)] hover:shadow-[0_8px_32px_rgba(242,183,5,0.4)] transition-shadow flex items-center justify-center gap-2">
-            {activeCta || 'Donate Now'} <ArrowRight size={16} />
-          </motion.button>
-          <Link to="/apply" className="px-8 sm:px-9 py-4 text-[14px] font-[600] text-white/90 border border-white/[0.15] rounded-full hover:bg-white/[0.06] hover:border-white/[0.25] transition-all text-center">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.45 }} className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mb-10 sm:mb-12 w-full max-w-sm sm:max-w-none mx-auto">
+          <Magnetic strength={7} className="w-full sm:w-auto">
+            <motion.button onClick={openOverlay} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="group w-full px-8 sm:px-9 py-4 text-[14px] font-[700] bg-[var(--yellow)] text-[var(--dark)] rounded-full shadow-[0_4px_16px_rgba(242,183,5,0.25)] hover:shadow-[0_8px_32px_rgba(242,183,5,0.4)] transition-shadow flex items-center justify-center gap-2">
+              {activeCta || 'Donate Now'}
+              <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+            </motion.button>
+          </Magnetic>
+          <Link to="/apply" className="px-8 sm:px-9 py-4 text-[14px] font-[600] text-white/90 border border-white/[0.15] rounded-full hover:bg-white/[0.06] hover:border-white/[0.25] hover:-translate-y-0.5 transition-all duration-300 text-center">
             Apply for Support
           </Link>
         </motion.div>
 
         {/* Stats - hidden on mobile */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.6 }} className="hidden sm:flex flex-wrap justify-center divide-x divide-white/[0.1] mb-8">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55, duration: 0.5 }} className="hidden sm:flex flex-wrap justify-center divide-x divide-white/[0.1] mb-8">
           {heroStats.map((s, i) => (
             <KPIStatCard
               key={s.label}
               variant="hero"
               display={s.value}
               label={s.label}
-              delay={1.15 + i * 0.1}
+              delay={0.6 + i * 0.08}
             />
           ))}
         </motion.div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.5 }} className="hidden sm:flex flex-wrap justify-center gap-5 text-white/45">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.45 }} className="hidden sm:flex flex-wrap justify-center gap-5 text-white/45">
           {[
             { icon: Shield, text: "Secure Stripe Checkout" },
             { icon: Heart, text: "100% Transparent" },
@@ -149,7 +182,7 @@ const HeroSection = () => {
 
       {/* Live donation ticker (CMS-driven) */}
       {!heroLoading && hero.live_activity_enabled && (hero.live_activity_message || '').trim() && (
-        <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.6, duration: 0.6 }} className="absolute bottom-28 left-6 z-20 hidden lg:block">
+        <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9, duration: 0.5 }} className="absolute bottom-28 left-6 z-20 hidden lg:block">
           <div className="bg-white/[0.06] backdrop-blur-xl rounded-2xl p-4 max-w-[260px] border border-white/[0.08]">
             <div className="flex items-center gap-2 mb-2">
               <span className="relative flex h-2 w-2">
@@ -166,7 +199,7 @@ const HeroSection = () => {
         </motion.div>
       )}
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.0 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2">
         <span className="text-[10px] text-white/30 font-[500] uppercase tracking-[0.14em]">Scroll</span>
         <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}><ChevronDown size={14} className="text-white/30" /></motion.div>
       </motion.div>

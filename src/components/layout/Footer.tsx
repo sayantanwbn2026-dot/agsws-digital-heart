@@ -155,9 +155,10 @@ const Footer = () => {
             <h3 className="text-lg font-bold text-white">{c.newsletter_heading}</h3>
             <p className="text-sm text-white/50 mt-1">{c.newsletter_subtitle}</p>
           </div>
-          <form onSubmit={handleSubscribe} className="flex w-full md:w-auto">
+          <form onSubmit={handleSubscribe} className="flex w-full pr-16 md:pr-0 md:w-auto">
             <input
               type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+              aria-label="Your email address for the newsletter"
               placeholder="Your email address"
               className="flex-1 md:w-[280px] bg-white/[0.06] border border-white/[0.1] rounded-l-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(var(--primary))]/40 transition-colors"
             />

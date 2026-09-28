@@ -359,7 +359,7 @@ const EventPreviewCard = ({ event }: { event: any }) => {
   const isPast = d ? d.getTime() < Date.now() : false;
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   return (
-    <div className={`bg-white rounded-[20px] border border-border overflow-hidden shadow-sm transition-opacity ${isPast ? 'opacity-60' : ''}`}>
+    <div className={`bg-white rounded-[12px] border border-border overflow-hidden shadow-sm transition-opacity ${isPast ? 'opacity-60' : ''}`}>
       <div className="h-1 bg-gradient-to-r from-[#1F9AA8] to-[#156B75]" />
       {event.image && (
         <img src={event.image} alt="" className="w-full h-40 object-cover" />

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +14,7 @@ import PageHero from "@/components/layout/PageHero";
 import toast from "react-hot-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { createStripeCheckoutRedirect } from "@/lib/stripeCheckout";
+import { IS_DEMO, withDemoFlag } from "@/lib/demo-mode";
 import { PremiumInput, PremiumTextarea } from "@/components/ui/PremiumFormElements";
 import { sanitizeINRInput, formatINR, validateINRAmount, INR_MAX } from "@/lib/inrAmount";
 
@@ -28,6 +30,22 @@ const donorSchema = z.object({
 });
 
 type DonorFormData = z.infer<typeof donorSchema>;
+
+// End of the current quarter, so the campaign countdown never shows a past
+// date. Replace with a real campaign deadline from the CMS when one exists.
+// Placeholder campaign window: always a rolling 45 days out, so the countdown
+// never reads "0d left" the way the old hardcoded 2025 date did. Formatted from
+// local date parts — toISOString() would shift the day back in IST.
+// Replace with a real deadline from the CMS when campaigns are managed there.
+const { deadline: campaignDeadline, label: campaignQuarter } = (() => {
+  const end = new Date();
+  end.setDate(end.getDate() + 45);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return {
+    deadline: `${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}`,
+    label: `Q${Math.floor(end.getMonth() / 3) + 1}`,
+  };
+})();
 
 const amounts = [
   { value: 1500, label: "₹1,500", impact: "School books & stationery for 1 child, full year" },
@@ -92,6 +110,16 @@ const DonateEducation = () => {
   const onSubmit = async (data: DonorFormData) => {
     const check = validateINRAmount(currentAmount);
     if (!check.ok) { toast.error(check.message || "Please select or enter a valid amount."); return; }
+    const successUrl = `${window.location.origin}/donation-complete?gateway=education&amount=${currentAmount}&frequency=${frequency}&name=${encodeURIComponent(data.name)}`;
+    const cancelUrl = `${window.location.origin}/donation-cancelled?gateway=education&amount=${currentAmount}&frequency=${frequency}&name=${encodeURIComponent(data.name)}`;
+
+    // Prototype build: show the completed journey without taking a payment.
+    if (IS_DEMO) {
+      setIsSubmitting(true);
+      window.location.assign(withDemoFlag(successUrl));
+      return;
+    }
+
     const checkoutRedirect = createStripeCheckoutRedirect();
     setIsSubmitting(true);
     try {
@@ -112,8 +140,9 @@ const DonateEducation = () => {
           gift_recipient_email: data.giftRecipientEmail,
           gift_message: data.giftMessage,
           show_on_wall: data.showOnWall,
-          success_url: `${window.location.origin}/donation-complete?gateway=education&amount=${currentAmount}&name=${encodeURIComponent(data.name)}`,
-          cancel_url: `${window.location.origin}/donation-cancelled?gateway=education&amount=${currentAmount}&name=${encodeURIComponent(data.name)}`,
+          frequency,
+          success_url: successUrl,
+          cancel_url: cancelUrl,
         },
       });
       if (error) throw error;
@@ -142,7 +171,7 @@ const DonateEducation = () => {
                   {(["once", "monthly"] as const).map((f) => {
                     const isActive = frequency === f;
                     return (
-                      <button key={f} onClick={() => setFrequency(f)}
+                      <button key={f} type="button" aria-pressed={isActive} onClick={() => setFrequency(f)}
                         className={`relative px-[20px] py-[8px] rounded-[var(--radius-full)] font-['Inter'] font-[600] text-[13px] transition-colors duration-200 z-10 ${isActive ? "text-white" : "text-[var(--mid)]"}`}>
                         {isActive && (
                           <motion.div layoutId="freqBgEdu" className="absolute inset-0 bg-[var(--purple)] rounded-[var(--radius-full)] z-[-1]" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
@@ -152,6 +181,22 @@ const DonateEducation = () => {
                     );
                   })}
                 </div>
+                <AnimatePresence initial={false}>
+                  {frequency === "monthly" && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-3 overflow-hidden text-[13px] leading-relaxed text-[var(--mid)]"
+                    >
+                      {currentAmount > 0
+                        ? `₹${currentAmount.toLocaleString()} will be charged today and on the same date every month.`
+                        : "Your donation will repeat on the same date every month."}{" "}
+                      Cancel anytime —{" "}
+                      <Link to="/contact" className="font-[600] text-[var(--purple)] underline underline-offset-2">contact us</Link>.
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div className="grid grid-cols-2 gap-[12px] mb-6">
@@ -159,10 +204,17 @@ const DonateEducation = () => {
                   const isSelected = selectedAmount === a.value;
                   return (
                     <motion.button key={a.value} onClick={() => { setSelectedAmount(a.value); setCustomAmount(""); }}
-                      className={`flex flex-col justify-center min-h-[72px] lg:min-h-[64px] p-4 rounded-[var(--radius-lg)] border-[1.5px] text-left transition-colors duration-200 ${isSelected ? "bg-[var(--purple)] border-[var(--purple)] text-white shadow-[var(--shadow-md)]" : "bg-white text-[var(--dark)] border-[var(--border-color)] hover:bg-[var(--purple-light)] hover:border-[var(--purple)]"}`}
+                      className={`relative flex flex-col justify-center min-h-[72px] lg:min-h-[64px] p-4 rounded-[var(--radius-lg)] border-[1.5px] text-left transition-colors duration-200 ${isSelected ? "border-[var(--purple)] text-white shadow-[var(--shadow-md)]" : "bg-white text-[var(--dark)] border-[var(--border-color)] hover:bg-[var(--purple-light)] hover:border-[var(--purple)]"}`}
                       animate={{ scale: isSelected ? 1.02 : 1 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
-                      <span className="font-['Inter'] font-[700] text-[20px] leading-tight">{a.label}</span>
-                      <p className={`font-['Inter'] font-[400] text-[11px] leading-tight mt-1 transition-opacity ${isSelected ? "opacity-[0.85] text-white" : "opacity-[0.80] text-[var(--mid)]"}`}>{a.impact}</p>
+                      {isSelected && (
+                        <motion.span
+                          layoutId="edu-amount-select"
+                          className="absolute inset-0 rounded-[var(--radius-lg)] bg-[var(--purple)] -z-0"
+                          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                        />
+                      )}
+                      <span className="relative z-10 font-['Inter'] font-[700] text-[20px] leading-tight">{a.label}</span>
+                      <p className={`relative z-10 font-['Inter'] font-[400] text-[11px] leading-tight mt-1 transition-opacity ${isSelected ? "opacity-[0.85] text-white" : "opacity-[0.80] text-[var(--mid)]"}`}>{a.impact}</p>
                     </motion.button>
                   );
                 })}
@@ -185,7 +237,7 @@ const DonateEducation = () => {
                     value={customAmount ? formatINR(customAmount) : ""}
                     onChange={(e) => { setCustomAmount(sanitizeINRInput(e.target.value)); setSelectedAmount(null); }}
                     style={{ paddingLeft: 40, paddingRight: 16 }}
-                    className="no-float w-full h-[52px] bg-white border-[1.5px] border-[var(--border-color)] rounded-[14px] text-[18px] font-[600] font-['Inter'] text-[var(--dark)] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] hover:border-[var(--mid)]/40 focus:border-[var(--purple)] focus:shadow-[0_0_0_4px_rgba(168,85,247,0.12),inset_0_1px_0_rgba(0,0,0,0.02)] outline-none transition-all duration-300 placeholder:text-[var(--light)]/60 placeholder:font-[400] placeholder:text-[14px]"
+                    className="no-float w-full h-[52px] bg-white border-[1.5px] border-[var(--border-color)] rounded-[10px] text-[18px] font-[600] font-['Inter'] text-[var(--dark)] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] hover:border-[var(--mid)]/40 focus:border-[var(--purple)] focus:shadow-[0_0_0_4px_rgba(168,85,247,0.12),inset_0_1px_0_rgba(0,0,0,0.02)] outline-none transition-all duration-300 placeholder:text-[var(--light)]/60 placeholder:font-[400] placeholder:text-[14px]"
                     placeholder="Enter amount"
                     aria-label="Custom donation amount in rupees"
                   />
@@ -236,7 +288,7 @@ const DonateEducation = () => {
 
                     <button type="submit" disabled={isSubmitting}
                       className="w-full h-[52px] bg-[var(--yellow)] font-['Inter'] font-[700] text-[15px] text-[var(--dark)] rounded-[var(--radius-full)] hover:shadow-[var(--shadow-yellow)] transition-all flex items-center justify-center mt-6 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed">
-                      {isSubmitting ? (<><Loader2 className="animate-spin mr-2 h-5 w-5" />Redirecting to secure checkout…</>) : (`Donate ₹${currentAmount.toLocaleString()} via Stripe →`)}
+                      {isSubmitting ? (<><Loader2 className="animate-spin mr-2 h-5 w-5" />Redirecting to secure checkout…</>) : (frequency === "monthly" ? `Donate ₹${currentAmount.toLocaleString()}/month via Stripe →` : `Donate ₹${currentAmount.toLocaleString()} via Stripe →`)}
                     </button>
                   </form>
                 </motion.div>
@@ -245,7 +297,7 @@ const DonateEducation = () => {
           </div>
 
           <div className="lg:sticky lg:top-[80px] space-y-6 self-start">
-            <CampaignThermometer goalAmount={300000} raisedAmount={195000} deadlineDate="2025-06-30" campaignName="Education Q2 Drive" compact />
+            <CampaignThermometer goalAmount={300000} raisedAmount={195000} deadlineDate={campaignDeadline} campaignName={`Education ${campaignQuarter} Drive`} compact />
 
             <div className="bg-[var(--white)] border border-[var(--border-color)] rounded-[var(--radius-2xl)] p-[28px] shadow-[var(--shadow-card)]">
               <div className="flex items-center gap-3 mb-5">

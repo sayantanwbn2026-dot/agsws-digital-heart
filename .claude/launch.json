@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "vite"],
+      "port": 8080,
+      "autoPort": true
+    },
+    {
+      "name": "preview",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "vite", "preview", "--host", "::", "--port", "4173", "--strictPort"],
+      "port": 4173,
+      "autoPort": true
+    }
+  ]
+}

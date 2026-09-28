@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import toast from "react-hot-toast";
 import { isValidEmail, normalizeEmail, isValidIndianPhone } from "@/lib/validation";
 import { useCMSSection } from "@/hooks/useCMSSection";
+import { SITE_URL } from "@/lib/site";
 
 const iconMap: Record<string, any> = { Heart, BookOpen, Users, Wrench };
 
@@ -55,7 +56,7 @@ const Contact = () => {
       "@context": "https://schema.org",
       "@type": "NGO",
       name: "AGSWS — Social Welfare Society",
-      url: "https://agsws.lovable.app/contact",
+      url: `${SITE_URL}/contact`,
       areaServed: "Kolkata, West Bengal, India",
       address: {
         "@type": "PostalAddress",
@@ -143,7 +144,7 @@ const Contact = () => {
 
           <FadeInUp delay={0.15}>
             <div className="space-y-5">
-              <div className="bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-[20px] p-7 text-white shadow-[var(--shadow-lg)]">
+              <div className="bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-[12px] p-7 text-white shadow-[var(--shadow-lg)]">
                 <h3 className="text-[18px] font-[700] mb-6">{cms.info_heading}</h3>
                 <div className="flex flex-col gap-5">
                   {[
@@ -164,7 +165,7 @@ const Contact = () => {
                   ))}
                 </div>
               </div>
-              <motion.div whileHover={{ scale: 1.02 }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] p-6 shadow-[var(--shadow-card)] text-center cursor-pointer group">
+              <motion.div whileHover={{ scale: 1.02 }} className="bg-[var(--white)] rounded-[12px] border border-[var(--border-color)] p-6 shadow-[var(--shadow-card)] text-center cursor-pointer group">
                 <div className="w-14 h-14 rounded-2xl bg-[var(--teal-light)] flex items-center justify-center mx-auto mb-3 group-hover:shadow-[var(--shadow-md)] transition-shadow">
                   <MapPin size={24} className="text-[var(--teal)]" />
                 </div>
@@ -188,7 +189,7 @@ const Contact = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {volunteerRoles.map((role, i) => (
               <FadeInUp key={role.title} delay={i * 0.08}>
-                <motion.div whileHover={{ y: -6, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 text-center cursor-pointer transition-all group relative overflow-hidden">
+                <motion.div whileHover={{ y: -6, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 text-center cursor-pointer transition-all group relative overflow-hidden">
                   <div className="absolute inset-x-0 top-0 h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: `linear-gradient(90deg, ${role.color}, transparent)` }} />
                   <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center transition-all group-hover:shadow-[var(--shadow-md)]" style={{ backgroundColor: `color-mix(in srgb, ${role.color} 10%, white)` }}>
                     <role.icon size={24} style={{ color: role.color }} />
@@ -223,7 +224,7 @@ const Contact = () => {
             <div className="space-y-3">
               {(cms.faq_items || []).map((item: any, i: number) => (
                 <FadeInUp key={i} delay={i * 0.05}>
-                  <details className="group bg-[var(--white)] rounded-[16px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] open:shadow-[var(--shadow-md)] transition-shadow">
+                  <details className="group bg-[var(--white)] rounded-[10px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] open:shadow-[var(--shadow-md)] transition-shadow">
                     <summary className="flex items-center justify-between cursor-pointer list-none">
                       <span className="text-[15px] font-[600] text-[var(--dark)]">{item.q}</span>
                       <ArrowRight size={14} className="text-[var(--teal)] group-open:rotate-90 transition-transform" />
@@ -240,7 +241,7 @@ const Contact = () => {
       <AnimatePresence>
         {volunteerModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center backdrop-blur-md" onClick={() => setVolunteerModal(null)}>
-            <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full sm:max-w-md sm:rounded-[24px] rounded-t-[24px] p-8 shadow-[var(--shadow-lg)]">
+            <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full sm:max-w-md sm:rounded-[14px] rounded-t-[14px] p-8 shadow-[var(--shadow-lg)]">
               <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-6">Volunteer as {volunteerModal}</h3>
               <div className="space-y-5">
                 <PremiumInput label="Name" placeholder="Your name" value={vol.name} onChange={(e: any) => setVol(v => ({ ...v, name: e.target.value }))} />

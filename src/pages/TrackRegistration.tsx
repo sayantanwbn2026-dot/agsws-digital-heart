@@ -103,9 +103,9 @@ const TrackRegistration = () => {
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="e.g. REG-2025-0001"
               autoComplete="off"
-              className="no-float flex-1 h-[52px] px-4 text-[15px] font-[600] uppercase tracking-wide bg-white border-[1.5px] border-[var(--border-color)] rounded-[14px] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.10)] outline-none transition-all"
+              className="no-float flex-1 h-[52px] px-4 text-[15px] font-[600] uppercase tracking-wide bg-white border-[1.5px] border-[var(--border-color)] rounded-[10px] shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] focus:border-[var(--teal)] focus:shadow-[0_0_0_4px_rgba(31,154,168,0.10)] outline-none transition-all"
             />
-            <button onClick={() => handleSearch()} disabled={loading} className="h-[52px] px-6 bg-[var(--teal)] text-white font-[600] rounded-[14px] flex items-center justify-center gap-2 hover:bg-[var(--teal-dark)] transition-colors disabled:opacity-60">
+            <button onClick={() => handleSearch()} disabled={loading} className="h-[52px] px-6 bg-[var(--teal)] text-white font-[600] rounded-[10px] flex items-center justify-center gap-2 hover:bg-[var(--teal-dark)] transition-colors disabled:opacity-60">
               {loading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />} {loading ? "Tracking…" : "Track"}
             </button>
           </div>

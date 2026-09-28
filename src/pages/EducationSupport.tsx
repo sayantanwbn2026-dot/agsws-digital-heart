@@ -88,7 +88,7 @@ const EducationSupport = () => {
               const Icon = iconMap[item.icon] || GraduationCap;
               return (
                 <FadeInUp key={item.title} delay={i * 0.08}>
-                  <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-all">
+                  <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-all">
                     <div className="w-12 h-12 rounded-2xl bg-[var(--purple-light)] flex items-center justify-center mb-4">
                       <Icon size={22} className="text-[var(--purple)]" />
                     </div>
@@ -139,7 +139,7 @@ const EducationSupport = () => {
       <AnimatePresence>
         {showApply && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center backdrop-blur-md p-4" onClick={() => setShowApply(false)}>
-            <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full max-w-[520px] rounded-[20px] sm:rounded-[24px] p-5 sm:p-8 shadow-[var(--shadow-lg)] max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={(e) => e.stopPropagation()} className="bg-[var(--white)] w-full max-w-[520px] rounded-[12px] sm:rounded-[14px] p-5 sm:p-8 shadow-[var(--shadow-lg)] max-h-[90vh] overflow-y-auto">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--purple)] to-[#4A48A0] flex items-center justify-center">
                   <GraduationCap size={18} className="text-white" />

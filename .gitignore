@@ -11,7 +11,16 @@ node_modules
 dist
 dist-ssr
 *.local
-.env.local
+
+# Environment files — these hold Supabase keys and must never be committed.
+# Configure them in the hosting provider's dashboard instead.
+.env
+.env.*
+!.env.example
+
+# Local Claude Code session artifacts (launch.json is intentionally kept).
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
 
 # Editor directories and files
 .vscode/*

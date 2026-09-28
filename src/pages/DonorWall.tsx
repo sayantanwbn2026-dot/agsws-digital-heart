@@ -119,7 +119,7 @@ const DonorWall = () => {
           </div>
 
           {/* Filters */}
-          <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap scrollbar-none">
+          <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap scrollbar-none [mask-image:linear-gradient(to_right,black_90%,transparent)] sm:[mask-image:none]">
             {filters.map(f => {
               const isActive = (gateway === null && f === "All") || gateway === f;
               return (

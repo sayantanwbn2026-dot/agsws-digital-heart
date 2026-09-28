@@ -23,8 +23,8 @@
 import { motion } from 'framer-motion'
 import CountUp from 'react-countup'
 import { useInView } from 'react-intersection-observer'
-import * as Icons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { useResolvedIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useGlobalStats } from '@/hooks/useGlobalStats'
 
@@ -61,15 +61,6 @@ export interface KPIStatCardProps {
    *  icon ring / underline). Falls back to the variant default. */
   accent?: string
   className?: string
-}
-
-function resolveIcon(icon: KPIStatCardProps['icon']): LucideIcon | null {
-  if (!icon) return null
-  if (typeof icon === 'string') {
-    const I = (Icons as any)[icon] as LucideIcon | undefined
-    return I ?? null
-  }
-  return icon
 }
 
 /** Variant-specific Tailwind class bundles. Centralised so spacing &
@@ -115,7 +106,7 @@ const VARIANT_STYLES: Record<KPIVariant, {
     showUnderline: false,
   },
   analytics: {
-    wrap: 'bg-white/[0.04] rounded-[16px] border border-white/[0.06] p-4',
+    wrap: 'bg-white/[0.04] rounded-[10px] border border-white/[0.06] p-4',
     number: 'text-[18px] font-[800] text-white leading-none',
     label: 'text-[9px] text-white/30 uppercase tracking-[0.06em] font-[500] mt-1',
     icon: 'mx-auto mb-2',
@@ -164,7 +155,7 @@ const KPIStatCard = ({
     if (!label) label = stat.label
     if (!icon && stat.icon) icon = stat.icon as any
   }
-  const Icon = resolveIcon(icon)
+  const Icon = useResolvedIcon(icon)
 
   // Render the number. CountUp only fires when both animate=true AND a
   // numeric value is provided. Otherwise we trust the display string.

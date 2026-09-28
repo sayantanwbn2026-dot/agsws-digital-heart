@@ -16,47 +16,69 @@ import BackToTop from "./components/ui/BackToTop";
 import { AnimatePresence, motion } from "framer-motion";
 import CookieConsent from "./components/ui/CookieConsent";
 import DonateChoiceOverlay from "./components/ui/DonateChoiceOverlay";
+import CommandPalette from "./components/ui/CommandPalette";
+import ScrollProgress from "./components/ui/ScrollProgress";
+import RouteFallback from "./components/ui/RouteFallback";
+import { useCardSpotlight } from "@/hooks/useCardSpotlight";
+import { registerRoute, prefetchWhenIdle } from "@/lib/route-prefetch";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { syncPreviewFromURL } from "@/lib/cms-preview";
+// Home ships in the entry chunk: it's the landing page for most visitors, so
+// making it wait on a second round-trip would cost LCP for no benefit.
 import Home from "./pages/Home";
-import About from "./pages/About";
-import Initiatives from "./pages/Initiatives";
-import MedicalAid from "./pages/MedicalAid";
-import EducationSupport from "./pages/EducationSupport";
-import DonateMedical from "./pages/DonateMedical";
-import DonateEducation from "./pages/DonateEducation";
-import RegisterParent from "./pages/RegisterParent";
-import TrackRegistration from "./pages/TrackRegistration";
-import TrackDonation from "./pages/TrackDonation";
-import DonorWall from "./pages/DonorWall";
-import CSRPartnership from "./pages/CSRPartnership";
-import VolunteerPortal from "./pages/VolunteerPortal";
-import ApplyForSupport from "./pages/ApplyForSupport";
-import Resources from "./pages/Resources";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import Contact from "./pages/Contact";
-import ThankYou from "./pages/ThankYou";
-import DonationComplete from "./pages/DonationComplete";
-import DonationCancelled from "./pages/DonationCancelled";
-import EventRegistration from "./pages/EventRegistration";
-import FAQ from "./pages/FAQ";
-import Events from "./pages/Events";
-import Gallery from "./pages/Gallery";
-import Members from "./pages/Members";
-import ImpactReport from "./pages/ImpactReport";
-import Updates from "./pages/Updates";
-import SearchPage from "./pages/Search";
-import TransparencyPage from "./pages/TransparencyPage";
-import SystemHealth from "./pages/SystemHealth";
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import NotFound from "./pages/NotFound";
-import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
-import TermsOfUse from "./pages/legal/TermsOfUse";
-import RefundPolicy from "./pages/legal/RefundPolicy";
+
+/**
+ * Split a route out of the entry bundle and register its loader for prefetching.
+ * Visitors on a slow connection — which is most of the people this site is for —
+ * should not download the receipt generator, the events calendar and the admin
+ * CMS just to read the homepage.
+ */
+const page = <T extends { default: React.ComponentType<unknown> }>(
+  path: string,
+  loader: () => Promise<T>
+) => {
+  registerRoute(path, loader);
+  return lazy(loader);
+};
+
+const About = page("/about", () => import("./pages/About"));
+const Initiatives = page("/initiatives", () => import("./pages/Initiatives"));
+const MedicalAid = page("/initiatives/medical", () => import("./pages/MedicalAid"));
+const EducationSupport = page("/initiatives/education", () => import("./pages/EducationSupport"));
+const DonateMedical = page("/donate/medical", () => import("./pages/DonateMedical"));
+const DonateEducation = page("/donate/education", () => import("./pages/DonateEducation"));
+const RegisterParent = page("/register-parent", () => import("./pages/RegisterParent"));
+const TrackRegistration = page("/track", () => import("./pages/TrackRegistration"));
+const TrackDonation = page("/track-donation", () => import("./pages/TrackDonation"));
+const DonorWall = page("/donor-wall", () => import("./pages/DonorWall"));
+const CSRPartnership = page("/csr", () => import("./pages/CSRPartnership"));
+const VolunteerPortal = page("/volunteer-portal", () => import("./pages/VolunteerPortal"));
+const ApplyForSupport = page("/apply", () => import("./pages/ApplyForSupport"));
+const Resources = page("/resources", () => import("./pages/Resources"));
+const Blog = page("/blog", () => import("./pages/Blog"));
+const BlogPost = page("/blog/:slug", () => import("./pages/BlogPost"));
+const Contact = page("/contact", () => import("./pages/Contact"));
+const ThankYou = page("/thank-you", () => import("./pages/ThankYou"));
+const DonationComplete = page("/donation-complete", () => import("./pages/DonationComplete"));
+const DonationCancelled = page("/donation-cancelled", () => import("./pages/DonationCancelled"));
+const EventRegistration = page("/events/register", () => import("./pages/EventRegistration"));
+const FAQ = page("/faq", () => import("./pages/FAQ"));
+const Events = page("/events", () => import("./pages/Events"));
+const Gallery = page("/gallery", () => import("./pages/Gallery"));
+const Members = page("/members", () => import("./pages/Members"));
+const ImpactReport = page("/impact", () => import("./pages/ImpactReport"));
+const Updates = page("/updates", () => import("./pages/Updates"));
+const SearchPage = page("/search", () => import("./pages/Search"));
+const TransparencyPage = page("/transparency", () => import("./pages/TransparencyPage"));
+const SystemHealth = page("/system/health", () => import("./pages/SystemHealth"));
+const AdminLogin = page("/admin/login", () => import("./pages/admin/AdminLogin"));
+const AdminDashboard = page("/admin", () => import("./pages/admin/AdminDashboard"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const PrivacyPolicy = page("/privacy", () => import("./pages/legal/PrivacyPolicy"));
+const TermsOfUse = page("/terms", () => import("./pages/legal/TermsOfUse"));
+const RefundPolicy = page("/refund", () => import("./pages/legal/RefundPolicy"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // Two-step check: a token must exist locally AND it must validate server-side.
@@ -115,10 +137,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const queryClient = new QueryClient();
 
-// Scroll to top on route change
+// Scroll to top on route change.
+// When Lenis smooth-scroll is active it keeps its OWN internal scroll
+// position, so a bare window.scrollTo leaves the two out of sync (the page
+// snaps back on the next wheel/touch). Reset Lenis directly when present, and
+// always fall back to native scroll so reduced-motion users (Lenis disabled)
+// still land at the top.
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
+    if (window.lenis) {
+      window.lenis.scrollTo(0, { immediate: true });
+    }
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, [pathname]);
   return null;
@@ -127,15 +157,22 @@ const ScrollToTop = () => {
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="will-change-transform"
-      >
+    // Suspense sits OUTSIDE AnimatePresence on purpose. With it nested inside
+    // the keyed child, `mode="wait"` deadlocks against lazy routes: it holds the
+    // incoming child back until the outgoing exit finishes, that child suspends
+    // on its chunk, and the swap never completes — the URL changes but the old
+    // page stays on screen. Hoisting the boundary lets the fallback replace the
+    // whole animated area while the chunk loads.
+    <Suspense fallback={<RouteFallback />}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 14, scale: 0.99, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
+          exit={{ opacity: 0, y: -10, scale: 0.99, filter: "blur(4px)" }}
+          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          className="will-change-transform"
+        >
         <Routes location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -176,8 +213,9 @@ const AnimatedRoutes = () => {
           <Route path="/refund" element={<RefundPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </motion.div>
-    </AnimatePresence>
+        </motion.div>
+      </AnimatePresence>
+    </Suspense>
   );
 };
 
@@ -187,8 +225,17 @@ const AppLayout = () => {
 
   return (
     <>
+      {/* Keyboard users can jump the fixed header + full nav on every page.
+          The `.skip-to-main` styles already existed; nothing rendered one. */}
+      {!isAdmin && (
+        <a href="#main-content" className="skip-to-main">
+          Skip to main content
+        </a>
+      )}
+      {!isAdmin && <ScrollProgress />}
       {!isAdmin && <PreviewBar />}
       {!isAdmin && <DonateChoiceOverlay />}
+      {!isAdmin && <CommandPalette />}
       {!isAdmin && <LiveTicker />}
       {!isAdmin && <Navbar />}
       <AnimatedRoutes />
@@ -203,9 +250,22 @@ const AppLayout = () => {
 
 const AppInner = () => {
   useLenis();
+  useCardSpotlight();
 
   useEffect(() => {
     syncPreviewFromURL();
+  }, []);
+
+  // Warm the routes visitors reach most often once the main thread settles, so
+  // the first navigation after landing feels instant despite the code split.
+  useEffect(() => {
+    prefetchWhenIdle([
+      "/donate/medical",
+      "/about",
+      "/initiatives",
+      "/register-parent",
+      "/contact",
+    ]);
   }, []);
 
   return (
@@ -217,7 +277,7 @@ const AppInner = () => {
           style: {
             background: '#1A1D2E',
             color: '#FFFFFF',
-            borderRadius: '10px',
+            borderRadius: '8px',
             fontSize: '13px',
             fontFamily: 'Inter, sans-serif',
             padding: '12px 18px',

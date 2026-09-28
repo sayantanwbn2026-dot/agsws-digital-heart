@@ -137,7 +137,7 @@ const CSRPartnership = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {csrAreas.map((c, i) => (
               <FadeInUp key={c.title} delay={i * 0.08}>
-                <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] p-6 shadow-[var(--shadow-card)] transition-all">
+                <motion.div whileHover={{ y: -4, boxShadow: "var(--shadow-lg)" }} className="bg-[var(--white)] rounded-[12px] border border-[var(--border-color)] p-6 shadow-[var(--shadow-card)] transition-all">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ backgroundColor: `color-mix(in srgb, ${c.color} 10%, white)` }}>
                     <c.icon size={22} style={{ color: c.color }} />
                   </div>
@@ -207,7 +207,7 @@ const CSRPartnership = () => {
                                 { name: "focusElderly" as const, label: "Elderly Care Support", icon: Users },
                                 { name: "focusVolunteering" as const, label: "Employee Volunteering", icon: Building },
                               ].map(c => (
-                                <label key={c.name} className="flex items-center gap-3 p-4 rounded-[14px] border-[1.5px] border-[var(--border-color)] cursor-pointer hover:border-[var(--teal)] hover:bg-[var(--teal-light)]/50 transition-all">
+                                <label key={c.name} className="flex items-center gap-3 p-4 rounded-[10px] border-[1.5px] border-[var(--border-color)] cursor-pointer hover:border-[var(--teal)] hover:bg-[var(--teal-light)]/50 transition-all">
                                   <input {...register(c.name)} type="checkbox" className="w-4 h-4 accent-[var(--teal)] rounded" />
                                   <span className="text-[13px] text-[var(--mid)] font-[500]">{c.label}</span>
                                 </label>
@@ -231,7 +231,7 @@ const CSRPartnership = () => {
                     <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                       <PremiumCard>
                         <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-6">Review & Submit</h3>
-                        <div className="bg-[var(--bg)] rounded-[16px] p-6 mb-6">
+                        <div className="bg-[var(--bg)] rounded-[10px] p-6 mb-6">
                           {[["Company", data.companyName], ["Contact", data.contactName], ["Email", data.contactEmail], ["Budget", data.budgetRange], ["Timeline", data.timeline]].map(([l, v]) => (
                             <div key={l} className="flex justify-between py-3 border-b border-[var(--border-color)] last:border-0">
                               <span className="text-[13px] text-[var(--light)]">{l}</span>
@@ -256,7 +256,7 @@ const CSRPartnership = () => {
 
             {/* Live preview sidebar */}
             <div className="hidden lg:block">
-              <div className="bg-[var(--white)] rounded-[24px] border border-[var(--border-color)] shadow-[var(--shadow-card)] sticky top-24 overflow-hidden">
+              <div className="bg-[var(--white)] rounded-[14px] border border-[var(--border-color)] shadow-[var(--shadow-card)] sticky top-24 overflow-hidden">
                 <div className="bg-gradient-to-r from-[var(--teal-dark)] to-[var(--teal)] p-6">
                   <p className="text-[10px] font-[600] text-white/50 uppercase tracking-[0.1em]">AGSWS CSR Proposal</p>
                   <p className="text-white font-[700] text-[18px] mt-1">{data.companyName || "Your Company"}</p>

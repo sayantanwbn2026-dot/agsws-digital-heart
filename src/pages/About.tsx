@@ -13,6 +13,7 @@ import { StaggerContainer } from "@/components/ui/StaggerContainer";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import ReadingProgress from "@/components/ui/ReadingProgress";
 import AutoTOC from "@/components/ui/AutoTOC";
+import { TealBlob, YellowBlob } from "@/components/blobs/Blobs";
 import { useRef } from "react";
 
 const iconMapValues: Record<string, any> = { Heart, Target, Eye };
@@ -103,8 +104,10 @@ const About = () => {
       />
 
       {/* Mission + Values */}
-      <section id="mission" data-toc-label="Mission" className="bg-card py-20 lg:py-28 overflow-hidden" ref={parallaxRef}>
-        <div className="max-w-[1200px] mx-auto px-6">
+      <section id="mission" data-toc-label="Mission" className="relative bg-card py-20 lg:py-28 overflow-hidden" ref={parallaxRef}>
+        <TealBlob className="-right-24 top-[6%] w-[360px] h-[360px] hidden md:block" />
+        <YellowBlob className="-left-20 bottom-[10%] w-[280px] h-[280px] hidden md:block" />
+        <div className="relative z-10 max-w-[1200px] mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-20">
             <FadeInUp>
               <motion.div style={{ y: parallaxY }}>
@@ -136,7 +139,7 @@ const About = () => {
                 <FadeInUp key={v.title} delay={i * 0.1}>
                   <motion.div
                     whileHover={{ y: -6, boxShadow: "var(--shadow-lg)" }}
-                    className="bg-white rounded-[20px] border border-[var(--border-color)] p-8 shadow-[var(--shadow-card)] transition-shadow"
+                    className="bg-white rounded-[12px] border border-[var(--border-color)] p-8 shadow-[var(--shadow-card)] transition-shadow"
                   >
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] flex items-center justify-center mb-5 shadow-[0_8px_20px_rgba(31,154,168,0.2)]">
                       <Icon size={24} className="text-white" />
@@ -174,7 +177,10 @@ const About = () => {
       <section id="journey" data-toc-label="Journey" className="bg-[var(--bg)] py-20 lg:py-28">
         <div className="max-w-[800px] mx-auto px-6">
           <SectionHeader label="Our Journey" title="Milestones of Impact" />
-          <div className="relative">
+          {/* Rows slide in from ±30px; `clip` keeps that pre-animation offset from
+              extending past the viewport (iOS can pan sideways on it even under a
+              body overflow-x guard) without creating a scroll container. */}
+          <div className="relative [overflow-x:clip]">
             <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] border-l-2 border-dashed border-[var(--teal)]/30" />
             {timeline.map((item: any, i: number) => (
               <TimelineItem key={item.year} item={item} index={i} isLeft={i % 2 === 0} />
@@ -187,11 +193,11 @@ const About = () => {
       <section id="team" data-toc-label="Team" className="bg-card py-20 lg:py-28">
         <div className="max-w-[1200px] mx-auto px-6">
           <SectionHeader label="Our Team" title="The People Behind AGSWS" />
-          <StaggerContainer staggerDelay={0.08} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <StaggerContainer staggerDelay={0.08} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((member) => (
               <motion.div
                 key={member.name}
-                className="bg-white rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] text-center p-8 group relative overflow-hidden"
+                className="bg-white rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] text-center p-6 sm:p-8 group relative overflow-hidden"
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
               >
@@ -219,7 +225,7 @@ const About = () => {
                 <motion.div
                   key={doc.title}
                   whileHover={{ y: -4, boxShadow: "var(--shadow-md)" }}
-                  className="bg-white rounded-[16px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-shadow"
+                  className="bg-white rounded-[10px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 transition-shadow"
                 >
                   <Icon size={28} className="text-[var(--teal)] mb-4" />
                   <h4 className="font-[700] text-[var(--dark)] mb-1 text-[15px]">{doc.title}</h4>
@@ -276,7 +282,7 @@ const TimelineItem = ({ item, index, isLeft }: { item: { year: string; event: st
       <div className={`ml-20 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-20 md:text-right" : "md:pl-20 md:text-left"}`}>
         <motion.div
           whileHover={{ y: -4, boxShadow: "var(--shadow-md)" }}
-          className="bg-white shadow-[var(--shadow-card)] rounded-[16px] border border-[var(--border-color)] p-7 border-t-[3px] border-t-[var(--teal)] transition-all duration-300"
+          className="bg-white shadow-[var(--shadow-card)] rounded-[10px] border border-[var(--border-color)] p-7 border-t-[3px] border-t-[var(--teal)] transition-all duration-300"
         >
           <p className="text-[14px] leading-relaxed text-[var(--mid)] font-[500]">{item.event}</p>
         </motion.div>

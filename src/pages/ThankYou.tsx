@@ -3,6 +3,7 @@ import { useSEO } from "@/hooks/useSEO";
 import { motion } from "framer-motion";
 import { Check, Printer, Mail, Share2, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
+import CountUp from "react-countup";
 
 const impactStatements: Record<string, Record<string, string>> = {
   medical: {
@@ -83,10 +84,19 @@ const ThankYou = () => {
           <p className="text-sm text-primary-foreground/70 mt-3">Your impact update will be in your inbox within 60 seconds.</p>
         </motion.div>
 
-        <div className="global-card mb-6">
-          <p className="text-sm text-text-light mb-1">Donation Amount</p>
-          <p className="text-3xl font-bold text-teal">₹{amountNum.toLocaleString()}</p>
-          <p className="text-sm text-text-mid mt-2">Impact: {impact}</p>
+        <div className="global-card mb-6 relative overflow-hidden">
+          <motion.span
+            aria-hidden
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] h-[220px] rounded-full pointer-events-none"
+            style={{ background: "radial-gradient(circle, rgba(31,154,168,0.10) 0%, transparent 62%)" }}
+            animate={{ scale: [1, 1.08, 1], opacity: [0.55, 0.9, 0.55] }}
+            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <p className="relative text-sm text-text-light mb-1">Donation Amount</p>
+          <p className="relative text-3xl font-bold text-teal">
+            ₹<CountUp end={amountNum} duration={1.4} separator="," />
+          </p>
+          <p className="relative text-sm text-text-mid mt-2">Impact: {impact}</p>
         </div>
 
         <div className="text-sm text-text-mid mb-6">

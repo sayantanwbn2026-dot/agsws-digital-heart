@@ -64,7 +64,7 @@ const CTABanner = () => {
                 {data.features.map((f, i) => {
                   const Icon = iconMap[f.icon] || Shield;
                   return (
-                    <motion.div key={f.title} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.1 }} className="bg-white/[0.06] backdrop-blur-sm rounded-[16px] border border-white/[0.08] p-4 flex items-start gap-3">
+                    <motion.div key={f.title} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.1 }} className="bg-white/[0.06] backdrop-blur-sm rounded-[10px] border border-white/[0.08] p-4 flex items-start gap-3">
                       <div className="w-9 h-9 rounded-xl bg-white/[0.08] flex items-center justify-center flex-shrink-0">
                         <Icon size={16} className="text-[var(--yellow)]" />
                       </div>

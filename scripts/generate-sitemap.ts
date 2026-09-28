@@ -1,7 +1,7 @@
 import { writeFileSync } from "fs";
 import { resolve } from "path";
 
-const BASE_URL = "https://agsws.lovable.app";
+const BASE_URL = process.env.SITE_URL || "https://agsws.org";
 
 interface SitemapEntry {
   path: string;

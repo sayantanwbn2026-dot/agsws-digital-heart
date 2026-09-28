@@ -1,5 +1,6 @@
-// Creates a Stripe Checkout session for donations or GoldenAge registration
-// Uses the shared createStripeClient that routes through the Lovable gateway.
+// Creates a Stripe Checkout session for a donation (one-time or monthly) or a
+// GoldenAge registration. Monthly donations use a Stripe subscription; later
+// monthly charges are recorded by payments-webhook on `invoice.paid`.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import { type StripeEnv, createStripeClient } from '../_shared/stripe.ts'
 
@@ -31,6 +32,7 @@ interface DonationBody {
   blood_group?: string
   alternative_phone?: string
   plan_label?: string
+  frequency?: 'once' | 'monthly'
   success_url: string
   cancel_url: string
 }
@@ -56,6 +58,8 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
     const amountCents = Math.round(body.amount * 100)
+    // GoldenAge is a one-off registration fee; only donations can repeat.
+    const isMonthly = body.frequency === 'monthly' && body.cause !== 'goldenage'
 
     // Pre-create row
     let recordId = ''
@@ -91,6 +95,7 @@ Deno.serve(async (req) => {
         gift_recipient_email: body.gift_recipient_email,
         gift_message: body.gift_message,
         show_on_wall: body.show_on_wall ?? true,
+        frequency: isMonthly ? 'monthly' : 'once',
       }).select('id').single()
       if (error) throw error
       recordId = data.id
@@ -101,8 +106,10 @@ Deno.serve(async (req) => {
       body.cause === 'education' ? 'AGSWS Education Support Donation' :
       'AGSWS GoldenAge Care Registration'
 
+    const recordMeta = { record_id: recordId, cause: body.cause }
     const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
+      // A subscription charges now and then on the same date each month.
+      mode: isMonthly ? 'subscription' : 'payment',
       success_url: `${body.success_url}${body.success_url.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: body.cancel_url,
       customer_email: body.donor_email,
@@ -110,12 +117,17 @@ Deno.serve(async (req) => {
         price_data: {
           currency: 'inr',
           unit_amount: amountCents,
-          product_data: { name: productName },
+          product_data: { name: isMonthly ? `${productName} (Monthly)` : productName },
+          ...(isMonthly ? { recurring: { interval: 'month' as const } } : {}),
         },
         quantity: 1,
       }],
-      metadata: { record_id: recordId, cause: body.cause, donor_name: body.donor_name },
-      payment_intent_data: { metadata: { record_id: recordId, cause: body.cause } },
+      metadata: { ...recordMeta, donor_name: body.donor_name, frequency: isMonthly ? 'monthly' : 'once' },
+      // payment_intent_data is only valid in payment mode; subscriptions carry
+      // the same metadata so renewal invoices can be traced to this donation.
+      ...(isMonthly
+        ? { subscription_data: { metadata: recordMeta } }
+        : { payment_intent_data: { metadata: recordMeta } }),
     })
 
     const targetTable = body.cause === 'goldenage' ? 'goldenage_registrations' : 'donations'

@@ -6,6 +6,7 @@ import { Twitter, MessageCircle, Linkedin, Copy, ArrowLeft, Heart, Clock, User, 
 import ShareSheet from "@/components/ui/ShareSheet";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { useRef } from "react";
+import { SITE_URL } from "@/lib/site";
 
 const colorMap: Record<string, string> = {
   teal: "var(--teal)",
@@ -37,9 +38,9 @@ const BlogPost = () => {
             publisher: {
               "@type": "Organization",
               name: "AGSWS",
-              logo: { "@type": "ImageObject", url: "https://agsws.lovable.app/favicon.ico" },
+              logo: { "@type": "ImageObject", url: `${SITE_URL}/favicon.ico` },
             },
-            mainEntityOfPage: `https://agsws.lovable.app/blog/${slug}`,
+            mainEntityOfPage: `${SITE_URL}/blog/${slug}`,
           },
         }
       : undefined
@@ -122,7 +123,7 @@ const BlogPost = () => {
 
           {/* Donate CTA */}
           <FadeInUp delay={0.2}>
-            <motion.div whileHover={{ scale: 1.01 }} className="bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-[24px] p-10 mt-16 text-center shadow-[var(--shadow-lg)] relative overflow-hidden">
+            <motion.div whileHover={{ scale: 1.01 }} className="bg-gradient-to-br from-[var(--teal)] to-[var(--teal-dark)] rounded-[14px] p-10 mt-16 text-center shadow-[var(--shadow-lg)] relative overflow-hidden">
               <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
               <div className="relative">
                 <h3 className="text-[24px] font-[700] text-white mb-3">Support stories like this one</h3>
@@ -151,7 +152,7 @@ const BlogPost = () => {
             {relatedStories.map((s, i) => (
               <FadeInUp key={s.slug} delay={i * 0.08}>
                 <Link to={`/blog/${s.slug}`}>
-                  <motion.div whileHover={{ y: -4 }} className="bg-[var(--white)] rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 h-full transition-all hover:shadow-[var(--shadow-lg)] group">
+                  <motion.div whileHover={{ y: -4 }} className="bg-[var(--white)] rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 h-full transition-all hover:shadow-[var(--shadow-lg)] group">
                     <span className="inline-block text-[10px] font-[600] uppercase tracking-[0.1em] px-2.5 py-1 rounded-full mb-3" style={{ backgroundColor: `${colorMap[s.color]}15`, color: colorMap[s.color] }}>{s.category}</span>
                     <h4 className="text-[16px] font-[700] text-[var(--dark)] mb-2 group-hover:text-[var(--teal)] transition-colors leading-snug">{s.title}</h4>
                     <p className="text-[13px] text-[var(--mid)] leading-[1.6] line-clamp-2">{s.excerpt}</p>

@@ -23,6 +23,7 @@ export type Database = {
           id: string
           image: string | null
           is_featured: boolean
+          is_impact_story: boolean
           is_published: boolean
           published_at: string | null
           slug: string
@@ -38,6 +39,7 @@ export type Database = {
           id?: string
           image?: string | null
           is_featured?: boolean
+          is_impact_story?: boolean
           is_published?: boolean
           published_at?: string | null
           slug: string
@@ -53,6 +55,7 @@ export type Database = {
           id?: string
           image?: string | null
           is_featured?: boolean
+          is_impact_story?: boolean
           is_published?: boolean
           published_at?: string | null
           slug?: string
@@ -819,6 +822,11 @@ export type Database = {
       }
       donations: {
         Row: {
+          frequency: string
+          parent_donation_id: string | null
+          stripe_invoice_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
           amount_cents: number
           cause: string
           created_at: string
@@ -839,6 +847,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          frequency?: string
+          parent_donation_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           amount_cents: number
           cause: string
           created_at?: string
@@ -859,6 +872,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          frequency?: string
+          parent_donation_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           amount_cents?: number
           cause?: string
           created_at?: string
@@ -878,7 +896,15 @@ export type Database = {
           stripe_session_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "donations_parent_donation_id_fkey"
+            columns: ["parent_donation_id"]
+            isOneToOne: false
+            referencedRelation: "donations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       goldenage_registrations: {
         Row: {

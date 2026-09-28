@@ -7,6 +7,7 @@ import { getEventAlbum, type AlbumPhoto } from "@/data/eventAlbums";
 import { useCMSList } from "@/hooks/useCMSList";
 import FadeInUp from "@/components/ui/FadeInUp";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import ModalPortal from "@/components/ui/ModalPortal";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { ZoomIn, ChevronLeft, ChevronRight, X, Play, Camera, Film, FolderOpen, Calendar, MapPin } from "lucide-react";
 
@@ -165,7 +166,11 @@ const Gallery = () => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    window.lenis?.stop();
+    return () => {
+      document.body.style.overflow = prev;
+      window.lenis?.start();
+    };
   }, [activeAlbum, lightboxIndex]);
 
   const openLightbox = (idx: number) => setLightboxIndex(idx);
@@ -215,7 +220,7 @@ const Gallery = () => {
         {view === "photos" ? (
           <motion.div key="photos" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="sticky top-[64px] z-30 bg-[hsl(var(--card))]/95 backdrop-blur-md border-b border-[hsl(var(--border))]">
-              <div className="max-w-[1200px] mx-auto px-6 py-3 flex gap-2 overflow-x-auto no-scrollbar">
+              <div className="max-w-[1200px] mx-auto px-6 py-3 flex gap-2 overflow-x-auto no-scrollbar [mask-image:linear-gradient(to_right,black_90%,transparent)] sm:[mask-image:none]">
                 {categories.map(c => (
                   <button key={c} onClick={() => setFilter(c)} className={`px-4 py-2 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all duration-200 ${filter === c ? "bg-[hsl(var(--primary))] text-white shadow-sm" : "bg-[hsl(var(--background))] text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--secondary))] border border-[hsl(var(--border))]"}`}>
                     {catLabels[c]}
@@ -230,7 +235,7 @@ const Gallery = () => {
                     <FadeInUp key={photo.id} delay={(i % 6) * 0.03}>
                       <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="mb-4 break-inside-avoid rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => openLightbox(i)}>
                         {photo.image && !photo.image.startsWith('placeholder') ? (
-                          <img src={photo.image} alt={photo.caption} className="w-full rounded-xl" />
+                          <img src={photo.image} alt={photo.caption} className="w-full rounded-xl" loading="lazy" decoding="async" />
                         ) : (
                           <ImagePlaceholder category={photo.category} className="w-full" />
                         )}
@@ -344,9 +349,10 @@ const Gallery = () => {
         )}
       </AnimatePresence>
 
+      <ModalPortal>
       <AnimatePresence>
         {lightboxIndex !== null && filtered[lightboxIndex] && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-6" onClick={closeLightbox}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9990] bg-black/95 backdrop-blur-md flex items-center justify-center p-6" onClick={closeLightbox}>
             <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-white/[0.06] px-4 py-1.5 rounded-full text-white/50 text-[12px] font-medium backdrop-blur-sm">{lightboxIndex + 1} / {filtered.length}</div>
             <button className="absolute top-5 right-5 text-white/70 p-2.5 hover:bg-white/10 rounded-xl transition-colors z-10" onClick={closeLightbox}><X size={22} /></button>
             <button className="absolute left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/70 hover:bg-white/15 transition-colors backdrop-blur-sm z-10" onClick={(e) => { e.stopPropagation(); navigate(-1); }}><ChevronLeft size={22} /></button>
@@ -370,13 +376,15 @@ const Gallery = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </ModalPortal>
 
+      <ModalPortal>
       <AnimatePresence>
         {activeAlbum && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-6 overflow-hidden"
+            className="fixed inset-0 z-[9990] bg-black/95 backdrop-blur-md flex items-center justify-center p-6 overflow-hidden"
             onClick={closeAlbum}
           >
             <div className="absolute top-5 left-1/2 -translate-x-1/2 text-center pointer-events-none">
@@ -436,6 +444,7 @@ const Gallery = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </ModalPortal>
     </main>
   );
 };

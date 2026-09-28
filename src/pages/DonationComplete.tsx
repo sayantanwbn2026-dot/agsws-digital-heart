@@ -1,8 +1,9 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { useSEO } from "@/hooks/useSEO";
 import { motion } from "framer-motion";
-import { Check, Stethoscope, GraduationCap, Heart, Printer, Share2, ArrowRight, TrendingUp, Users, ShieldCheck, Download } from "lucide-react";
+import { Check, Stethoscope, GraduationCap, Heart, Printer, Share2, ArrowRight, TrendingUp, Users, ShieldCheck, Download, Info } from "lucide-react";
 import { useEffect, useRef } from "react";
+import CountUp from "react-countup";
 import FadeInUp from "@/components/ui/FadeInUp";
 import { jsPDF } from "jspdf";
 
@@ -18,6 +19,9 @@ const DonationComplete = () => {
   const name = params.get("name") || "Friend";
   const amount = params.get("amount") || "0";
   const gateway = params.get("gateway") || "medical";
+  const isMonthly = params.get("frequency") === "monthly";
+  // Set only by the prototype build, which skips Stripe entirely.
+  const isDemo = params.get("demo") === "1";
   const amountNum = parseInt(amount);
   const config = gatewayConfig[gateway] || gatewayConfig.medical;
   const GatewayIcon = config.icon;
@@ -72,16 +76,19 @@ const DonationComplete = () => {
     doc.text(intro, M, y);
     y += intro.length * 14 + 18;
 
-    // Box
-    doc.setDrawColor(220, 220, 220);
-    doc.roundedRect(M, y, W - M * 2, 130, 8, 8);
     const rows: [string, string][] = [
+      ...(isDemo ? ([["Status", "DEMO — no payment was taken"]] as [string, string][]) : []),
       ["Donor Name", name],
       ["Cause", config.label],
+      ["Frequency", isMonthly ? "Monthly" : "One-time"],
       ["Payment ID", paymentId || "Processing"],
       ["Date", today],
-      ["Amount", `INR ${amountNum.toLocaleString("en-IN")}`],
+      ["Amount", isMonthly ? `INR ${amountNum.toLocaleString("en-IN")} / month` : `INR ${amountNum.toLocaleString("en-IN")}`],
     ];
+    // Box — sized to the rows (22pt each) so adding a row can't overflow it.
+    const boxH = 20 + rows.length * 22;
+    doc.setDrawColor(220, 220, 220);
+    doc.roundedRect(M, y, W - M * 2, boxH, 8, 8);
     let ry = y + 24;
     rows.forEach(([k, v]) => {
       doc.setTextColor(120, 120, 120);
@@ -94,7 +101,7 @@ const DonationComplete = () => {
       doc.text(String(v), W - M - 18, ry, { align: "right" });
       ry += 22;
     });
-    y += 150;
+    y += boxH + 20;
 
     // 80G note
     doc.setFont("helvetica", "bold");
@@ -141,22 +148,50 @@ const DonationComplete = () => {
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <h1 className="text-[26px] sm:text-[32px] lg:text-[40px] font-[800] text-white mb-2 tracking-[-0.02em] leading-[1.15]">Thank You, {name}!</h1>
-            <p className="text-white/70 text-[14px] sm:text-[16px]">Your generosity is making a real difference.</p>
+            <p className="text-white/70 text-[14px] sm:text-[16px]">
+              {isMonthly
+                ? "You're now a monthly donor — your support arrives every month."
+                : "Your generosity is making a real difference."}
+            </p>
           </motion.div>
         </div>
       </section>
 
       {/* Content */}
       <section className="max-w-[700px] mx-auto px-5 sm:px-6 -mt-6 sm:-mt-8 pb-28 sm:pb-20 relative z-10">
+        {isDemo && (
+          <div
+            role="status"
+            className="mb-5 flex items-start gap-3 rounded-[12px] border border-[var(--yellow)] bg-[var(--yellow-light)] px-4 py-3.5"
+          >
+            <Info size={18} className="mt-0.5 flex-shrink-0 text-[var(--dark)]" />
+            <p className="text-[13px] leading-relaxed text-[var(--dark)]">
+              <strong className="font-[700]">Demo preview — no payment was taken.</strong>{" "}
+              This page shows what a donor sees after giving. Online payments are enabled at launch.
+            </p>
+          </div>
+        )}
+
         {/* Amount Card */}
         <FadeInUp>
-          <div className="bg-[var(--white)] rounded-[20px] sm:rounded-[24px] border border-[var(--border-color)] shadow-[var(--shadow-lg)] p-6 sm:p-8 mb-5 sm:mb-6 text-center">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl mx-auto mb-3 sm:mb-4 flex items-center justify-center" style={{ backgroundColor: `${config.color}15` }}>
+          <div className="relative bg-[var(--white)] rounded-[12px] sm:rounded-[14px] border border-[var(--border-color)] shadow-[var(--shadow-lg)] p-6 sm:p-8 mb-5 sm:mb-6 text-center overflow-hidden">
+            {/* Slow-breathing aureole behind the amount */}
+            <motion.span
+              aria-hidden
+              className="absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full pointer-events-none"
+              style={{ background: `radial-gradient(circle, ${config.color}12 0%, transparent 62%)` }}
+              animate={{ scale: [1, 1.08, 1], opacity: [0.55, 0.9, 0.55] }}
+              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl mx-auto mb-3 sm:mb-4 flex items-center justify-center" style={{ backgroundColor: `${config.color}15` }}>
               <GatewayIcon size={22} style={{ color: config.color }} />
             </div>
-            <p className="text-[10px] sm:text-[11px] text-[var(--light)] uppercase tracking-[0.12em] font-[600] mb-1">Donation Amount</p>
-            <p className="text-[34px] sm:text-[42px] font-[800] tracking-[-0.02em]" style={{ color: config.color }}>₹{amountNum.toLocaleString("en-IN")}</p>
-            <p className="text-[12px] sm:text-[14px] text-[var(--mid)] mt-1 px-2 break-all">{config.label}{paymentId ? ` • ID: ${paymentId.slice(0, 14)}` : " • Processing"}</p>
+            <p className="relative text-[10px] sm:text-[11px] text-[var(--light)] uppercase tracking-[0.12em] font-[600] mb-1">{isMonthly ? "Monthly Donation" : "Donation Amount"}</p>
+            <p className="relative text-[34px] sm:text-[42px] font-[800] tracking-[-0.02em]" style={{ color: config.color }}>
+              ₹<CountUp end={amountNum} duration={1.4} separator="," />
+              {isMonthly && <span className="text-[18px] sm:text-[22px] font-[700]">/month</span>}
+            </p>
+            <p className="relative text-[12px] sm:text-[14px] text-[var(--mid)] mt-1 px-2 break-all">{config.label}{paymentId ? ` • ID: ${paymentId.slice(0, 14)}` : " • Processing"}</p>
           </div>
         </FadeInUp>
 
@@ -164,7 +199,7 @@ const DonationComplete = () => {
         <FadeInUp delay={0.1}>
           <div className="grid grid-cols-3 gap-2.5 sm:gap-4 mb-5 sm:mb-6">
             {impactItems.map((item, i) => (
-              <motion.div key={item.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.1 }} className="bg-[var(--white)] rounded-[14px] sm:rounded-[18px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-3 sm:p-5 text-center min-w-0">
+              <motion.div key={item.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.1 }} className="bg-[var(--white)] rounded-[10px] sm:rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-3 sm:p-5 text-center min-w-0">
                 <p className="text-[14px] sm:text-[20px] font-[800] text-[var(--dark)] leading-[1.2] break-words">{item.value}</p>
                 <p className="text-[9px] sm:text-[10px] text-[var(--light)] uppercase tracking-[0.06em] font-[600] mt-1.5 leading-tight">{item.label}</p>
               </motion.div>
@@ -174,7 +209,7 @@ const DonationComplete = () => {
 
         {/* Receipt & Actions */}
         <FadeInUp delay={0.2}>
-          <div className="bg-[var(--white)] rounded-[18px] sm:rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-5 sm:p-6 mb-5 sm:mb-6">
+          <div className="bg-[var(--white)] rounded-[12px] sm:rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-5 sm:p-6 mb-5 sm:mb-6">
             <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <ShieldCheck size={18} style={{ color: config.color }} />
               <p className="text-[13px] sm:text-[14px] font-[700] text-[var(--dark)]">Your Donation Receipt</p>
@@ -197,13 +232,13 @@ const DonationComplete = () => {
         {/* Next steps */}
         <FadeInUp delay={0.3}>
           <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
-            <Link to={`/track-donation?payment_id=${paymentId || "demo"}`} className="flex-1 h-[50px] sm:h-[52px] bg-[var(--white)] rounded-[14px] sm:rounded-[16px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--teal)] hover:shadow-[var(--shadow-md)] transition-all">
+            <Link to={`/track-donation?payment_id=${paymentId || "demo"}`} className="flex-1 h-[50px] sm:h-[52px] bg-[var(--white)] rounded-[10px] sm:rounded-[10px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--teal)] hover:shadow-[var(--shadow-md)] transition-all">
               <TrendingUp size={16} /> Track Your Donation
             </Link>
-            <Link to="/donor-wall" className="flex-1 h-[50px] sm:h-[52px] bg-[var(--white)] rounded-[14px] sm:rounded-[16px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--teal)] hover:shadow-[var(--shadow-md)] transition-all">
+            <Link to="/donor-wall" className="flex-1 h-[50px] sm:h-[52px] bg-[var(--white)] rounded-[10px] sm:rounded-[10px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--teal)] hover:shadow-[var(--shadow-md)] transition-all">
               <Users size={16} /> View Donor Wall
             </Link>
-            <Link to="/" className="flex-1 h-[50px] sm:h-[52px] bg-[var(--white)] rounded-[14px] sm:rounded-[16px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--mid)] hover:shadow-[var(--shadow-md)] transition-all">
+            <Link to="/" className="flex-1 h-[50px] sm:h-[52px] bg-[var(--white)] rounded-[10px] sm:rounded-[10px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--mid)] hover:shadow-[var(--shadow-md)] transition-all">
               <ArrowRight size={16} /> Back to Home
             </Link>
           </div>

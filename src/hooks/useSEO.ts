@@ -1,6 +1,7 @@
 import { useEffect } from "react";
+import { SITE_URL } from "@/lib/site";
+import { IS_DEMO } from "@/lib/demo-mode";
 
-const SITE_URL = "https://agsws.lovable.app";
 const JSONLD_ID = "page-jsonld";
 
 const upsertMeta = (selector: string, attrs: Record<string, string>) => {
@@ -44,6 +45,12 @@ export const useSEO = (
     upsertMeta('meta[name="twitter:title"]', { name: "twitter:title", content: ogTitle });
     upsertMeta('meta[name="twitter:description"]', { name: "twitter:description", content: desc });
     upsertCanonical(url);
+    // A prototype deployment must never be indexed: it carries placeholder
+    // content and would compete with the real site in search results.
+    upsertMeta('meta[name="robots"]', {
+      name: "robots",
+      content: IS_DEMO ? "noindex, nofollow" : "index, follow",
+    });
 
     // Page-level JSON-LD (replaces previous page script if any)
     const existing = document.getElementById(JSONLD_ID);

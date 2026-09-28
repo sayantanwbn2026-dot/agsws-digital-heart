@@ -43,7 +43,7 @@ const Resources = () => {
       <PageHero title="Resources & Reports" label="Transparency" size="sm" breadcrumb={[{ label: "Home", href: "/" }, { label: "Resources" }]} />
       <div className="sticky top-[64px] sm:top-[72px] z-30 bg-white/95 backdrop-blur border-b border-border">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="flex gap-2 overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 scrollbar-none">
+          <div className="flex gap-2 overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 scrollbar-none [mask-image:linear-gradient(to_right,black_90%,transparent)] sm:[mask-image:none]">
             {categories.map((cat) => (
               <button key={cat} onClick={() => setActiveFilter(cat)} className={`whitespace-nowrap px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${activeFilter === cat ? "bg-teal text-primary-foreground" : "bg-background text-text-mid border border-border hover:bg-teal-light"}`}>{cat}</button>
             ))}

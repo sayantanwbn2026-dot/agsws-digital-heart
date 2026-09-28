@@ -11,8 +11,15 @@
     
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AGSWS" />
-    <link rel="canonical" href="https://agsws.lovable.app/" />
-    <meta property="og:url" content="https://agsws.lovable.app/" />
+    <link rel="canonical" href="https://agsws.org/" />
+    <meta property="og:url" content="https://agsws.org/" />
+    <meta name="robots" content="index, follow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Loaded here rather than via @import in the CSS bundle: an @import is only
+         discovered after the whole stylesheet downloads, adding two sequential
+         round-trips before any text can render. -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
 
     <meta name="twitter:card" content="summary_large_image" />
 
@@ -33,23 +40,23 @@
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://agsws.lovable.app/#organization",
+        "@id": "https://agsws.org/#organization",
         "name": "AGSWS — Social Welfare Society",
-        "url": "https://agsws.lovable.app/",
-        "logo": "https://agsws.lovable.app/favicon.ico",
+        "url": "https://agsws.org/",
+        "logo": "https://agsws.org/favicon.ico",
         "description": "AGSWS is a Kolkata-based NGO providing medical aid, education support, and GoldenAge elderly care for families across West Bengal.",
         "areaServed": "Kolkata, West Bengal, India",
         "foundingDate": "2016"
       },
       {
         "@type": "WebSite",
-        "@id": "https://agsws.lovable.app/#website",
-        "url": "https://agsws.lovable.app/",
+        "@id": "https://agsws.org/#website",
+        "url": "https://agsws.org/",
         "name": "AGSWS",
-        "publisher": { "@id": "https://agsws.lovable.app/#organization" },
+        "publisher": { "@id": "https://agsws.org/#organization" },
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://agsws.lovable.app/search?q={search_term_string}",
+          "target": "https://agsws.org/search?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       }

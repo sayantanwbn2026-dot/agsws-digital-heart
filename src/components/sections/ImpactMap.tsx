@@ -1,5 +1,5 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { MapPin, Activity, Users, BookOpen, Heart, GraduationCap, Stethoscope } from "lucide-react";
 import FadeInUp from "../ui/FadeInUp";
 import { useCMSList } from "@/hooks/useCMSList";
@@ -31,15 +31,75 @@ const colorMap: Record<string, string> = {
   community: "hsl(var(--accent))",
 };
 
+const clamp = (v: number, min: number, max: number) =>
+  Math.min(Math.max(v, min), max);
+
+/** Gutter kept between the tooltip and the map's edges. */
+const EDGE = 10;
+/** Marker radius + breathing room, used to offset the tooltip off the pin. */
+const PIN_GAP = 30;
+/** Roughly how tall a tooltip gets — only used to pick above vs. below. */
+const TIP_H = 128;
+
 const ImpactMap = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [map, setMap] = useState({ w: 0, h: 0 });
   const { data: regions } = useCMSList<ImpactZone>('cms_impact_zones', fallbackZones, {
     orderBy: { column: 'sort_order', ascending: true },
   });
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
   const mapScale = useTransform(scrollYProgress, [0, 0.5], [0.92, 1]);
   const bgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+
+  // The tooltip is placed in pixels against the map box, so it has to know how
+  // big that box currently is (it's fluid: square on phones, 16/9 on desktop).
+  useEffect(() => {
+    const el = mapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setMap({ w: width, h: height });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Dismiss on Escape or a tap anywhere outside the map (touch has no hover-out).
+  useEffect(() => {
+    if (!activeRegion) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setActiveRegion(null); };
+    const onDown = (e: PointerEvent) => {
+      if (!mapRef.current?.contains(e.target as Node)) setActiveRegion(null);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onDown);
+    };
+  }, [activeRegion]);
+
+  const active = regions.find((r) => r.id === activeRegion) || null;
+
+  // Solve the tooltip box against the map: never wider than the map, never
+  // past an edge, and flipped below the pin when there's no room above.
+  let tip: { w: number; left: number; top?: number; bottom?: number; arrowX: number; below: boolean } | null = null;
+  if (active && map.w > 0) {
+    const w = Math.min(220, map.w - EDGE * 2);
+    const pinX = (active.position_x / 100) * map.w;
+    const pinY = (active.position_y / 100) * map.h;
+    const left = clamp(pinX - w / 2, EDGE, Math.max(EDGE, map.w - w - EDGE));
+    const below = pinY - PIN_GAP - TIP_H < 0;
+    tip = {
+      w,
+      left,
+      ...(below ? { top: pinY + PIN_GAP } : { bottom: map.h - pinY + PIN_GAP }),
+      arrowX: clamp(pinX - left, 16, w - 16),
+      below,
+    };
+  }
 
   return (
     <section className="section bg-[hsl(187,68%,5%)] relative overflow-hidden" ref={containerRef}>
@@ -61,88 +121,93 @@ const ImpactMap = () => {
         </FadeInUp>
 
         <motion.div
+          ref={mapRef}
           className="relative w-full max-w-[900px] mx-auto aspect-square md:aspect-[16/9] rounded-2xl bg-white/[0.03] backdrop-blur-sm overflow-hidden border border-white/[0.06]"
           style={{ scale: mapScale }}
         >
           <div className="absolute inset-0 pointer-events-none opacity-[0.06]" style={{ backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
 
           {regions.map((region, i) => {
-            const isHovered = hoveredRegion === region.id;
             const color = colorMap[region.type] || colorMap.medical;
-            const Icon = ICONS[region.icon || 'MapPin'] || MapPin;
-
-            // Keep tooltip inside the map: flip to right/left edge if pin is near borders.
-            const tooltipW = 220;
-            const isNearLeft = region.position_x < 18;
-            const isNearRight = region.position_x > 82;
-            const isNearTop = region.position_y < 22;
+            const isActive = activeRegion === region.id;
 
             return (
               <motion.div
                 key={region.id}
-                className="absolute flex items-center justify-center pointer-events-auto"
+                className="absolute flex items-center justify-center"
                 style={{ left: `${region.position_x}%`, top: `${region.position_y}%`, x: "-50%", y: "-50%" }}
                 initial={{ scale: 0, opacity: 0 }}
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 + i * 0.1, type: "spring" }}
-                onMouseEnter={() => setHoveredRegion(region.id)}
-                onMouseLeave={() => setHoveredRegion(null)}
               >
                 <span className="absolute inline-flex h-full w-full rounded-full opacity-20 animate-ping" style={{ backgroundColor: color, animationDuration: '3s' }} />
-                <motion.div
+                <motion.button
+                  type="button"
                   whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label={`${region.name}${region.description ? ` — ${region.description}` : ''}`}
+                  aria-expanded={isActive}
+                  onMouseEnter={() => setActiveRegion(region.id)}
+                  onMouseLeave={() => setActiveRegion((cur) => (cur === region.id ? null : cur))}
+                  onFocus={() => setActiveRegion(region.id)}
+                  onBlur={() => setActiveRegion((cur) => (cur === region.id ? null : cur))}
+                  onClick={() => setActiveRegion((cur) => (cur === region.id ? null : region.id))}
                   className="relative flex items-center justify-center w-10 h-10 rounded-full shadow-lg border-2 cursor-pointer bg-[hsl(187,68%,5%)]"
                   style={{ borderColor: color }}
                 >
                   <MapPin size={16} style={{ color }} />
-                </motion.div>
-
-                {isHovered && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    className="absolute w-[220px] bg-white rounded-xl p-3.5 shadow-xl z-50 text-left border border-[hsl(var(--border))] pointer-events-none"
-                    style={{
-                      [isNearTop ? 'top' : 'bottom']: isNearTop ? '3.25rem' : '3.25rem',
-                      left: isNearLeft ? '50%' : isNearRight ? 'auto' : '50%',
-                      right: isNearRight ? '50%' : 'auto',
-                      marginLeft: isNearLeft ? '-12px' : isNearRight ? '0' : `-${tooltipW / 2}px`,
-                      marginRight: isNearRight ? '-12px' : '0',
-                    }}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <Icon size={14} style={{ color }} />
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-[hsl(var(--foreground))]">{region.name}</span>
-                    </div>
-                    {region.description && (
-                      <p className="text-[12px] text-[hsl(var(--muted-foreground))] mb-2 leading-snug">{region.description}</p>
-                    )}
-                    {region.metric && (
-                      <div className="rounded-lg py-1.5 px-2.5 text-center" style={{ backgroundColor: `${color}14` }}>
-                        <span className="text-[11px] font-semibold" style={{ color }}>{region.metric}</span>
-                      </div>
-                    )}
-                    {/* connector arrow */}
-                    <span
-                      aria-hidden
-                      className="absolute w-2.5 h-2.5 bg-white border-[hsl(var(--border))] rotate-45"
-                      style={{
-                        [isNearTop ? 'top' : 'bottom']: '-5px',
-                        left: isNearLeft ? '14px' : isNearRight ? 'auto' : '50%',
-                        right: isNearRight ? '14px' : 'auto',
-                        marginLeft: isNearLeft || isNearRight ? '0' : '-5px',
-                        borderRightWidth: isNearTop ? 0 : '1px',
-                        borderBottomWidth: isNearTop ? 0 : '1px',
-                        borderTopWidth: isNearTop ? '1px' : 0,
-                        borderLeftWidth: isNearTop ? '1px' : 0,
-                      }}
-                    />
-                  </motion.div>
-                )}
+                </motion.button>
               </motion.div>
             );
           })}
+
+          {/* One tooltip, positioned against the map box rather than the pin, so
+              it can be clamped inside the edges instead of overflowing them. */}
+          <AnimatePresence>
+            {active && tip && (() => {
+              const color = colorMap[active.type] || colorMap.medical;
+              const Icon = ICONS[active.icon || 'MapPin'] || MapPin;
+              return (
+                <motion.div
+                  key={active.id}
+                  role="tooltip"
+                  initial={{ opacity: 0, y: tip.below ? -6 : 6, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: tip.below ? -4 : 4, scale: 0.98 }}
+                  transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute z-50 rounded-xl border border-[hsl(var(--border))] bg-white p-3.5 text-left shadow-xl pointer-events-none"
+                  style={{ width: tip.w, left: tip.left, top: tip.top, bottom: tip.bottom }}
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    <Icon size={14} style={{ color }} />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[hsl(var(--foreground))]">{active.name}</span>
+                  </div>
+                  {active.description && (
+                    <p className="mb-2 text-[12px] leading-snug text-[hsl(var(--muted-foreground))]">{active.description}</p>
+                  )}
+                  {active.metric && (
+                    <div className="rounded-lg px-2.5 py-1.5 text-center" style={{ backgroundColor: `${color}14` }}>
+                      <span className="text-[11px] font-semibold" style={{ color }}>{active.metric}</span>
+                    </div>
+                  )}
+                  {/* Connector points back at the pin, wherever it was clamped to. */}
+                  <span
+                    aria-hidden
+                    className="absolute h-2.5 w-2.5 rotate-45 border-[hsl(var(--border))] bg-white"
+                    style={{
+                      left: tip.arrowX - 5,
+                      [tip.below ? 'top' : 'bottom']: -5,
+                      borderTopWidth: tip.below ? 1 : 0,
+                      borderLeftWidth: tip.below ? 1 : 0,
+                      borderRightWidth: tip.below ? 0 : 1,
+                      borderBottomWidth: tip.below ? 0 : 1,
+                    }}
+                  />
+                </motion.div>
+              );
+            })()}
+          </AnimatePresence>
         </motion.div>
       </div>
     </section>

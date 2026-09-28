@@ -238,7 +238,7 @@ const EventRegistration = () => {
                   </div>
                 </div>
               </PremiumCard>
-              <div className="bg-[var(--teal-light)] rounded-[20px] p-5 text-center">
+              <div className="bg-[var(--teal-light)] rounded-[12px] p-5 text-center">
                 <p className="text-[13px] text-[var(--teal)] font-[600]">Free Entry • Open to All</p>
               </div>
             </div>

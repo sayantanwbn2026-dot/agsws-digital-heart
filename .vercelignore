@@ -1,0 +1,10 @@
+# The api/ directory is legacy. The frontend routes every /api/* call to a
+# Supabase Edge Function at runtime (see src/hooks/useAdminAPI.ts), so these
+# handlers are never requested from the browser.
+#
+# Excluding them keeps unused endpoints off the public deployment and — because
+# four of them hold SUPABASE_SERVICE_ROLE_KEY — means that key never has to be
+# configured in Vercel at all.
+#
+# Delete this file if you ever move back to Vercel-hosted API routes.
+api/

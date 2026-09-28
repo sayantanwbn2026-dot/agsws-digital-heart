@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -51,11 +50,11 @@
     --container-px:  24px;
    
     /* Radius */
-    --radius-sm:     6px;
-    --radius-md:     10px;
-    --radius-lg:     16px;
-    --radius-xl:     20px;
-    --radius-2xl:    24px;
+    --radius-sm:     4px;
+    --radius-md:     6px;
+    --radius-lg:     8px;
+    --radius-xl:     10px;
+    --radius-2xl:    12px;
     --radius-full:   9999px;
    
     /* Shadows */
@@ -89,7 +88,7 @@
     --border: 0 0% 91%;
     --input: 0 0% 91%;
     --ring: 187 70% 39%;
-    --radius: 0.625rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -134,31 +133,38 @@
     padding: 20px;
     overflow: hidden;
     position: relative;
-    transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 300ms ease;
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 420ms cubic-bezier(0.22, 1, 0.36, 1), border-color 420ms ease;
   }
   @media (min-width: 1024px) {
     .global-card { padding: 24px; }
   }
-  .global-card::before {
+  /* Cursor-tracking spotlight. Position and the 0/1 `--spot` switch are written
+     by useCardSpotlight(), which delegates a single pointermove listener for
+     the whole page — no per-card JS. Pointer devices only. */
+  [data-spotlight] { position: relative; }
+  .global-card::before,
+  [data-spotlight]::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--teal);
-    opacity: 0;
-    transition: opacity 0ms;
-    z-index: 10;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      280px circle at var(--mx, 50%) var(--my, 0%),
+      rgba(31, 154, 168, 0.09),
+      transparent 62%
+    );
+    opacity: var(--spot, 0);
+    transition: opacity 300ms ease;
+    z-index: 3;
     pointer-events: none;
   }
   .global-card:hover {
-    transform: translateY(-6px);
+    transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
-  }
-  .global-card:hover::before {
-    opacity: 1;
+    border-color: rgba(31, 154, 168, 0.22);
   }
   .global-card:active {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     transition: transform 100ms ease;
   }
   
@@ -308,15 +314,18 @@ body {
     opacity: 1;
   }
 
-  input:focus:not([type="checkbox"]):not([type="radio"]), 
-  textarea:focus, 
-  select:focus {
+  /* `[data-bare]` opts a field out of the global field chrome above — used by
+     chrome-less inputs that live inside their own surface (command palette,
+     inline search rows) and would otherwise render a stray bordered box. */
+  input:focus:not([type="checkbox"]):not([type="radio"]):not([data-bare]),
+  textarea:focus:not([data-bare]),
+  select:focus:not([data-bare]) {
     border-color: var(--teal) !important;
     box-shadow: 0 0 0 3px rgba(31, 154, 168, 0.12) !important;
   }
 
-  input:not(:placeholder-shown):not(:focus):not(.border-destructive):not(.error):not([type="checkbox"]),
-  textarea:not(:placeholder-shown):not(:focus):not(.border-destructive):not(.error) {
+  input:not(:placeholder-shown):not(:focus):not(.border-destructive):not(.error):not([type="checkbox"]):not([data-bare]),
+  textarea:not(:placeholder-shown):not(:focus):not(.border-destructive):not(.error):not([data-bare]) {
     border-color: rgba(22, 163, 74, 0.4) !important;
   }
 
@@ -418,7 +427,27 @@ h2 { font-size: clamp(26px, 3.5vw, 36px); font-weight: 700; letter-spacing: -0.0
 h3 { font-size: clamp(18px, 2.5vw, 22px); font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
 h4 { font-size: 17px; font-weight: 600; line-height: 1.4; }
 
-p { font-size: 15px; line-height: 1.75; color: var(--mid); }
+/* Headings break into even lines instead of leaving a lone trailing word.
+   Supported browsers only; everything else keeps the default wrapping. */
+h1, h2, h3, h4, .display-hero, .heading-1, .heading-2, .heading-3 {
+  text-wrap: balance;
+}
+
+p { font-size: 15px; line-height: 1.75; color: var(--mid); text-wrap: pretty; }
+
+/* Numerals line up in tables, stats and amounts. */
+.stat-number, .tabular, time, [data-amount] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* In-page anchors clear the fixed announcement bar + navbar (36 + 64 px)
+   instead of landing underneath them. Scoped to the elements anchors actually
+   point at, so arbitrary id'd nodes inside scroll containers aren't affected. */
+:target,
+section[id], article[id],
+h1[id], h2[id], h3[id], h4[id] {
+  scroll-margin-top: 120px;
+}
 
 /* Section label */
 .label {
@@ -431,19 +460,30 @@ p { font-size: 15px; line-height: 1.75; color: var(--mid); }
   margin-bottom: 12px;
 }
 
-/* Focus ring */
+/* Focus ring — softer, ringed rather than blocky outline */
 :focus-visible {
-  outline: 3px solid var(--teal);
-  outline-offset: 3px;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(31, 154, 168, 0.35), 0 0 0 5px rgba(31, 154, 168, 0.10);
   border-radius: var(--radius-sm);
+  transition: box-shadow 160ms ease-out;
+}
+
+/* Native selection color */
+::selection {
+  background: rgba(31, 154, 168, 0.18);
+  color: var(--dark);
 }
 
 /* Smooth scrollbar */
-::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--teal);
+  background: rgba(31, 154, 168, 0.55);
   border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--teal);
 }
 
 /* Link hover underline */
@@ -452,6 +492,28 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+/* Inline text links: underline sweeps in from the left instead of snapping on.
+   Opt-in so pill/button-styled links are unaffected. Also triggers when a
+   parent card (.group) is hovered. */
+.text-link {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1.5px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.text-link:hover,
+.text-link:focus-visible,
+.group:hover .text-link { background-size: 100% 1.5px; }
+
+.link-arrow {
+  display: inline-block;
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.text-link:hover .link-arrow,
+.group:hover .link-arrow { transform: translateX(4px); }
 
 /* Image defaults */
 img { display: block; max-width: 100%; }
@@ -543,6 +605,95 @@ body::before {
 .animate-marquee {
   animation: marquee 30s linear infinite;
 }
+/* Hovering a ticker pauses it so the content can actually be read/clicked. */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* =========================================
+   INTERACTION UTILITIES
+   Small, composable primitives so individual components don't each
+   reinvent hover/press feedback.
+========================================= */
+
+/* Lift on hover, settle on press. */
+.hover-lift {
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hover-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.hover-lift:active { transform: translateY(-1px); }
+
+/* Tactile press for buttons and button-like links. */
+.press { transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1); }
+.press:active { transform: scale(0.97); }
+
+/* Frosted surface used by overlays and floating controls. */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Command palette query field. Pairs with `data-bare` on the element, which
+   opts it out of the global field chrome in the base layer above. */
+.cmdk-input {
+  height: 58px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  font-size: 15px !important;
+}
+.cmdk-input:focus,
+.cmdk-input:focus-visible {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Keyboard-shortcut chip. */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background: var(--white);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--light);
+}
+
+/* Sweeping highlight for loading skeletons. */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+/* Horizontal scrollers: hide the bar, keep momentum, snap to items. */
+.snap-row {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.snap-row > * { scroll-snap-align: start; }
 
 .drop-cap::first-letter {
   font-size: 64px;
@@ -581,9 +732,9 @@ body::before {
    Scoped to .cms-shell on the admin pages.
    Palette: warm off-white paper + ink + teal accent.
    Type: Sora (display) + Manrope (UI/body).
+   (Sora + Manrope are loaded on demand by the admin pages via
+   loadAdminFonts() — public visitors never download them.)
 ========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
-
 .cms-shell {
   /* Paper & Ink — warm, editorial neutrals with a single teal accent */
   --cms-bg:        #F5F3EE;
@@ -613,7 +764,7 @@ body::before {
 }
 
 /* Spacious, paper-like surfaces */
-.cms-shell .cms-surface { background: var(--cms-surface); border: 1px solid var(--cms-border); border-radius: 14px; }
+.cms-shell .cms-surface { background: var(--cms-surface); border: 1px solid var(--cms-border); border-radius: 10px; }
 .cms-shell .cms-surface-flat { background: var(--cms-surface); border-bottom: 1px solid var(--cms-border); }
 
 /* Display / UI typography — Sora for headings, Manrope for body */
@@ -710,7 +861,7 @@ body::before {
   background: var(--cms-surface);
   border: 1px solid var(--cms-border);
   color: var(--cms-text);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 .cms-shell input:focus, .cms-shell select:focus, .cms-shell textarea:focus {
   outline: none;
@@ -738,8 +889,8 @@ body::before {
 .cms-shell .shadow-2xl { box-shadow: 0 24px 48px -20px rgba(31,29,26,0.20), 0 2px 6px rgba(31,29,26,0.06) !important; }
 
 /* Rounded corners — editorial / paper feel */
-.cms-shell .rounded-xl { border-radius: 14px !important; }
-.cms-shell .rounded-2xl { border-radius: 18px !important; }
+.cms-shell .rounded-xl { border-radius: 10px !important; }
+.cms-shell .rounded-2xl { border-radius: 12px !important; }
 
 /* Buttons — primary teal, refined hover */
 .cms-shell button.bg-primary:hover { background: var(--cms-accent-hover) !important; }
@@ -867,7 +1018,7 @@ body::before {
   padding: 8px 12px !important;
   font-size: 13px !important;
   line-height: 1.4 !important;
-  border-radius: 10px !important;
+  border-radius: 8px !important;
   font-family: 'Manrope', 'Inter', sans-serif !important;
 }
 

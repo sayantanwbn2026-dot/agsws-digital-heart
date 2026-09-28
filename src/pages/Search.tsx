@@ -35,7 +35,7 @@ const SearchPage = () => {
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="relative bg-white rounded-[16px] border border-[var(--border-color)] shadow-[var(--shadow-md)] overflow-hidden"
+            className="relative bg-white rounded-[10px] border border-[var(--border-color)] shadow-[var(--shadow-md)] overflow-hidden"
           >
             <SearchIcon size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--light)]" />
             <input
@@ -94,7 +94,7 @@ const SearchPage = () => {
               <h3 className="text-[11px] font-[600] text-[var(--teal)] uppercase tracking-[0.1em] mb-4">Stories ({results.stories.length})</h3>
               <div className="space-y-3">
                 {results.stories.map(s => (
-                  <Link key={s.slug} to={`/blog/${s.slug}`} className="block bg-white rounded-[14px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
+                  <Link key={s.slug} to={`/blog/${s.slug}`} className="block bg-white rounded-[10px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
                     <h4 className="font-[600] text-[var(--dark)] text-[15px]">{highlightMatch(s.title, query)}</h4>
                     <p className="text-[13px] text-[var(--mid)] mt-1.5 line-clamp-2">{highlightMatch(s.excerpt, query)}</p>
                   </Link>
@@ -108,7 +108,7 @@ const SearchPage = () => {
               <h3 className="text-[11px] font-[600] text-[var(--teal)] uppercase tracking-[0.1em] mb-4">FAQs ({results.faqs.length})</h3>
               <div className="space-y-3">
                 {results.faqs.map((f, i) => (
-                  <Link key={i} to="/faq" className="block bg-white rounded-[14px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
+                  <Link key={i} to="/faq" className="block bg-white rounded-[10px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
                     <h4 className="font-[600] text-[var(--dark)] text-[15px]">{highlightMatch(f.question, query)}</h4>
                     <p className="text-[13px] text-[var(--mid)] mt-1.5 line-clamp-2">{highlightMatch(f.answer, query)}</p>
                   </Link>
@@ -122,7 +122,7 @@ const SearchPage = () => {
               <h3 className="text-[11px] font-[600] text-[var(--teal)] uppercase tracking-[0.1em] mb-4">Events ({results.events.length})</h3>
               <div className="space-y-3">
                 {results.events.map(e => (
-                  <Link key={e.id} to="/events" className="block bg-white rounded-[14px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
+                  <Link key={e.id} to="/events" className="block bg-white rounded-[10px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
                     <h4 className="font-[600] text-[var(--dark)] text-[15px]">{highlightMatch(e.title, query)}</h4>
                     <p className="text-[13px] text-[var(--mid)] mt-1.5 line-clamp-2">{highlightMatch(e.description, query)}</p>
                   </Link>
@@ -136,7 +136,7 @@ const SearchPage = () => {
               <h3 className="text-[11px] font-[600] text-[var(--teal)] uppercase tracking-[0.1em] mb-4">Resources ({results.resources.length})</h3>
               <div className="space-y-3">
                 {results.resources.map((r, i) => (
-                  <Link key={i} to="/resources" className="block bg-white rounded-[14px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
+                  <Link key={i} to="/resources" className="block bg-white rounded-[10px] border border-[var(--border-color)] p-5 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5 transition-all">
                     <h4 className="font-[600] text-[var(--dark)] text-[15px]">{highlightMatch(r.title, query)}</h4>
                     <p className="text-[13px] text-[var(--mid)] mt-1.5 line-clamp-2">{highlightMatch(r.description, query)}</p>
                   </Link>

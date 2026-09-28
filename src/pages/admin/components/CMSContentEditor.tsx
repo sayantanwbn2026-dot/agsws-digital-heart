@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, Pencil, Trash2, Save, X, Loader2, Copy, Search, Eye, EyeOff, ChevronUp, ChevronDown as ChevronDownIcon, Check } from 'lucide-react';
+import { Plus, Pencil, Trash2, Save, X, Loader2, Copy, Search, Eye, EyeOff, ChevronUp, ChevronDown as ChevronDownIcon, Check, Star, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent
@@ -74,13 +74,29 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
 
   const handleSave = async () => {
     if (!editItem) return;
+    // Enforce the "max 3 featured" rule before writing (mirrors the per-row
+    // quick toggle) so the constraint holds no matter where it's edited.
+    if (fields.some(f => f.key === 'is_featured') && editItem.is_featured) {
+      const othersFeatured = items.filter(i => i.id !== editItem.id && i.is_featured).length;
+      if (othersFeatured >= 3) {
+        toast.error('Only 3 stories can be featured. Unfeature one first.');
+        return;
+      }
+    }
     try {
+      let savedId = editItem.id;
       if (isNew) {
-        await create(table, editItem);
+        const created = await create(table, editItem);
+        savedId = (created as any)?.id ?? savedId;
         toast.success('Item created');
       } else {
         await update(table, editItem.id, editItem);
         toast.success('Item updated');
+      }
+      // Exactly one Impact Story — clear the flag on every other row.
+      if (fields.some(f => f.key === 'is_impact_story') && editItem.is_impact_story) {
+        const others = items.filter(i => i.id !== savedId && i.is_impact_story);
+        await Promise.all(others.map(o => update(table, o.id, { is_impact_story: false })));
       }
       setEditItem(null);
       setIsNew(false);
@@ -150,6 +166,53 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
       notifyCMSContentUpdated();
     } catch (err: any) {
       toast.error(err.message);
+    }
+  };
+
+  // ── Blog spotlight controls ──────────────────────────────────────────
+  // "Featured" surfaces a post in the homepage Latest Stories strip (max 3).
+  // "Impact Story" spotlights a single post in the homepage Impact Story
+  // section (exactly 1 — flagging a new one clears the previous).
+  const MAX_FEATURED = 3;
+  const hasFeaturedField = fields.some(f => f.key === 'is_featured');
+  const hasImpactField = fields.some(f => f.key === 'is_impact_story');
+
+  const handleToggleFeatured = async (item: any) => {
+    const turningOn = !item.is_featured;
+    if (turningOn) {
+      const currentFeatured = items.filter(i => i.id !== item.id && i.is_featured).length;
+      if (currentFeatured >= MAX_FEATURED) {
+        toast.error(`Only ${MAX_FEATURED} stories can be featured. Unfeature one first.`);
+        return;
+      }
+    }
+    try {
+      await update(table, item.id, { is_featured: turningOn });
+      toast.success(turningOn ? 'Featured in Latest Stories' : 'Removed from Latest Stories');
+      fetchItems();
+      notifyCMSContentUpdated();
+    } catch (err: any) {
+      toast.error(err.message || 'Update failed');
+    }
+  };
+
+  const handleToggleImpact = async (item: any) => {
+    const turningOn = !item.is_impact_story;
+    try {
+      if (turningOn) {
+        // Exactly one impact story at a time — clear any others, then set this.
+        const others = items.filter(i => i.id !== item.id && i.is_impact_story);
+        await Promise.all(others.map(o => update(table, o.id, { is_impact_story: false })));
+        await update(table, item.id, { is_impact_story: true });
+        toast.success('Set as the Impact Story spotlight');
+      } else {
+        await update(table, item.id, { is_impact_story: false });
+        toast.success('Removed from Impact Story spotlight');
+      }
+      fetchItems();
+      notifyCMSContentUpdated();
+    } catch (err: any) {
+      toast.error(err.message || 'Update failed');
     }
   };
 
@@ -418,6 +481,34 @@ const CMSContentEditor = ({ table, title, fields, singleRow = false }: CMSConten
                       <p className="text-xs text-muted-foreground truncate mt-0.5">{getDisplaySubtitle(item)}</p>
                     )}
                   </div>
+
+                  {/* Featured toggle (homepage Latest Stories) */}
+                  {hasFeaturedField && (
+                    <button
+                      onClick={() => handleToggleFeatured(item)}
+                      title="Feature in the homepage Latest Stories strip (max 3)"
+                      className={`shrink-0 hidden sm:flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-colors ${
+                        item.is_featured ? 'bg-amber-100 text-amber-700' : 'bg-muted text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Star size={10} className={item.is_featured ? 'fill-amber-500 text-amber-500' : ''} />
+                      Featured
+                    </button>
+                  )}
+
+                  {/* Impact Story spotlight toggle (homepage) */}
+                  {hasImpactField && (
+                    <button
+                      onClick={() => handleToggleImpact(item)}
+                      title="Spotlight as the homepage Impact Story (only 1 at a time)"
+                      className={`shrink-0 hidden sm:flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-colors ${
+                        item.is_impact_story ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Sparkles size={10} />
+                      Impact
+                    </button>
+                  )}
 
                   {/* Publish status */}
                   {hasPublishField && (

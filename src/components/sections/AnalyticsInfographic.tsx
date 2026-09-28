@@ -88,7 +88,7 @@ const AnalyticsInfographic = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
           <FadeInUp>
-            <div className="bg-white/[0.04] backdrop-blur-sm rounded-[24px] border border-white/[0.06] p-8">
+            <div className="bg-white/[0.04] backdrop-blur-sm rounded-[14px] border border-white/[0.06] p-8">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-[16px] font-[600] text-white">Monthly Impact — 2025</h3>
                 <div className="flex items-center gap-4">
@@ -122,7 +122,7 @@ const AnalyticsInfographic = () => {
 
           <div className="space-y-5">
             <FadeInUp delay={0.1}>
-              <div className="bg-white/[0.04] backdrop-blur-sm rounded-[20px] border border-white/[0.06] p-6">
+              <div className="bg-white/[0.04] backdrop-blur-sm rounded-[12px] border border-white/[0.06] p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <MiniDonut value={data.donut_value} max={100} color="var(--teal)" />
                   <div>

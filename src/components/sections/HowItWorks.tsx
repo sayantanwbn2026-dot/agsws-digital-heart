@@ -3,6 +3,7 @@ import { MousePointer2, CreditCard, BarChart2 } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import FadeInUp from "../ui/FadeInUp";
 import { useCMSSection } from "@/hooks/useCMSSection";
+import { TealBlob, PurpleBlob } from "../blobs/Blobs";
 
 const iconMap: Record<string, any> = { MousePointer2, CreditCard, BarChart2 };
 
@@ -27,6 +28,10 @@ const HowItWorks = () => {
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[hsl(var(--primary))]/[0.02] rounded-full blur-[120px]" />
       </motion.div>
+      <TealBlob className="-left-24 top-[8%] w-[320px] h-[320px] hidden md:block" />
+      <PurpleBlob className="-right-16 bottom-[4%] w-[260px] h-[260px] hidden md:block" />
+      <TealBlob className="-left-24 top-[8%] w-[320px] h-[320px] hidden md:block" />
+      <PurpleBlob className="-right-16 bottom-[4%] w-[260px] h-[260px] hidden md:block" />
 
       <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] relative z-10">
         <FadeInUp className="max-w-[540px] mb-12">
@@ -35,7 +40,7 @@ const HowItWorks = () => {
         </FadeInUp>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-3 pb-4 lg:pb-0 w-full lg:w-[300px] flex-shrink-0">
+          <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-3 pb-4 lg:pb-0 w-full lg:w-[300px] flex-shrink-0 [mask-image:linear-gradient(to_right,black_88%,transparent)] lg:[mask-image:none]">
             {steps.map((step, i) => {
               const isActive = i === activeTab;
               const Icon = iconMap[step.icon] || MousePointer2;

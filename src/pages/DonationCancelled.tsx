@@ -67,7 +67,7 @@ const DonationCancelled = () => {
       <section className="max-w-[680px] mx-auto px-5 sm:px-6 -mt-6 sm:-mt-8 pb-28 sm:pb-20 relative z-10">
         {/* Summary */}
         <FadeInUp>
-          <div className="bg-white rounded-[20px] sm:rounded-[24px] border border-[var(--border-color)] shadow-[var(--shadow-lg)] p-6 sm:p-8 mb-5 sm:mb-6 text-center">
+          <div className="bg-white rounded-[12px] sm:rounded-[14px] border border-[var(--border-color)] shadow-[var(--shadow-lg)] p-6 sm:p-8 mb-5 sm:mb-6 text-center">
             <p className="text-[10px] sm:text-[11px] text-[var(--light)] uppercase tracking-[0.12em] font-[600] mb-2">Attempted Contribution</p>
             <p className="text-[34px] sm:text-[42px] font-[800] tracking-[-0.02em]" style={{ color: cfg.accent }}>
               ₹{amountNum.toLocaleString("en-IN")}
@@ -82,7 +82,7 @@ const DonationCancelled = () => {
 
         {/* Why this happens */}
         <FadeInUp delay={0.1}>
-          <div className="bg-white rounded-[18px] sm:rounded-[20px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-5 sm:p-6 mb-5 sm:mb-6">
+          <div className="bg-white rounded-[12px] sm:rounded-[12px] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-5 sm:p-6 mb-5 sm:mb-6">
             <p className="text-[14px] sm:text-[15px] font-[700] text-[var(--dark)] mb-3">Common reasons a payment is cancelled</p>
             <ul className="space-y-2.5 sm:space-y-3">
               {[
@@ -104,20 +104,20 @@ const DonationCancelled = () => {
           <div className="flex flex-col gap-3">
             <Link
               to={cfg.retry}
-              className="h-[54px] sm:h-[56px] w-full bg-[var(--yellow)] text-[var(--dark)] font-[700] text-[14px] sm:text-[15px] rounded-[16px] shadow-[var(--shadow-yellow)] flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              className="h-[54px] sm:h-[56px] w-full bg-[var(--yellow)] text-[var(--dark)] font-[700] text-[14px] sm:text-[15px] rounded-[10px] shadow-[var(--shadow-yellow)] flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
               <RefreshCw size={16} /> Try the donation again
             </Link>
             <div className="grid grid-cols-2 gap-3">
               <Link
                 to="/"
-                className="h-[50px] bg-white rounded-[14px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--mid)] active:scale-[0.98] transition-transform"
+                className="h-[50px] bg-white rounded-[10px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--mid)] active:scale-[0.98] transition-transform"
               >
                 <ArrowLeft size={15} /> Home
               </Link>
               <Link
                 to="/contact"
-                className="h-[50px] bg-white rounded-[14px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--teal)] active:scale-[0.98] transition-transform"
+                className="h-[50px] bg-white rounded-[10px] border border-[var(--border-color)] shadow-[var(--shadow-card)] flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-[600] text-[var(--teal)] active:scale-[0.98] transition-transform"
               >
                 <MessageCircle size={15} /> Need help?
               </Link>
@@ -127,7 +127,7 @@ const DonationCancelled = () => {
 
         {/* Reassurance */}
         <FadeInUp delay={0.3}>
-          <div className="mt-6 sm:mt-8 flex items-start gap-3 p-4 sm:p-5 rounded-[16px] bg-gradient-to-br from-[var(--bg)] to-white border border-[var(--border-color)]">
+          <div className="mt-6 sm:mt-8 flex items-start gap-3 p-4 sm:p-5 rounded-[10px] bg-gradient-to-br from-[var(--bg)] to-white border border-[var(--border-color)]">
             <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${cfg.accent}15` }}>
               <Heart size={16} style={{ color: cfg.accent }} />
             </div>

@@ -64,9 +64,9 @@ const DonateChoiceOverlay = () => {
               </button>
 
               {/* Card with gradient border effect */}
-              <div className="relative bg-white rounded-[28px] shadow-[0_32px_80px_rgba(0,0,0,0.3),0_0_0_1px_rgba(31,154,168,0.08)] overflow-hidden">
+              <div className="relative bg-white rounded-[16px] shadow-[0_32px_80px_rgba(0,0,0,0.3),0_0_0_1px_rgba(31,154,168,0.08)] overflow-hidden">
                 {/* Top accent gradient */}
-                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[var(--teal)] via-[var(--yellow)] to-[var(--purple)] rounded-t-[28px]" />
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[var(--teal)] via-[var(--yellow)] to-[var(--purple)] rounded-t-[16px]" />
 
                 {/* Content */}
                 <div className="px-5 pt-6 pb-7 sm:px-10 sm:pt-10 sm:pb-8">
@@ -89,14 +89,26 @@ const DonateChoiceOverlay = () => {
                   </div>
 
                   {/* Choice Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <motion.div
+                    initial="hidden"
+                    animate="show"
+                    variants={{
+                      hidden: {},
+                      show: { transition: { staggerChildren: 0.08, delayChildren: 0.22 } },
+                    }}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
+                  >
                     {/* Medical */}
                     <motion.button
                       onClick={() => handleChoice("/donate/medical")}
+                      variants={{
+                        hidden: { opacity: 0, y: 24, scale: 0.94 },
+                        show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 320, damping: 26 } },
+                      }}
                       whileHover={{ y: -4, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="group relative bg-gradient-to-br from-white to-[#F0F9FA] rounded-[20px] border-[1.5px] border-[var(--border-color)] p-5 sm:p-6 text-left cursor-pointer hover:border-[var(--teal)] hover:shadow-[0_12px_32px_rgba(31,154,168,0.12)] transition-[border-color,box-shadow] duration-300 overflow-hidden"
+                      className="group relative bg-gradient-to-br from-white to-[#F0F9FA] rounded-[12px] border-[1.5px] border-[var(--border-color)] p-5 sm:p-6 text-left cursor-pointer hover:border-[var(--teal)] hover:shadow-[0_12px_32px_rgba(31,154,168,0.12)] transition-[border-color,box-shadow] duration-300 overflow-hidden"
                     >
                       {/* Background glow */}
                       <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-[var(--teal)]/[0.06] blur-2xl group-hover:bg-[var(--teal)]/[0.12] transition-colors duration-500" />
@@ -126,10 +138,14 @@ const DonateChoiceOverlay = () => {
                     {/* Education */}
                     <motion.button
                       onClick={() => handleChoice("/donate/education")}
+                      variants={{
+                        hidden: { opacity: 0, y: 24, scale: 0.94 },
+                        show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 320, damping: 26 } },
+                      }}
                       whileHover={{ y: -4, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="group relative bg-gradient-to-br from-white to-[#F5F4FB] rounded-[20px] border-[1.5px] border-[var(--border-color)] p-5 sm:p-6 text-left cursor-pointer hover:border-[var(--purple)] hover:shadow-[0_12px_32px_rgba(92,90,166,0.12)] transition-[border-color,box-shadow] duration-300 overflow-hidden"
+                      className="group relative bg-gradient-to-br from-white to-[#F5F4FB] rounded-[12px] border-[1.5px] border-[var(--border-color)] p-5 sm:p-6 text-left cursor-pointer hover:border-[var(--purple)] hover:shadow-[0_12px_32px_rgba(92,90,166,0.12)] transition-[border-color,box-shadow] duration-300 overflow-hidden"
                     >
                       <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-[var(--purple)]/[0.06] blur-2xl group-hover:bg-[var(--purple)]/[0.12] transition-colors duration-500" />
 
@@ -154,7 +170,7 @@ const DonateChoiceOverlay = () => {
                         </span>
                       </div>
                     </motion.button>
-                  </div>
+                  </motion.div>
 
                   {/* Separator + GoldenAge Care */}
                   <div className="mt-6 pt-5 border-t border-[var(--border-color)]">

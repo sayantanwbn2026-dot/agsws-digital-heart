@@ -1,4 +1,4 @@
-// Sends transactional emails via Resend (connector gateway)
+// Sends transactional emails via Resend
 // Templates: donation-receipt, goldenage-confirmation, gift-card,
 //            admin-donation, admin-application, newsletter-welcome
 
@@ -8,9 +8,11 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-const RESEND_GATEWAY = 'https://connector-gateway.lovable.dev/resend'
+const RESEND_API_URL = 'https://api.resend.com'
 const FROM = 'AGSWS <onboarding@resend.dev>'
 const ADMIN_EMAIL = Deno.env.get('CMS_ADMIN_EMAIL') || 'admin@agsws.org'
+// Public site origin, for links inside emails (matches VITE_SITE_URL on the frontend).
+const SITE_URL = (Deno.env.get('SITE_URL') || 'https://agsws.org').replace(/\/+$/, '')
 const INTERNAL_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 
 // Types that are safe to invoke from public/unauthenticated browser flows.
@@ -44,6 +46,7 @@ function fmtINR(cents: number) {
 
 function donationReceiptHTML(d: any) {
   const causeLabel = d.cause === 'medical' ? 'Medical Aid' : d.cause === 'education' ? 'Education Support' : 'GoldenAge Care'
+  const isMonthly = d.frequency === 'monthly'
   return `
     <div style="font-family:-apple-system,Segoe UI,Arial,sans-serif;background:#F7F5F2;padding:32px 0">
       <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.06)">
@@ -57,10 +60,12 @@ function donationReceiptHTML(d: any) {
             <table style="width:100%;border-collapse:collapse;font-size:14px">
               <tr><td style="color:#64748b;padding:6px 0">Amount</td><td style="text-align:right;font-weight:700;color:#1F9AA8;font-size:18px">${fmtINR(d.amount_cents)}</td></tr>
               <tr><td style="color:#64748b;padding:6px 0">Cause</td><td style="text-align:right;font-weight:600">${causeLabel}</td></tr>
-              <tr><td style="color:#64748b;padding:6px 0">Payment ID</td><td style="text-align:right;font-family:monospace;font-size:12px">${d.stripe_payment_intent || d.stripe_session_id || '—'}</td></tr>
+              <tr><td style="color:#64748b;padding:6px 0">Frequency</td><td style="text-align:right;font-weight:600">${isMonthly ? 'Monthly' : 'One-time'}</td></tr>
+              <tr><td style="color:#64748b;padding:6px 0">Payment ID</td><td style="text-align:right;font-family:monospace;font-size:12px">${d.stripe_payment_intent || d.stripe_invoice_id || d.stripe_session_id || '—'}</td></tr>
               <tr><td style="color:#64748b;padding:6px 0">Date</td><td style="text-align:right">${new Date(d.created_at || Date.now()).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
             </table>
           </div>
+          ${isMonthly ? `<p style="color:#475569;font-size:14px;line-height:1.6;margin:0 0 12px"><strong>This is a monthly donation.</strong> ${fmtINR(d.amount_cents)} will be charged on the same date each month. To change or stop it at any time, <a href="${SITE_URL}/contact" style="color:${TEAL}">contact us</a>.</p>` : ''}
           <p style="color:#475569;font-size:14px;line-height:1.6;margin:0 0 12px">A formal acknowledgement letter will be issued separately if needed for your records.</p>
           <p style="color:#94a3b8;font-size:12px;margin:24px 0 0">AGSWS — The Ascension Group Social Welfare Society<br/>Kolkata, West Bengal, India</p>
         </div>
@@ -183,9 +188,8 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders })
 
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
   const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-  if (!LOVABLE_API_KEY || !RESEND_API_KEY) {
+  if (!RESEND_API_KEY) {
     return new Response(JSON.stringify({ error: 'Email service not configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 
@@ -214,7 +218,9 @@ Deno.serve(async (req) => {
 
     switch (type) {
       case 'donation-receipt':
-        subject = `Your AGSWS donation receipt — ${fmtINR(data.amount_cents)}`
+        subject = data.frequency === 'monthly'
+          ? `Your AGSWS monthly donation receipt — ${fmtINR(data.amount_cents)}`
+          : `Your AGSWS donation receipt — ${fmtINR(data.amount_cents)}`
         html = donationReceiptHTML(data)
         break
       case 'goldenage-confirmation':
@@ -251,11 +257,10 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: 'Unknown email type' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    const resendRes = await fetch(`${RESEND_GATEWAY}/emails`, {
+    const resendRes = await fetch(`${RESEND_API_URL}/emails`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'X-Connection-Api-Key': RESEND_API_KEY,
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ from: FROM, to: [recipient], subject, html }),

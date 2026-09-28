@@ -103,8 +103,9 @@ const InitiativeCards = () => {
               className="h-full"
             >
               <motion.div
-                className="group relative bg-white rounded-[20px] overflow-hidden border border-[var(--border-color)] shadow-[var(--shadow-card)] flex flex-col h-full"
-                whileHover={{ y: -8 }}
+                data-spotlight
+                className="group relative bg-white rounded-[12px] overflow-hidden border border-[var(--border-color)] shadow-[var(--shadow-card)] flex flex-col h-full transition-[box-shadow,border-color] duration-300 hover:shadow-[var(--shadow-lg)] hover:border-[rgba(31,154,168,0.22)]"
+                whileHover={{ y: -6 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
               >
                 <div className={`h-[3px] bg-gradient-to-r ${card.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
@@ -117,7 +118,7 @@ const InitiativeCards = () => {
 
                 <div className={`relative h-[160px] lg:h-[180px] w-full bg-gradient-to-br ${card.gradient} flex items-center justify-center overflow-hidden flex-shrink-0`}>
                   {card.image ? (
-                    <img src={card.image} alt={card.title} className="absolute inset-0 w-full h-full object-cover" />
+                    <img src={card.image} alt={card.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
                   ) : (
                     <ImagePlaceholder category={card.imgCategory} className="absolute inset-0 w-full h-full opacity-[0.2] object-cover mix-blend-overlay" />
                   )}

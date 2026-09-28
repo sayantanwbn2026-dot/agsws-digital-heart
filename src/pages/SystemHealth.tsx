@@ -9,7 +9,7 @@ type Check = { id: string; label: string; group: "Database" | "Edge Functions"; 
 const TABLES = [
   "cms_hero", "cms_sections", "cms_stats", "cms_initiatives", "cms_partners",
   "cms_testimonials", "cms_blog_posts", "cms_events", "cms_faqs", "cms_gallery",
-  "cms_resources", "cms_site_settings", "cms_team", "cms_stories",
+  "cms_resources", "cms_site_settings", "cms_team",
 ] as const;
 
 const FN_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;

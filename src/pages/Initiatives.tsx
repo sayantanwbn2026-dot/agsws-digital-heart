@@ -68,7 +68,7 @@ const Initiatives = () => {
         <div className="max-w-[var(--container)] mx-auto px-[var(--container-px)] space-y-8">
           {initiatives.map((item: any, i: number) => (
             <motion.div key={item.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.6, delay: i * 0.1 }}>
-              <div className="group relative bg-white rounded-[24px] border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden hover:shadow-[var(--shadow-lg)] transition-shadow duration-400">
+              <div className="group relative bg-white rounded-[14px] border border-[var(--border-color)] shadow-[var(--shadow-card)] overflow-hidden hover:shadow-[var(--shadow-lg)] transition-shadow duration-400">
                 <div className={`h-1 bg-gradient-to-r ${item.gradient}`} />
                 <div className="p-8 lg:p-10">
                   <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">

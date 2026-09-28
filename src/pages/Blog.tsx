@@ -84,7 +84,7 @@ const Blog = () => {
           <>
           <FadeInUp>
             <Link to={`/blog/${featured.slug}`} className="group block">
-              <div className="relative rounded-2xl overflow-hidden bg-[hsl(var(--card))] border border-[hsl(var(--border))] shadow-sm hover:shadow-lg transition-shadow duration-500">
+              <div data-spotlight className="relative rounded-2xl overflow-hidden bg-[hsl(var(--card))] border border-[hsl(var(--border))] shadow-sm hover:shadow-lg transition-shadow duration-500">
                 <div className="grid grid-cols-1 lg:grid-cols-2">
                   <div className="relative h-[280px] lg:h-[420px] overflow-hidden">
                     {featured.image ? (
@@ -113,10 +113,10 @@ const Blog = () => {
             {rest.map((story: any, i: number) => (
               <FadeInUp key={story.slug} delay={i * 0.08}>
                 <Link to={`/blog/${story.slug}`} className="group block h-full">
-                  <motion.div whileHover={{ y: -6 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="rounded-2xl overflow-hidden bg-[hsl(var(--card))] border border-[hsl(var(--border))] h-full flex flex-col shadow-sm">
+                  <motion.div whileHover={{ y: -6 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} data-spotlight className="rounded-2xl overflow-hidden bg-[hsl(var(--card))] border border-[hsl(var(--border))] h-full flex flex-col shadow-sm transition-shadow duration-300 hover:shadow-[var(--shadow-lg)]">
                     <div className="relative h-[200px] overflow-hidden">
                       {story.image ? (
-                        <img src={story.image} alt={story.title} className="w-full h-full object-cover" />
+                        <img src={story.image} alt={story.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                       ) : (
                         <ImagePlaceholder category={getCategory(story.category)} className="w-full h-full" />
                       )}

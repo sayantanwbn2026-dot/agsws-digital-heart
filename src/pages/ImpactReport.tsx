@@ -204,7 +204,11 @@ const ImpactReport = () => {
           <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-[hsl(var(--accent))] mb-6">
             {cms.reach_label}
           </motion.span>
-          <div className="relative w-[300px] h-[300px] mx-auto mb-12">
+          {/* Fluid rather than a fixed 300px box: on a 320px phone the fixed
+              size overflowed the container and was silently clipped by the
+              page's overflow-x guard. Markers are positioned in %, so scaling
+              the box keeps them correct. */}
+          <div className="relative w-[min(300px,100%)] aspect-square mx-auto mb-12">
             {[
               { city: "Mumbai", x: 25, y: 55, size: 12, count: 42 },
               { city: "Delhi", x: 40, y: 22, size: 12, count: 38 },

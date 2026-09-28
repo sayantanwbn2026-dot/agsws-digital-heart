@@ -10,6 +10,7 @@ import PageHero from "@/components/layout/PageHero";
 import { PremiumInput, PremiumSelect, PremiumTextarea, PremiumCard, PremiumButton } from "@/components/ui/PremiumFormElements";
 import { supabase } from "@/integrations/supabase/client";
 import { createStripeCheckoutRedirect } from "@/lib/stripeCheckout";
+import { IS_DEMO, withDemoFlag } from "@/lib/demo-mode";
 import { useCMSSection } from "@/hooks/useCMSSection";
 import toast from "react-hot-toast";
 import { isValidEmail, isValidIndianPhone } from "@/lib/validation";
@@ -113,6 +114,16 @@ const RegisterParent = () => {
       toast.error(cms.validation_error || defaultData.validation_error);
       return;
     }
+    const successUrl = `${window.location.origin}/donation-complete?gateway=goldenage&amount=${selectedPlan.amount}&name=${encodeURIComponent(v.fullName)}`;
+    const cancelUrl = `${window.location.origin}/donation-cancelled?gateway=goldenage&amount=${selectedPlan.amount}&name=${encodeURIComponent(v.fullName)}`;
+
+    // Prototype build: show the completed journey without taking a payment.
+    if (IS_DEMO) {
+      setIsSubmitting(true);
+      window.location.assign(withDemoFlag(successUrl));
+      return;
+    }
+
     const checkoutRedirect = createStripeCheckoutRedirect();
     setIsSubmitting(true);
     try {
@@ -128,8 +139,8 @@ const RegisterParent = () => {
           alternative_phone: v.altPhone || undefined,
           blood_group: v.bloodGroup,
           plan_label: selectedPlan.label,
-          success_url: `${window.location.origin}/donation-complete?gateway=goldenage&amount=${selectedPlan.amount}&name=${encodeURIComponent(v.fullName)}`,
-          cancel_url: `${window.location.origin}/donation-cancelled?gateway=goldenage&amount=${selectedPlan.amount}&name=${encodeURIComponent(v.fullName)}`,
+          success_url: successUrl,
+          cancel_url: cancelUrl,
         },
       });
       if (error) throw error;
@@ -146,7 +157,7 @@ const RegisterParent = () => {
   const FilePicker = ({
     icon: Icon, label, file, onPick, accept = "image/*,application/pdf",
   }: { icon: any; label: string; file: File | null; onPick: (f: File | null) => void; accept?: string }) => (
-    <label className="block border-2 border-dashed border-[var(--border-color)] rounded-[18px] p-6 text-center cursor-pointer transition-all bg-[var(--bg)]/50 hover:bg-[var(--teal-light)]/30 hover:border-[var(--teal)]">
+    <label className="block border-2 border-dashed border-[var(--border-color)] rounded-[12px] p-6 text-center cursor-pointer transition-all bg-[var(--bg)]/50 hover:bg-[var(--teal-light)]/30 hover:border-[var(--teal)]">
       {file ? (
         <div className="flex items-center justify-center gap-3 text-left">
           <Check size={20} className="text-[var(--teal)] flex-shrink-0" />
@@ -228,7 +239,7 @@ const RegisterParent = () => {
                 {currentStep === 0 && (
                   <div className="space-y-6">
                     <h3 className="text-[20px] font-[700] text-[var(--dark)] mb-1">{cms.step1_title || defaultData.step1_title}</h3>
-                    <div className="bg-[var(--yellow-light)] rounded-[14px] p-4 flex items-start gap-3">
+                    <div className="bg-[var(--yellow-light)] rounded-[10px] p-4 flex items-start gap-3">
                       <Shield size={18} className="text-[var(--yellow)] mt-0.5 flex-shrink-0" />
                       <p className="text-[13px] text-[var(--mid)] leading-[1.6]">{cms.step1_trust_badge || defaultData.step1_trust_badge}</p>
                     </div>
@@ -273,7 +284,7 @@ const RegisterParent = () => {
                             key={p.key}
                             type="button"
                             onClick={() => setSelectedPlanKey(p.key)}
-                            className={`w-full text-left rounded-[18px] border-2 p-5 transition-all flex items-center justify-between gap-4 ${
+                            className={`w-full text-left rounded-[12px] border-2 p-5 transition-all flex items-center justify-between gap-4 ${
                               active
                                 ? "border-[var(--teal)] bg-[var(--teal-light)]/40 shadow-[var(--shadow-md)]"
                                 : "border-[var(--border-color)] bg-[var(--white)] hover:border-[var(--teal)]/50"
@@ -300,7 +311,7 @@ const RegisterParent = () => {
                     </div>
 
                     {/* Services */}
-                    <div className="bg-[var(--bg)] rounded-[16px] p-5">
+                    <div className="bg-[var(--bg)] rounded-[10px] p-5">
                       <p className="text-[11px] uppercase tracking-[0.12em] font-[700] text-[var(--teal)] mb-3">{cms.services_title || defaultData.services_title}</p>
                       <div className="space-y-2">
                         {services.map((s: any, i: number) => (
@@ -313,7 +324,7 @@ const RegisterParent = () => {
                     </div>
 
                     {/* Contact numbers */}
-                    <div className="bg-[var(--bg)] rounded-[16px] p-5">
+                    <div className="bg-[var(--bg)] rounded-[10px] p-5">
                       <p className="text-[11px] uppercase tracking-[0.12em] font-[700] text-[var(--teal)] mb-3">{cms.contact_label || defaultData.contact_label}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {contactNumbers.map((n: string, i: number) => (

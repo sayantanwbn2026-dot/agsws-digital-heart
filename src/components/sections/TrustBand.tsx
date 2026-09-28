@@ -43,8 +43,8 @@ const TrustBand = () => {
                 <h4 className="font-[700] text-[14px] text-white mb-2">{item.title}</h4>
                 <p className="text-[12px] text-white/70 leading-relaxed max-w-[200px]">{item.desc}</p>
                 {item.link && (
-                  <Link to={item.link} className="text-[var(--yellow)] text-[11px] font-[600] hover:underline mt-3 inline-block">
-                    View Report →
+                  <Link to={item.link} className="text-link text-[var(--yellow)] text-[11px] font-[600] mt-3 inline-block">
+                    View Report <span className="link-arrow">→</span>
                   </Link>
                 )}
               </motion.div>

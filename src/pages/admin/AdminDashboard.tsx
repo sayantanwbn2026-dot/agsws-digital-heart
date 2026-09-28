@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { loadAdminFonts } from "@/lib/admin-fonts";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -54,19 +55,10 @@ const testimonialFields: FieldConfig[] = [
   { key: 'avatar', label: 'Avatar', type: 'image', resolution: '200×200px', imageFolder: 'avatars' },
 ];
 
-const storyFields: FieldConfig[] = [
-  { key: 'title', label: 'Title', type: 'text', required: true },
-  { key: 'excerpt', label: 'Excerpt', type: 'textarea' },
-  { key: 'content', label: 'Full Content', type: 'textarea' },
-  { key: 'image', label: 'Cover Image', type: 'image', resolution: '800×500px', imageFolder: 'stories' },
-  { key: 'category', label: 'Category', type: 'select', options: [
-    { label: 'Medical', value: 'Medical' }, { label: 'Education', value: 'Education' },
-    { label: 'Community', value: 'Community' }, { label: 'Report', value: 'Report' },
-  ]},
-  { key: 'is_published', label: 'Published', type: 'boolean' },
-  { key: 'is_featured', label: 'Feature on Home (Latest Stories)', type: 'boolean' },
-  { key: 'published_at', label: 'Publish Date', type: 'date' },
-];
+// NOTE: The legacy `cms_stories` ("Impact Stories") section has been retired.
+// Blog posts now drive both the homepage "Latest Stories" strip (is_featured)
+// and the "Impact Story" spotlight (is_impact_story), so a separate stories
+// table is no longer part of the CMS surface.
 
 const eventFields: FieldConfig[] = [
   { key: 'title', label: 'Event Title', type: 'text', required: true },
@@ -133,6 +125,8 @@ const blogFields: FieldConfig[] = [
   { key: 'image', label: 'Cover Image', type: 'image', resolution: '1200×630px', imageFolder: 'blog' },
   { key: 'author', label: 'Author', type: 'text' },
   { key: 'is_published', label: 'Published', type: 'boolean' },
+  { key: 'is_featured', label: 'Feature in "Latest Stories" (max 3)', type: 'boolean' },
+  { key: 'is_impact_story', label: 'Set as "Impact Story" spotlight (only 1)', type: 'boolean' },
   { key: 'published_at', label: 'Publish Date', type: 'date' },
 ];
 
@@ -196,7 +190,6 @@ const sections = [
   { id: 'impact_zones', label: 'Active Impact Zones', icon: MapPin, table: 'cms_impact_zones', fields: impactZoneFields, group: 'Homepage' },
   { id: 'testimonials', label: 'Testimonials', icon: Star, table: 'cms_testimonials', fields: testimonialFields, group: 'Homepage' },
 
-  { id: 'stories', label: 'Impact Stories', icon: BookOpen, table: 'cms_stories', fields: storyFields, group: 'Content' },
   { id: 'events', label: 'Events', icon: Calendar, table: 'cms_events', fields: eventFields, isCustom: true, group: 'Content' },
   { id: 'event_albums', label: 'Event Albums', icon: ImageIcon, table: 'cms_event_albums', fields: [], isCustom: true, group: 'Content' },
   { id: 'blog', label: 'Blog Posts', icon: FileText, table: 'cms_blog_posts', fields: blogFields, group: 'Content' },
@@ -277,7 +270,7 @@ const sections = [
 const previewUrls: Record<string, string> = {
   landing: '/', hero: '/', stats: '/', initiatives: '/initiatives', testimonials: '/',
   impact_zones: '/',
-  stories: '/', events: '/events', team: '/about', faqs: '/faq',
+  events: '/events', team: '/about', faqs: '/faq',
   gallery: '/gallery', partners: '/', blog: '/blog', resources: '/resources',
   how_it_works: '/', scrolling_stories: '/', impact_story: '/',
   analytics_section: '/', cta_banner: '/', trust_band: '/',
@@ -1025,9 +1018,8 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
     { id: 'stats', label: 'Impact Stats', desc: 'Counter numbers shown below hero (e.g. 2,400+ Patients)', icon: LayoutDashboard, color: 'bg-emerald-100 text-emerald-700' },
     { id: 'initiatives', label: 'Initiative Cards', desc: 'Three main cause cards with images, descriptions, and links', icon: Heart, color: 'bg-red-100 text-red-700' },
     { id: 'testimonials', label: 'Testimonials', desc: 'Rotating quotes from donors, volunteers, and beneficiaries', icon: Star, color: 'bg-amber-100 text-amber-700' },
-    { id: 'stories', label: 'Impact Stories', desc: 'Featured success stories shown in the scrolling strip', icon: BookOpen, color: 'bg-purple-100 text-purple-700' },
     { id: 'partners', label: 'Partner Strip', desc: 'Scrolling list of partner organizations', icon: Handshake, color: 'bg-blue-100 text-blue-700' },
-    { id: 'blog', label: 'Latest Stories', desc: 'Blog posts shown in the "Latest Stories" section', icon: FileText, color: 'bg-pink-100 text-pink-700' },
+    { id: 'blog', label: 'Blog & Stories', desc: 'Manage blog posts. Flag up to 3 as "Featured" (Latest Stories) and 1 as "Impact Story".', icon: FileText, color: 'bg-pink-100 text-pink-700' },
     { id: 'settings', label: 'Site Settings', desc: 'Site name, announcement bar, social links, contact info', icon: Settings, color: 'bg-gray-100 text-gray-700' },
     { id: 'payment', label: 'Payment Settings', desc: 'Currency, donation limits, bank details, receipt prefix.', icon: CreditCard, color: 'bg-orange-100 text-orange-700' },
   ];
@@ -1035,7 +1027,7 @@ const LandingPageCMS = ({ onNavigate }: { onNavigate: (id: string) => void }) =>
   const dynamicSections = [
     { id: 'how_it_works', label: 'How It Works', desc: '3-step process (Choose → Donate → Impact). Editable steps, titles, descriptions.', icon: LayoutDashboard, color: 'bg-indigo-100 text-indigo-700' },
     { id: 'scrolling_stories', label: 'Story Strip', desc: 'Animated marquee pills (e.g. "Kalinda, 8 got school books").', icon: BookOpen, color: 'bg-cyan-100 text-cyan-700' },
-    { id: 'impact_story', label: 'Impact Story', desc: 'Featured case study with timeline card, milestones, and stats.', icon: Heart, color: 'bg-rose-100 text-rose-700' },
+    { id: 'impact_story', label: 'Impact Story', desc: 'Driven by the blog post you flag as "Impact Story". Edit here to set the fallback shown when none is flagged.', icon: Heart, color: 'bg-rose-100 text-rose-700' },
     { id: 'analytics_section', label: 'Analytics Infographic', desc: 'Bar charts, donut value, and sidebar stats for fund allocation.', icon: BarChart3, color: 'bg-violet-100 text-violet-700' },
     { id: 'cta_banner', label: 'CTA Banner', desc: 'Call-to-action headline, subtitle, and feature cards.', icon: Type, color: 'bg-lime-100 text-lime-700' },
     { id: 'trust_band', label: 'Trust Band', desc: 'NGO Registration, Direct Impact, Secure Payments, Transparency badges.', icon: Shield, color: 'bg-slate-100 text-slate-700' },
@@ -1372,6 +1364,9 @@ const OverviewDashboard = ({ counts, allData, onNavigate }: { counts: Record<str
     </div>
   );
 };
+
+// This module is a lazy chunk, so module scope runs on the first admin visit.
+loadAdminFonts();
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
