@@ -27,7 +27,14 @@ const CookieConsent = () => {
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="fixed bottom-0 left-0 right-0 z-[70] h-auto bg-[var(--white)] border-t border-[var(--border-color)] shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
+          // Cleared of two other fixed bottom bars, not just raised above them:
+          // MobileBottomNav (64px + safe-area, mobile only) and, on desktop,
+          // StickyDonationRibbon (60px, appears after ~30% scroll). Both used
+          // to share bottom-0 with this banner; z-[70] kept it invisibly stuck
+          // underneath them, so raising z-index alone would have made it start
+          // visibly overlapping the ribbon instead. Offsetting the position at
+          // each breakpoint avoids collision either way.
+          className="fixed bottom-[calc(64px+env(safe-area-inset-bottom))] lg:bottom-[60px] left-0 right-0 z-[998] h-auto bg-[var(--white)] border-t border-[var(--border-color)] shadow-[0_-4px_16px_rgba(0,0,0,0.08)]"
         >
           <div className="max-w-[1200px] mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
